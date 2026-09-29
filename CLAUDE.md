@@ -6,7 +6,7 @@ el código manda y este archivo debe actualizarse (ver sección final).
 
 ## Proyecto
 
-**Nombre:** ShopList
+**Nombre:** ShopLab
 **Descripción:** App de hogar para gestionar lista de la compra, despensa
 (existencias y caducidades) y recetas, con sugerencias de recetas según lo
 que hay en casa.

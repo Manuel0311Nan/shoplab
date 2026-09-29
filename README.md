@@ -1,4 +1,4 @@
-# ShopList
+# ShopLab
 
 Aplicación de hogar para gestionar la **lista de la compra**, la
 **despensa** (existencias y caducidades) y las **recetas**, con
