@@ -30,3 +30,9 @@ export const unauthorizedError = (code: string, message: string): AppError => ({
   code,
   message,
 });
+
+export const validationError = (code: string, message: string): AppError => ({
+  type: "validation",
+  code,
+  message,
+});
