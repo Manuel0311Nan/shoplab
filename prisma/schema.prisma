@@ -1,0 +1,38 @@
+generator client {
+    provider = "prisma-client"
+    output = "../src/generated/prisma"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model Hogar {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  nombre    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  miembros MiembroHogar[]
+}
+
+model Usuario {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  email     String   @unique
+  nombre    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  hogares MiembroHogar[]
+}
+
+model MiembroHogar {
+  hogarId   String   @db.Uuid
+  usuarioId String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  hogar   Hogar   @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@id([hogarId, usuarioId])
+}
