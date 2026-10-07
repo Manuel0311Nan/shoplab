@@ -21,6 +21,7 @@ const eslintConfig = [
       "src/generated/**",
     ],
   },
+  ...compat.extends("next/core-web-vitals", "next/typescript", "prettier"),
 ];
 
 export default eslintConfig;

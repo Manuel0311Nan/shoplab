@@ -31,11 +31,11 @@ consumirán otros clientes, como una futura app móvil (proyecto aparte).
 
 Tres niveles para lo que se compra y se guarda:
 
-| Nivel             | Qué es                                | Ejemplo                    |
-| ----------------- | ------------------------------------- | -------------------------- |
-| **Ingredient**    | Concepto canónico                     | Tomate                     |
-| **Product**       | Lo que se compra (marca/formato)      | Tomate triturado 400 g     |
-| **InventoryItem** | Lo que hay en casa                    | 2 botes, caduca 12/2026    |
+| Nivel             | Qué es                           | Ejemplo                 |
+| ----------------- | -------------------------------- | ----------------------- |
+| **Ingredient**    | Concepto canónico                | Tomate                  |
+| **Product**       | Lo que se compra (marca/formato) | Tomate triturado 400 g  |
+| **InventoryItem** | Lo que hay en casa               | 2 botes, caduca 12/2026 |
 
 Toda entidad de negocio pertenece a un hogar (`hogarId`), salvo el
 catálogo global de ingredientes y productos.
@@ -48,17 +48,18 @@ Actions delgadas que llaman a use cases).
 
 **Bounded contexts**
 
-| Contexto        | Responsabilidad                                        |
-| --------------- | ------------------------------------------------------ |
-| Catalog         | Ingredientes, productos, sinónimos, unidades           |
-| Pantry (core)   | Existencias, caducidades, consumo                      |
-| Shopping        | Listas de la compra e ítems                            |
-| Recipes         | Recetas e importación de recetarios                    |
-| Suggestions (core) | Puntuación y sugerencia de recetas                  |
-| Households      | Hogares, miembros, invitaciones                        |
-| Identity        | Autenticación web (cookie) y API (Bearer)              |
+| Contexto           | Responsabilidad                              |
+| ------------------ | -------------------------------------------- |
+| Catalog            | Ingredientes, productos, sinónimos, unidades |
+| Pantry (core)      | Existencias, caducidades, consumo            |
+| Shopping           | Listas de la compra e ítems                  |
+| Recipes            | Recetas e importación de recetarios          |
+| Suggestions (core) | Puntuación y sugerencia de recetas           |
+| Households         | Hogares, miembros, invitaciones              |
+| Identity           | Autenticación web (cookie) y API (Bearer)    |
 
 **Flujos entre contextos** (por eventos de dominio):
+
 - Comprar un ítem → entra en la despensa (`ShoppingItemPurchased`)
 - Cocinar una receta → descuenta de la despensa (`RecipeCooked`)
 
@@ -86,17 +87,17 @@ prisma/           schema y migraciones
 
 ## Stack
 
-| Área          | Tecnología                                        |
-| ------------- | ------------------------------------------------- |
-| Framework     | Next.js 15 (App Router), TypeScript estricto      |
-| Datos         | Prisma + PostgreSQL (Neon)                        |
-| Auth          | Auth.js v5 + tokens Bearer para la API            |
-| Validación    | Zod                                               |
-| UI            | Tailwind CSS, shadcn/ui, React Hook Form          |
-| Estado        | Zustand, TanStack Query (donde aporta)            |
-| Tests         | Vitest, Testing Library, Playwright               |
-| Calidad       | ESLint, Prettier, Husky + lint-staged             |
-| Hosting / CI  | Vercel, GitHub Actions                            |
+| Área         | Tecnología                                   |
+| ------------ | -------------------------------------------- |
+| Framework    | Next.js 15 (App Router), TypeScript estricto |
+| Datos        | Prisma + PostgreSQL (Neon)                   |
+| Auth         | Auth.js v5 + tokens Bearer para la API       |
+| Validación   | Zod                                          |
+| UI           | Tailwind CSS, shadcn/ui, React Hook Form     |
+| Estado       | Zustand, TanStack Query (donde aporta)       |
+| Tests        | Vitest, Testing Library, Playwright          |
+| Calidad      | ESLint, Prettier, Husky + lint-staged        |
+| Hosting / CI | Vercel, GitHub Actions                       |
 
 ## Puesta en marcha
 
@@ -112,34 +113,34 @@ pnpm dev
 
 ### Variables de entorno
 
-| Variable        | Uso                                           |
-| --------------- | --------------------------------------------- |
-| `DATABASE_URL`  | Conexión pooled a Postgres                    |
-| `DIRECT_URL`    | Conexión directa (Prisma Migrate)             |
-| `AUTH_SECRET`   | Firma de sesiones de Auth.js                  |
-| `AUTH_URL`      | URL base de la app                            |
+| Variable       | Uso                               |
+| -------------- | --------------------------------- |
+| `DATABASE_URL` | Conexión pooled a Postgres        |
+| `DIRECT_URL`   | Conexión directa (Prisma Migrate) |
+| `AUTH_SECRET`  | Firma de sesiones de Auth.js      |
+| `AUTH_URL`     | URL base de la app                |
 
 Se validan al arrancar en `src/env.ts`; si falta alguna, la app no
 inicia.
 
 ### Scripts
 
-| Script            | Qué hace                         |
-| ----------------- | -------------------------------- |
-| `pnpm dev`        | Servidor de desarrollo           |
-| `pnpm build`      | Build de producción              |
-| `pnpm lint`       | ESLint                           |
-| `pnpm typecheck`  | `tsc --noEmit`                   |
-| `pnpm test`       | Tests unitarios (Vitest)         |
-| `pnpm test:e2e`   | Tests e2e (Playwright)           |
+| Script           | Qué hace                 |
+| ---------------- | ------------------------ |
+| `pnpm dev`       | Servidor de desarrollo   |
+| `pnpm build`     | Build de producción      |
+| `pnpm lint`      | ESLint                   |
+| `pnpm typecheck` | `tsc --noEmit`           |
+| `pnpm test`      | Tests unitarios (Vitest) |
+| `pnpm test:e2e`  | Tests e2e (Playwright)   |
 
 ## Entornos y despliegue
 
-| Rama      | Entorno      | Despliegue         | BD (rama Neon) |
-| --------- | ------------ | ------------------ | -------------- |
-| PR        | preview      | Vercel preview     | preview        |
-| `develop` | staging      | Vercel             | staging        |
-| `main`    | producción   | Vercel             | main           |
+| Rama      | Entorno    | Despliegue     | BD (rama Neon) |
+| --------- | ---------- | -------------- | -------------- |
+| PR        | preview    | Vercel preview | preview        |
+| `develop` | staging    | Vercel         | staging        |
+| `main`    | producción | Vercel         | main           |
 
 `main` está protegida: PR + lint, typecheck y tests en verde.
 
@@ -156,6 +157,7 @@ inicia.
 ## Convenciones
 
 Resumen; el detalle está en `CLAUDE.md`:
+
 - Sin lógica de negocio en `app/`.
 - Errores de negocio con `Result<T>`, nunca `throw`.
 - Nada que solo funcione vía Server Action: todo existe en `/api/v1`.
