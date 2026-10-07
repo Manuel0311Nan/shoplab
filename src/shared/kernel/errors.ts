@@ -29,3 +29,9 @@ export const forbiddenError = (code: string, message: string): AppError => ({
   code,
   message,
 });
+
+export const unauthorizedError = (code: string, message: string): AppError => ({
+  type: "unauthorized",
+  code,
+  message,
+});
