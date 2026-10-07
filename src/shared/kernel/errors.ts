@@ -12,7 +12,7 @@ export interface AppError{
     readonly details?: Readonly<Record<string, unknown>>
 }
 
-export const notFounfError = (code: string, message: string): AppError => ({
+export const notFoundError = (code: string, message: string): AppError => ({
     type: "not_found",
     code,
     message
