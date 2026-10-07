@@ -21,6 +21,24 @@ const eslintConfig = [
       "src/generated/**",
     ],
   },
+  ...compat.extends("next/core-web-vitals", "next/typescript", "prettier"),
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/shared/kernel/**", "src/domains/*/infrastructure/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/shared/kernel/prisma", "@/shared/kernel/tenant-prisma", "@/generated/*"],
+              message: "Prisma solo se usa en infrastructure/. Desde aquí, llama a un use case.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 export default eslintConfig;

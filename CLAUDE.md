@@ -97,6 +97,7 @@ hay en casa: cantidad, caducidad, ubicación).
 Ningún PR toca más de un bounded context salvo refactors acordados.
 Integraciones esperadas, siempre vía eventos de dominio o use case
 orquestador, nunca importando repositorios ajenos:
+
 - `ShoppingItemPurchased` → Pantry crea/incrementa InventoryItem
 - `RecipeCooked` → Pantry descuenta ingredientes
 - Suggestions lee Pantry + Recipes mediante queries, no escribe en ellos
@@ -127,6 +128,7 @@ con hogar activo en el `AuthContext`>
 ## Sync
 
 Los clientes offline-first envían una cola de mutaciones. El backend:
+
 - Toda entidad sincronizable tiene `updatedAt` (lo pone el servidor) y
   `deletedAt` (soft delete; los borrados viajan como tombstones).
 - `GET /api/v1/sync?since=<cursor>` devuelve cambios + tombstones.
@@ -183,6 +185,7 @@ a otros hogares>
 ## Infraestructura
 
 **Decisión tomada:**
+
 - **Versionado:** GitHub. `main` = producción (protegida, PR + checks),
   `develop` = staging.
 - **Hosting:** Vercel (PR → preview, `develop` → staging, `main` →
