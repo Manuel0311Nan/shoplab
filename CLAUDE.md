@@ -22,7 +22,9 @@ API HTTP: todo lo que haga la web debe poder hacerse vía `/api/v1`.
   excepción justificada con comentario)
 - **Validación:** Zod en el borde (API input, Server Action input, env
   vars). Los esquemas de la API viven en `src/contracts`
-- **ORM / BD:** Prisma + PostgreSQL en Neon (una rama por entorno)
+- **ORM / BD:** Prisma 7 (fijado; migrar a Prisma 8 es decisión aparte)
+  con PostgreSQL en Neon vía `@prisma/adapter-neon`. Cliente generado en
+  `src/generated/prisma` (no se versiona; `postinstall` lo genera)
 - **Autenticación:** Auth.js (NextAuth v5) para la web; tokens Bearer
   para clientes de la API (ver Identity)
 - **Estado de cliente:** Zustand para estado UI local; estado de servidor
@@ -32,7 +34,8 @@ API HTTP: todo lo que haga la web debe poder hacerse vía `/api/v1`.
 - **Formularios:** React Hook Form + Zod resolver
 - **Testing:** Vitest (dominio) + Testing Library + Playwright (e2e
   críticos: login, lista → comprado → despensa, sugerencias, sync)
-- **Linter/formatter:** ESLint + Prettier, Husky + lint-staged
+- **Linter/formatter:** ESLint + Prettier (con `prettier-plugin-tailwindcss`),
+  Husky + lint-staged en pre-commit
 - **Documentación API:** OpenAPI generado desde `src/contracts`
 - **Futuro:** microservicio Python para canonicalización de ingredientes
   y NLP/ML, detrás de un puerto (`IngredientCanonicalizer`); hasta
@@ -45,16 +48,20 @@ entrega (UI + endpoints), nunca contiene reglas de negocio.
 
 ```
 src/
+  env.ts              → única lectura de process.env (validada con Zod)
   contracts/          → esquemas Zod + tipos DTO de /api/v1 (sin Prisma)
+  generated/prisma/   → cliente Prisma generado (gitignored)
   domains/<bounded-context>/
     domain/           → entidades, value objects, eventos de dominio
     application/      → use cases (commands/queries), puertos
     infrastructure/   → repositorios Prisma, adaptadores externos
   shared/
-    kernel/           → Result<T>, errores base, auth-context, tenant
+    kernel/           → Result, errores, Unidad/Cantidad, auth-context,
+                        prisma (singleton), tenant-prisma, TenantRepository
     sync/             → motor de sincronización (ver Sync)
     ui/               → componentes UI agnósticos de dominio
   app/
+    api/_lib/           → helpers privados de la API (Result → HTTP)
     api/v1/.../route.ts → API pública
     (rutas)/page.tsx    → Server Components que llaman use cases
     actions/            → Server Actions (solo web), delgadas
@@ -63,6 +70,10 @@ src/
 Regla dura: ni `route.ts` ni `page.tsx` ni una Server Action contienen
 lógica de negocio. Validan input → llaman a un use case → mapean
 resultado.
+
+Regla aplicada por ESLint (`no-restricted-imports`): Prisma y
+`@/generated/*` solo se importan desde `shared/kernel` e
+`infrastructure/`.
 
 ## API pública (decisión tomada)
 
@@ -86,13 +97,18 @@ hay en casa: cantidad, caducidad, ubicación).
 
 - **Catalog**: Ingredient y Product, sinónimos, unidades y conversiones
 - **Pantry** (core): InventoryItem, caducidades, consumo
-- **Shopping**: listas, ítems, estado comprado, lista por tienda/pasillo
+- **Shopping**: listas, ítems, estado comprado, lista por tienda/pasillo.
+  Un ítem tiene `nombre` libre + `ingredientId` opcional (se vincula con
+  Catalog cuando exista)
 - **Recipes**: recetas e ingredientes de receta (referencian Ingredient)
 - **Suggestions** (core): motor de puntuación de recetas según despensa,
   caducidades próximas y preferencias. Detalle en
   `src/domains/suggestions/README.md`
 - **Households**: hogar, miembros, invitaciones (tenant)
 - **Identity**: autenticación web y por token
+
+Conceptos compartidos entre contextos (Unidad, Cantidad) viven en
+`shared/kernel` (shared kernel de DDD).
 
 Ningún PR toca más de un bounded context salvo refactors acordados.
 Integraciones esperadas, siempre vía eventos de dominio o use case
@@ -120,8 +136,12 @@ con hogar activo en el `AuthContext`>
 - Clientes de la API: <PENDING: mecanismo concreto — por defecto access
   token JWT corto + refresh token rotativo persistido, emitidos por
   `/api/v1/auth/token`>.
-- `getAuthContext(request)` resuelve cookie **o** Bearer y devuelve el
-  mismo `AuthContext { userId, hogarId }`. Los handlers no distinguen.
+- `getAuthContext(): Promise<Result<AuthContext>>`, sin parámetros: lee
+  cookie o Bearer con `next/headers` y devuelve el mismo
+  `AuthContext { userId, hogarId }`. Los handlers no distinguen. Hasta la
+  fase 5 devuelve una identidad de desarrollo
+  (`shared/kernel/dev-identity.ts`, creada por `prisma/seed.ts`),
+  bloqueada si `NODE_ENV === "production"`.
 - Email (invitaciones, reset) detrás del puerto `EmailSender`
   <PENDING: proveedor>.
 
@@ -162,6 +182,11 @@ a otros hogares>
 8. **Tests**: `MethodName_Scenario_ExpectedResult`; dominio con fakes.
 9. **Commits**: Conventional Commits.
 10. **Imports**: alias `@/` desde `src/`.
+11. **TypeScript**: `noUncheckedIndexedAccess` activo; se comprueba el
+    `undefined`, nunca se usa `!`.
+12. **Tests**: junto al archivo que prueban (`x.ts` → `x.test.ts`).
+13. **Value Objects**: tipo marcado (`unique symbol`) para que solo
+    `create()` pueda producirlos.
 
 ## Qué NO hacer
 
@@ -172,8 +197,16 @@ a otros hogares>
 - No generar IDs solo en servidor para entidades creables offline.
 - No romper `/api/v1` (renombrar campos, cambiar tipos): se versiona.
 - No leer cookies/headers fuera de `app/` y `shared/kernel/auth-context`.
-- No guardar cantidades sin unidad ni texto libre donde va un Ingredient.
+- No guardar cantidades sin unidad ni texto libre donde va un Ingredient
+  (aplica a Pantry y Recipes; Shopping admite `nombre` libre).
 - No llamar al microservicio Python directamente: siempre vía su puerto.
+- No importar `prisma` del kernel en repositorios de modelos de hogar:
+  usar `this.db` de `TenantRepository`.
+- No usar `$queryRaw`/`$executeRaw` sobre tablas de hogar sin filtrar
+  `hogarId` explícitamente.
+- No incluir `hogarId` en los datos de un `update`.
+- No editar ni borrar una migración ya aplicada: siempre una nueva.
+- No aceptar un reset de `prisma migrate dev` mientras local use `main`.
 
 ## Seguridad y configuración
 
@@ -196,9 +229,21 @@ a otros hogares>
   integración nativa de Vercel.
 - **Entornos:** development → staging (`develop`) → production (`main`).
 
-Variables (referencia, nunca valores reales): `DATABASE_URL` (pooled),
-`DIRECT_URL` (Prisma Migrate), `AUTH_SECRET`, `AUTH_URL`, credenciales
-del proveedor de email, secretos de firma de tokens de la API.
+Variables (referencia, nunca valores reales): `DATABASE_URL` (pooled, la
+app) y `DATABASE_URL_UNPOOLED` (directa, CLI de Prisma vía
+`prisma.config.ts`), nombres de la integración Neon ↔ Vercel;
+`AUTH_SECRET`, `AUTH_URL`, credenciales del proveedor de email, secretos
+de firma de tokens de la API.
+
+<PENDING: local trabaja contra la rama `main` de Neon. Antes del primer
+usuario real: `.env.local` pasa a la rama `development` y se borran de
+`main` las filas del seed>
+
+- Migraciones: `migrate dev` solo en local; producción con
+  `migrate deploy` en el despliegue <PENDING: script en el build de Vercel>.
+  En Prisma 7, `generate` y `db seed` se ejecutan siempre a mano.
+- CI: necesita `DATABASE_URL`/`DATABASE_URL_UNPOOLED` falsas porque
+  `prisma generate` (postinstall) carga `prisma.config.ts`.
 
 ## How to evolve this file
 
