@@ -1,21 +1,18 @@
 import { fileURLToPath } from "node:url";
 import nextEnv from "@next/env";
 import { defineConfig } from "vitest/config";
+import { urlDeTest } from "./scripts/test-db";
 
 // Lee .env.local, igual que prisma.config.ts.
 nextEnv.loadEnvConfig(process.cwd());
 
-const testDatabaseUrl = process.env.TEST_DATABASE_URL;
-if (!testDatabaseUrl) {
-  throw new Error(
-    "Define TEST_DATABASE_URL en .env.local: la URL de una rama de Neon SOLO para tests " +
-      "(los tests crean y borran datos).",
-  );
-}
+// Falla si falta o si apunta a la base de datos de la app.
+const testDatabaseUrl = urlDeTest("TEST_DATABASE_URL");
 
 /**
- * Tests de integración: repositorios contra una base de datos real.
- * `pnpm test:integration`. No forman parte de `pnpm test` ni de la CI (de momento).
+ * Tests de integración: repositorios contra una base de datos real (rama de Neon de test).
+ * Local: `pnpm db:migrate:test` (una vez por migración nueva) y `pnpm test:integration`.
+ * CI: job `integration` de ci.yml, con los secretos TEST_DATABASE_URL(_UNPOOLED).
  */
 export default defineConfig({
   resolve: {
@@ -34,7 +31,7 @@ export default defineConfig({
     env: {
       NODE_ENV: "test",
       DATABASE_URL: testDatabaseUrl,
-      DATABASE_URL_UNPOOLED: testDatabaseUrl,
+      DATABASE_URL_UNPOOLED: process.env.TEST_DATABASE_URL_UNPOOLED ?? testDatabaseUrl,
     },
   },
 });

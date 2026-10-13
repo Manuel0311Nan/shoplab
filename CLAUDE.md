@@ -212,7 +212,8 @@ a otros hogares>
 12. **Tests**: junto al archivo que prueban (`x.ts` → `x.test.ts`).
     Cada puerto de repositorio tiene una suite de contrato en `testing/`
     que pasan el fake en memoria (`pnpm test`) y Prisma
-    (`pnpm test:integration`, contra `TEST_DATABASE_URL`). La CI exige
+    (`pnpm test:integration`, contra `TEST_DATABASE_URL`; antes,
+    `pnpm db:migrate:test`, que se niega si apunta a la rama de la app). La CI exige
     cobertura ≥ 95 % de líneas en domain, application, kernel y `api/_lib`.
 13. **Value Objects**: tipo marcado (`unique symbol`) para que solo
     `create()` pueda producirlos.
@@ -235,6 +236,8 @@ a otros hogares>
   `hogarId` explícitamente.
 - No incluir `hogarId` en los datos de un `update`.
 - No editar ni borrar una migración ya aplicada: siempre una nueva.
+- No cambiar `schema.prisma` sin su migración: el job `migrations` de la CI
+  aplica todas sobre un Postgres vacío y falla si hay drift.
 - No escribir un Route Handler sin `apiRoute`.
 - No añadir comportamiento a un fake sin cubrirlo en la suite de contrato.
 - No aceptar un reset de `prisma migrate dev` mientras local use `main`.
