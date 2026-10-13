@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { AHORA, ITEM_ID, USUARIO_ID, cantidad, listaVacia } from "../testing/builders";
+import { AHORA, ITEM_ID, USUARIO_ID, cantidad, item, lista, listaVacia } from "../testing/builders";
+import { MAX_ITEMS_POR_LISTA } from "./shopping-list";
 
 describe("ShoppingList", () => {
   it("agregarItem_ConDatosValidos_AñadeUnItemPendiente", () => {
@@ -32,13 +33,13 @@ describe("ShoppingList", () => {
     expect(result).toMatchObject({ ok: false, error: { code: "ITEM_YA_EXISTE" } });
   });
 
-  it("marcarComprado_DosVeces_ConservaLaPrimeraFecha", () => {
+  it("actualizarItem_CompradoDosVeces_ConservaLaPrimeraFecha", () => {
     const lista = listaVacia();
     lista.agregarItem({ id: ITEM_ID, nombre: "Pan", cantidad: cantidad(1, "unidad") }, AHORA);
     const despues = new Date(AHORA.getTime() + 60_000);
 
-    lista.marcarComprado(ITEM_ID, USUARIO_ID, AHORA);
-    lista.marcarComprado(ITEM_ID, USUARIO_ID, despues);
+    lista.actualizarItem(ITEM_ID, { comprado: true }, USUARIO_ID, AHORA);
+    lista.actualizarItem(ITEM_ID, { comprado: true }, USUARIO_ID, despues);
     expect(lista.itemsActivos()[0]?.toSnapshot().compradoAt).toEqual(AHORA);
   });
 
@@ -81,5 +82,29 @@ describe("ShoppingList", () => {
 
     expect(result).toMatchObject({ ok: false, error: { code: "LISTA_ARCHIVADA" } });
     expect(lista.itemsModificados()).toHaveLength(0);
+  });
+
+  it("agregarItem_ListaLlena_DevuelveListaLlena", () => {
+    const llena = lista(
+      Array.from({ length: MAX_ITEMS_POR_LISTA }, (_, i) =>
+        item({ id: `0199c000-0000-7000-8000-${String(1000 + i).padStart(12, "0")}` }),
+      ),
+    );
+
+    const result = llena.agregarItem(
+      { id: ITEM_ID, nombre: "Uno más", cantidad: cantidad(1, "unidad") },
+      AHORA,
+    );
+
+    expect(result).toMatchObject({ ok: false, error: { code: "LISTA_LLENA" } });
+  });
+
+  it("actualizarItem_ItemQuitado_DevuelveItemNoEncontrado", () => {
+    const conItem = lista([item()]);
+    conItem.quitarItem(ITEM_ID, AHORA);
+
+    const result = conItem.actualizarItem(ITEM_ID, { comprado: true }, USUARIO_ID, AHORA);
+
+    expect(result).toMatchObject({ ok: false, error: { code: "ITEM_NO_ENCONTRADO" } });
   });
 });

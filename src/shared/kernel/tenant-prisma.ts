@@ -1,15 +1,6 @@
 import "server-only";
-import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "./prisma";
-
-/**
- * Modelos que pertenecen a un hogar. Todo modelo con columna `hogarId`
- * que sea dato de un hogar DEBE estar aquí.
- */
-const TENANT_MODELS: ReadonlySet<Prisma.ModelName> = new Set<Prisma.ModelName>([
-  "ShoppingList",
-  "ShoppingItem",
-]);
+import { TENANT_MODELS } from "./tenant-models";
 
 type TenantArgs = {
   where?: Record<string, unknown>;

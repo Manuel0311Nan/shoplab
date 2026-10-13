@@ -54,14 +54,16 @@ src/
   domains/<bounded-context>/
     domain/           → entidades, value objects, eventos de dominio
     application/      → use cases (commands/queries), puertos
-    infrastructure/   → repositorios Prisma, adaptadores externos
+    infrastructure/   → repositorios Prisma, adaptadores externos, <contexto>-module.ts
+    testing/          → builders, fakes en memoria, suites de contrato
   shared/
     kernel/           → Result, errores, Unidad/Cantidad, auth-context,
-                        prisma (singleton), tenant-prisma, TenantRepository
+                        prisma (singleton), tenant-prisma, tenant-models, TenantRepository
+    lib/              → utilidades de UI (cn)
     sync/             → motor de sincronización (ver Sync)
     ui/               → componentes UI agnósticos de dominio
   app/
-    api/_lib/           → helpers privados de la API (Result → HTTP)
+    api/_lib/           → apiRoute(), parse, Result → HTTP
     api/v1/.../route.ts → API pública
     (rutas)/page.tsx    → Server Components que llaman use cases
     actions/            → Server Actions (solo web), delgadas
@@ -71,9 +73,20 @@ Regla dura: ni `route.ts` ni `page.tsx` ni una Server Action contienen
 lógica de negocio. Validan input → llaman a un use case → mapean
 resultado.
 
-Regla aplicada por ESLint (`no-restricted-imports`): Prisma y
-`@/generated/*` solo se importan desde `shared/kernel` e
-`infrastructure/`.
+Reglas aplicadas por ESLint:
+
+- `no-restricted-imports`: Prisma y `@/generated/*` solo desde
+  `shared/kernel` e `infrastructure/`.
+- `boundaries/dependencies`: `domain` → kernel; `application` → domain y
+  kernel; `infrastructure` → application, domain, kernel, generated y env;
+  `kernel` → generated y env; `ui` → `shared/lib`. Entre capas de
+  `domains/`, solo dentro del mismo contexto. Los tests pueden importar
+  `testing/` y el kernel.
+
+Route Handlers: siempre con `apiRoute({ ids, body }, handler)`, que
+autentica, valida ids (UUID) y cuerpo, y convierte excepciones en 500
+con el contrato de error. El handler solo llama al use case y mapea con
+`mapResult`.
 
 ## API pública (decisión tomada)
 
@@ -125,6 +138,18 @@ de negocio. `shared/kernel/tenant-prisma.ts` (Prisma Client Extension) lo
 inyecta en toda query sobre modelos tenant-scoped; `TenantRepository` es
 la base para `infrastructure`. Catalog es global (no tenant-scoped),
 salvo productos personalizados del hogar.
+Todo modelo con `hogarId` va en `TENANT_MODELS` o en `TENANT_EXCLUDED`
+(con motivo), en `shared/kernel/tenant-models.ts`. Lo comprueba
+`tenant-models.test.ts` leyendo el schema.
+
+Lo que la extensión **no** filtra:
+
+- `include`/`select` de relaciones (las consultas anidadas no pasan por
+  la extensión). Solo es seguro si el padre ya está filtrado.
+- `$queryRaw`/`$executeRaw`.
+- Un `upsert` con un id de otro hogar no lo modifica, pero falla con un
+  error de clave primaria (500).
+
 <PENDING: ¿un usuario puede pertenecer a varios hogares? — por defecto sí,
 con hogar activo en el `AuthContext`>
 
@@ -185,6 +210,10 @@ a otros hogares>
 11. **TypeScript**: `noUncheckedIndexedAccess` activo; se comprueba el
     `undefined`, nunca se usa `!`.
 12. **Tests**: junto al archivo que prueban (`x.ts` → `x.test.ts`).
+    Cada puerto de repositorio tiene una suite de contrato en `testing/`
+    que pasan el fake en memoria (`pnpm test`) y Prisma
+    (`pnpm test:integration`, contra `TEST_DATABASE_URL`). La CI exige
+    cobertura ≥ 95 % de líneas en domain, application, kernel y `api/_lib`.
 13. **Value Objects**: tipo marcado (`unique symbol`) para que solo
     `create()` pueda producirlos.
 
@@ -206,6 +235,8 @@ a otros hogares>
   `hogarId` explícitamente.
 - No incluir `hogarId` en los datos de un `update`.
 - No editar ni borrar una migración ya aplicada: siempre una nueva.
+- No escribir un Route Handler sin `apiRoute`.
+- No añadir comportamiento a un fake sin cubrirlo en la suite de contrato.
 - No aceptar un reset de `prisma migrate dev` mientras local use `main`.
 
 ## Seguridad y configuración
