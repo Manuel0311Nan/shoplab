@@ -14,6 +14,8 @@ model Hogar {
   updatedAt DateTime @updatedAt
 
   miembros MiembroHogar[]
+  listas        ShoppingList[]   // ← nuevo
+  shoppingItems ShoppingItem[] 
 }
 
 model Usuario {
@@ -24,6 +26,8 @@ model Usuario {
   updatedAt DateTime @updatedAt
 
   hogares MiembroHogar[]
+  itemsComprados ShoppingItem[]
+
 }
 
 model MiembroHogar {
@@ -35,4 +39,44 @@ model MiembroHogar {
   usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@id([hogarId, usuarioId])
+}
+
+enum Unidad {
+  unidad
+  g
+  kg
+  ml
+  l
+}
+model ShoppingList {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  hogarId     String    @db.Uuid
+  nombre      String
+  archivadaAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  hogar Hogar          @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+  items ShoppingItem[]
+  @@index([hogarId, updatedAt])
+}
+model ShoppingItem {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  hogarId        String    @db.Uuid
+  listaId        String    @db.Uuid
+  nombre         String
+  ingredientId   String?   @db.Uuid
+  cantidadValor  Decimal   @db.Decimal(10, 3)
+  cantidadUnidad Unidad
+  nota           String?
+  compradoAt     DateTime?
+  compradoPorId  String?   @db.Uuid
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+  hogar       Hogar        @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+  lista       ShoppingList @relation(fields: [listaId], references: [id], onDelete: Cascade)
+  compradoPor Usuario?     @relation(fields: [compradoPorId], references: [id], onDelete: SetNull)
+  @@index([listaId, deletedAt])
+  @@index([hogarId, updatedAt])
 }

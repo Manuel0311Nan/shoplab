@@ -61,8 +61,8 @@ importers:
         specifier: ^3
         version: 3.3.7
       '@next/env':
-        specifier: ^16.3.7
-        version: 16.3.7
+        specifier: ^15.5.26
+        version: 15.5.26
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.3.3
@@ -824,9 +824,6 @@ packages:
 
   '@next/env@15.5.26':
     resolution: {integrity: sha512-NJBz9q10LU9h3KjHLEbdgWIV+ow/x+MYzKBRfqhm9/QmML3tPMhYmXF/UIV9SDVCNtOqFNc5oX7kZqeiigMCEA==}
-
-  '@next/env@16.3.7':
-    resolution: {integrity: sha512-/HuhBN1CorqNTmewTIh81yXOQri6B8Ye/c9D7+830XqwVaf8qMnJNrgNxDn6dLtihq8YzBbI6NSAuMKvpr+DvQ==}
 
   '@next/eslint-plugin-next@15.5.26':
     resolution: {integrity: sha512-xeVpG8CbnTf9IelaFbZQ7TN4BXHV2x+ejnXXbY7Z4kD+sgJ8j97psraV+4/fGjLCjNQuEofUHMeIeieDMyKO/w==}
@@ -4723,8 +4720,6 @@ snapshots:
   '@neondatabase/serverless@1.1.0': {}
 
   '@next/env@15.5.26': {}
-
-  '@next/env@16.3.7': {}
 
   '@next/eslint-plugin-next@15.5.26':
     dependencies:

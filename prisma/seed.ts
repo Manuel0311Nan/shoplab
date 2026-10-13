@@ -1,8 +1,9 @@
-import { loadEnvConfig } from "@next/env";
+import nextEnv from "@next/env";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "../src/generated/prisma/client";
-import { DEV_HOGAR_ID, DEV_USER_ID } from "../src/shared/kernel/dev-identity";
+import { DEV_HOGAR_ID, DEV_LISTA_ID, DEV_USER_ID } from "../src/shared/kernel/dev-identity";
 
+const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd());
 
 const connectionString = process.env.DATABASE_URL;
@@ -33,7 +34,13 @@ async function main() {
     create: { hogarId: DEV_HOGAR_ID, usuarioId: DEV_USER_ID },
   });
 
-  console.log("Seed completado: hogar y usuario de desarrollo listos");
+  await prisma.shoppingList.upsert({
+    where: { id: DEV_LISTA_ID },
+    update: {},
+    create: { id: DEV_LISTA_ID, hogarId: DEV_HOGAR_ID, nombre: "Lista de la compra" },
+  });
+
+  console.log("Seed completado: hogar, usuario y lista de desarrollo listos");
 }
 
 try {

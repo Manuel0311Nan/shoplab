@@ -1,0 +1,23 @@
+@base = http://localhost:3000/api/v1
+@lista = 0199b000-0000-7000-8000-000000000003
+
+### Ver la lista
+GET {{base}}/lists/{{lista}}
+
+### Añadir un producto
+POST {{base}}/lists/{{lista}}/items
+Content-Type: application/json
+
+{ "nombre": "Leche", "cantidad": { "valor": 2, "unidad": "l" } }
+
+### Marcar como comprado (sustituye el id)
+PATCH {{base}}/lists/{{lista}}/items/PEGA-AQUI-EL-ID
+Content-Type: application/json
+
+{ "comprado": true }
+
+### Error de validación esperado: 400
+POST {{base}}/lists/{{lista}}/items
+Content-Type: application/json
+
+{ "nombre": "", "cantidad": { "valor": -1, "unidad": "docena" } }

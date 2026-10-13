@@ -7,7 +7,8 @@ import { prisma } from "./prisma";
  * que sea dato de un hogar DEBE estar aquí.
  */
 const TENANT_MODELS: ReadonlySet<Prisma.ModelName> = new Set<Prisma.ModelName>([
-  // Se irán añadiendo: "ShoppingList", "ShoppingItem", "InventoryItem"…
+  "ShoppingList",
+  "ShoppingItem",
 ]);
 
 type TenantArgs = {
