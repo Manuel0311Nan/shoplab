@@ -8,7 +8,8 @@ Es a la vez la aplicación web y la **API pública** (`/api/v1`) que
 consumirán otros clientes, como una futura app móvil (proyecto aparte).
 
 > Las decisiones de arquitectura y convenciones para desarrollar están en
-> [`CLAUDE.md`](./CLAUDE.md). Este README es la visión general.
+> [`CLAUDE.md`](./CLAUDE.md), y las buenas prácticas generales en
+> [`AGENTS.md`](./AGENTS.md). Este README es la visión general.
 
 ---
 

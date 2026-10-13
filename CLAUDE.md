@@ -4,6 +4,9 @@ Memoria persistente del proyecto. Léelo al inicio de cada sesión. Documenta
 decisiones tomadas, no aspiraciones. Si el código contradice este archivo,
 el código manda y este archivo debe actualizarse (ver sección final).
 
+Las buenas prácticas generales (reutilizables en otros proyectos) están en
+@AGENTS.md. Este archivo recoge solo lo específico de ShopLab.
+
 ## Proyecto
 
 **Nombre:** ShopLab
