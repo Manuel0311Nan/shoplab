@@ -15,6 +15,9 @@ export const ShoppingErrors = {
   nombreNoValido: (max: number) =>
     validationError("NOMBRE_NO_VALIDO", `El nombre debe tener entre 1 y ${max} caracteres`),
 
+  sinCambios: () =>
+    validationError("SIN_CAMBIOS", "Indica al menos un cambio: cantidad o comprado"),
+
   notaNoValida: (max: number) =>
     validationError("NOTA_NO_VALIDA", `La nota admite como máximo ${max} caracteres`),
 };

@@ -11,6 +11,12 @@ export interface ShoppingListSnapshot {
   readonly updatedAt: Date;
 }
 
+/** Cambios parciales de un ítem. Los campos ausentes no se tocan. */
+export interface CambiosItem {
+  readonly cantidad?: Cantidad;
+  readonly comprado?: boolean;
+}
+
 export const MAX_ITEMS_POR_LISTA = 200;
 
 export class ShoppingList {
@@ -61,6 +67,23 @@ export class ShoppingList {
 
   cambiarCantidad(itemId: string, cantidad: Cantidad, ahora: Date): Result<ShoppingItem> {
     return this.modificarItem(itemId, ahora, (item) => item.cambiarCantidad(cantidad, ahora));
+  }
+
+  /**
+   * Aplica varios cambios a un ítem como una sola operación: se valida una vez
+   * (lista no archivada, ítem existente) y se aplican todos o ninguno.
+   */
+  actualizarItem(
+    itemId: string,
+    cambios: CambiosItem,
+    usuarioId: string,
+    ahora: Date,
+  ): Result<ShoppingItem> {
+    return this.modificarItem(itemId, ahora, (item) => {
+      if (cambios.cantidad !== undefined) item.cambiarCantidad(cambios.cantidad, ahora);
+      if (cambios.comprado === true) item.marcarComprado(usuarioId, ahora);
+      if (cambios.comprado === false) item.desmarcarComprado(ahora);
+    });
   }
 
   quitarItem(itemId: string, ahora: Date): Result<ShoppingItem> {

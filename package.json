@@ -9,9 +9,10 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
+    "db:format": "prisma format",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "format": "prettier --write .",
@@ -25,7 +26,8 @@
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{json,md,css,mjs}": "prettier --write"
+    "*.{json,md,css,mjs,yml}": "prettier --write",
+    "prisma/schema.prisma": "prisma format --schema"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

@@ -49,4 +49,37 @@ describe("ShoppingList", () => {
     expect(lista.itemsActivos()).toHaveLength(0);
     expect(lista.itemsModificados()[0]?.deletedAt).toEqual(AHORA);
   });
+
+  it("actualizarItem_ConCantidadYComprado_AplicaAmbosCambios", () => {
+    const lista = listaVacia();
+    lista.agregarItem({ id: ITEM_ID, nombre: "Pan", cantidad: cantidad(1, "unidad") }, AHORA);
+
+    const result = lista.actualizarItem(
+      ITEM_ID,
+      { cantidad: cantidad(3, "unidad"), comprado: true },
+      USUARIO_ID,
+      AHORA,
+    );
+
+    expect(result.ok).toBe(true);
+    expect(lista.itemsActivos()[0]?.toSnapshot()).toMatchObject({
+      cantidad: { valor: 3, unidad: "unidad" },
+      compradoAt: AHORA,
+      compradoPorId: USUARIO_ID,
+    });
+  });
+
+  it("actualizarItem_EnListaArchivada_NoAplicaNingunCambio", () => {
+    const lista = listaVacia({ archivada: true });
+
+    const result = lista.actualizarItem(
+      ITEM_ID,
+      { cantidad: cantidad(3, "unidad"), comprado: true },
+      USUARIO_ID,
+      AHORA,
+    );
+
+    expect(result).toMatchObject({ ok: false, error: { code: "LISTA_ARCHIVADA" } });
+    expect(lista.itemsModificados()).toHaveLength(0);
+  });
 });

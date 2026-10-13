@@ -1,0 +1,8 @@
+# Todo el texto se guarda en el repo con LF, también desde Windows.
+# Evita que Prettier y la CI vean "cambios" que solo son finales de línea.
+* text=auto eol=lf
+
+*.ico binary
+*.png binary
+*.jpg binary
+*.pdf binary
