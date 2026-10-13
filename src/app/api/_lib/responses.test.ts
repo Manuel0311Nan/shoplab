@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { errorResponseSchema } from "@/contracts/error";
 import type { ErrorType } from "@/shared/kernel/errors";
 import { err, ok } from "@/shared/kernel/result";
-import { errorResponse, resultResponse } from "./responses";
+import { errorResponse, noContentResponse, resultResponse } from "./responses";
 
 describe("resultResponse", () => {
   it("resultResponse_ConExito_Devuelve200ConElValor", async () => {
@@ -43,5 +43,14 @@ describe("errorResponse", () => {
 
     expect(() => errorResponseSchema.parse(body)).not.toThrow();
     expect(body.error).not.toHaveProperty("type");
+  });
+});
+
+describe("noContentResponse", () => {
+  it("noContentResponse_SinArgumentos_Devuelve204SinCuerpo", async () => {
+    const response = noContentResponse();
+
+    expect(response.status).toBe(204);
+    expect(await response.text()).toBe("");
   });
 });

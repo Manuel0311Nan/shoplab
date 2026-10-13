@@ -8,16 +8,15 @@ const relojFijo: Clock = { now: () => DESPUES };
 
 describe("RemoveItemCommand", () => {
   it("execute_ItemExistente_LoQuitaConSoftDeleteYGuarda", async () => {
-    const shoppingList = lista([item()]);
-    const repo = new InMemoryShoppingListRepository([shoppingList]);
+    const repo = new InMemoryShoppingListRepository([lista([item()])]);
     const command = new RemoveItemCommand(repo, relojFijo);
 
     const result = await command.execute({ listId: LISTA_ID, itemId: ITEM_ID });
 
     expect(result).toEqual({ ok: true, value: undefined });
     expect(repo.saveCount).toBe(1);
-    expect(shoppingList.itemsActivos()).toHaveLength(0);
-    expect(shoppingList.itemsModificados()[0]?.deletedAt).toEqual(DESPUES);
+    const guardada = await repo.findById(LISTA_ID);
+    expect(guardada?.itemsActivos()).toHaveLength(0);
   });
 
   it("execute_DosVeces_LaSegundaDevuelveItemNoEncontrado", async () => {

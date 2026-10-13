@@ -57,18 +57,6 @@ export class ShoppingList {
     return item;
   }
 
-  marcarComprado(itemId: string, usuarioId: string, ahora: Date): Result<ShoppingItem> {
-    return this.modificarItem(itemId, ahora, (item) => item.marcarComprado(usuarioId, ahora));
-  }
-
-  desmarcarComprado(itemId: string, ahora: Date): Result<ShoppingItem> {
-    return this.modificarItem(itemId, ahora, (item) => item.desmarcarComprado(ahora));
-  }
-
-  cambiarCantidad(itemId: string, cantidad: Cantidad, ahora: Date): Result<ShoppingItem> {
-    return this.modificarItem(itemId, ahora, (item) => item.cambiarCantidad(cantidad, ahora));
-  }
-
   /**
    * Aplica varios cambios a un ítem como una sola operación: se valida una vez
    * (lista no archivada, ítem existente) y se aplican todos o ninguno.
