@@ -31,8 +31,13 @@ export const unauthorizedError = (code: string, message: string): AppError => ({
   message,
 });
 
-export const validationError = (code: string, message: string): AppError => ({
+export const validationError = (
+  code: string,
+  message: string,
+  details?: Readonly<Record<string, unknown>>,
+): AppError => ({
   type: "validation",
   code,
   message,
+  details,
 });

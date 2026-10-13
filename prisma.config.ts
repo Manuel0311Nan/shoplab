@@ -1,6 +1,7 @@
-import { loadEnvConfig } from "@next/env";
+import nextEnv from "@next/env";
 import { defineConfig, env } from "prisma/config";
 
+const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd());
 
 export default defineConfig({
