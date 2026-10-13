@@ -44,5 +44,5 @@ next-env.d.ts
 # prisma
 /src/generated/
 
-# Doumentación propia
+# Guías en PDF (material propio, no se versiona). El resto de docs/ sí.
 /docs/*.pdf

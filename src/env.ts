@@ -3,8 +3,10 @@ import { z } from "zod";
 
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  /** Conexión con pooling: la usa la app. */
   DATABASE_URL: z.url(),
-  DIRECT_URL: z.url(),
+  /** Conexión directa: la usa la CLI de Prisma (prisma.config.ts). La integración Neon↔Vercel la define siempre. */
+  DATABASE_URL_UNPOOLED: z.url(),
 });
 
 const parsed = envSchema.safeParse(process.env);
