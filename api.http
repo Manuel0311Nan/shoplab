@@ -1,5 +1,7 @@
 @base = http://localhost:3000/api/v1
 @lista = 0199b000-0000-7000-8000-000000000003
+# Pega aquí el id que devuelve "Añadir un producto"
+@item = PEGA-AQUI-EL-ID
 
 ### Ver la lista
 GET {{base}}/lists/{{lista}}
@@ -10,14 +12,38 @@ Content-Type: application/json
 
 { "nombre": "Leche", "cantidad": { "valor": 2, "unidad": "l" } }
 
-### Marcar como comprado (sustituye el id)
-PATCH {{base}}/lists/{{lista}}/items/PEGA-AQUI-EL-ID
+### Marcar como comprado
+PATCH {{base}}/lists/{{lista}}/items/{{item}}
 Content-Type: application/json
 
 { "comprado": true }
+
+### Desmarcar (volver a "por comprar")
+PATCH {{base}}/lists/{{lista}}/items/{{item}}
+Content-Type: application/json
+
+{ "comprado": false }
+
+### Cambiar la cantidad
+PATCH {{base}}/lists/{{lista}}/items/{{item}}
+Content-Type: application/json
+
+{ "cantidad": { "valor": 3, "unidad": "l" } }
+
+### Quitar un producto (soft delete): 204
+DELETE {{base}}/lists/{{lista}}/items/{{item}}
 
 ### Error de validación esperado: 400
 POST {{base}}/lists/{{lista}}/items
 Content-Type: application/json
 
 { "nombre": "", "cantidad": { "valor": -1, "unidad": "docena" } }
+
+### PATCH sin campos: 400
+PATCH {{base}}/lists/{{lista}}/items/{{item}}
+Content-Type: application/json
+
+{}
+
+### Lista que no existe (o de otro hogar): 404
+GET {{base}}/lists/0199b000-0000-7000-8000-0000000000ff
