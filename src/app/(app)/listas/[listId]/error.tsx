@@ -17,7 +17,7 @@ export default function ListError({ error, reset }: Props) {
   }, [error]);
 
   return (
-    <div role="alert" className="mx-auto flex max-w-xl flex-col gap-3 p-4">
+    <div role="alert" className="mx-auto flex max-w-3xl flex-col gap-3 px-5 pt-4">
       <p>No se ha podido cargar la lista.</p>
       {error.digest !== undefined && (
         <p className="text-sm text-muted-foreground">Referencia: {error.digest}</p>

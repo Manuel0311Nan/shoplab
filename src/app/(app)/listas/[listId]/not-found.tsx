@@ -7,7 +7,7 @@ import Link from "next/link";
  */
 export default function ListNotFound() {
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-3 p-4">
+    <div className="mx-auto flex max-w-3xl flex-col gap-3 px-5 pt-4">
       <p>Esta lista no existe o no pertenece a tu hogar.</p>
       <Link href="/" className="self-start underline">
         Volver al inicio

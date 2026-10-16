@@ -9,7 +9,8 @@ Las buenas prácticas generales (reutilizables en otros proyectos) están en
 
 ## Proyecto
 
-**Nombre:** ShopLab
+**Nombre:** paquete y carpeta `shoplab`; nombre público
+<PENDING: ShopLab o ShoppingLab>
 **Descripción:** App de hogar para gestionar lista de la compra, despensa
 (existencias y caducidades) y recetas, con sugerencias de recetas según lo
 que hay en casa.
@@ -30,13 +31,14 @@ API HTTP: todo lo que haga la web debe poder hacerse vía `/api/v1`.
   `src/generated/prisma` (no se versiona; `postinstall` lo genera)
 - **Autenticación:** Auth.js (NextAuth v5) para la web; tokens Bearer
   para clientes de la API (ver Identity)
-- **Estado de cliente:** Zustand para estado UI local; estado de servidor
-  vía Server Components. TanStack Query donde haya mutaciones optimistas
-  (marcar comprado, ajustar cantidades) o revalidación fina
-- **Estilos:** Tailwind CSS + shadcn/ui
-- **Formularios:** React Hook Form + Zod resolver
-- **Testing:** Vitest (dominio) + Testing Library + Playwright (e2e
-  críticos: login, lista → comprado → despensa, sugerencias, sync)
+- **Estado:** lectura en Server Components; mutaciones con Server
+  Actions + `useOptimistic` (React 19). TanStack Query solo para polling
+  y revalidación sin acción del usuario. Zustand para estado UI local
+- **Estilos:** Tailwind CSS v4 + shadcn/ui (alias a `@/shared/ui`)
+- **Formularios:** ricos con React Hook Form + Zod; sencillos (login,
+  crear lista) con `<form action>` + `useActionState`
+- **Testing:** Vitest (`src/**/*.test.ts`, entorno node) + Playwright
+  <PENDING: e2e del flujo principal de cada vista>
 - **Linter/formatter:** ESLint + Prettier (con `prettier-plugin-tailwindcss`),
   Husky + lint-staged en pre-commit
 - **Documentación API:** OpenAPI generado desde `src/contracts`
@@ -62,15 +64,28 @@ src/
   shared/
     kernel/           → Result, errores, Unidad/Cantidad, auth-context,
                         prisma (singleton), tenant-prisma, tenant-models, TenantRepository
+    kernel/           → también Clock y newId() (UUIDv7, válido en cliente)
     lib/              → utilidades de UI (cn)
     sync/             → motor de sincronización (ver Sync)
-    ui/               → componentes UI agnósticos de dominio
+    ui/               → componentes UI agnósticos de dominio (shadcn)
   app/
+    _lib/<contexto>/    → mappers dominio → DTO, compartidos por API, actions y páginas
     api/_lib/           → apiRoute(), parse, Result → HTTP
-    api/v1/.../route.ts → API pública
-    (rutas)/page.tsx    → Server Components que llaman use cases
+    api/v1/.../route.ts → API pública (rutas en inglés: /api/v1/lists)
     actions/            → Server Actions (solo web), delgadas
+    (app)/<ruta>/       → UI (rutas en español: /listas)
+      page.tsx          → Server Component: loader → DTO → pantalla
+      _data.ts          → loader envuelto en cache(), compartido con generateMetadata
+      loading.tsx, error.tsx, not-found.tsx → obligatorios en rutas con datos
+      _components/      → componentes de esa ruta; reciben solo DTO de contracts
 ```
+
+Plantilla por vista (la vista 1, `listas/[listId]`, es la referencia):
+`<contexto>-errors.ts` → agregado → puerto → commands/queries → fake y
+builders en `testing/` → repositorio Prisma → `<contexto>-module.ts` →
+`contracts/<contexto>.ts` → `api/v1/<recurso>/` → `actions/<recurso>.ts`
+→ `(app)/<ruta>/`. Los enums del contrato duplican los del kernel y un
+test de paridad los mantiene iguales.
 
 Regla dura: ni `route.ts` ni `page.tsx` ni una Server Action contienen
 lógica de negocio. Validan input → llaman a un use case → mapean
@@ -90,6 +105,19 @@ Route Handlers: siempre con `apiRoute({ ids, body }, handler)`, que
 autentica, valida ids (UUID) y cuerpo, y convierte excepciones en 500
 con el contrato de error. El handler solo llama al use case y mapea con
 `mapResult`.
+
+## UI: mobile first (decisión tomada)
+
+El producto nace para el móvil, aunque hoy solo exista la web.
+
+- Se diseña para 360 px de ancho y se amplía con `sm:`/`md:`; nunca al revés.
+- Objetivo táctil mínimo de 44 × 44 px en todo lo pulsable (botón visible
+  de 40 px + área invisible con `after:` si el espacio no da para más).
+  Acciones principales e inputs: `h-11`.
+- Nada depende solo de `hover`; el texto importante no se trunca (salta
+  de línea).
+- Sistema visual del diseño de Stitch en `globals.css` (tokens de shadcn);
+  los componentes nunca usan hex.
 
 ## API pública (decisión tomada)
 
@@ -115,7 +143,9 @@ hay en casa: cantidad, caducidad, ubicación).
 - **Pantry** (core): InventoryItem, caducidades, consumo
 - **Shopping**: listas, ítems, estado comprado, lista por tienda/pasillo.
   Un ítem tiene `nombre` libre + `ingredientId` opcional (se vincula con
-  Catalog cuando exista)
+  Catalog cuando exista), cantidad obligatoria (la UI propone 1 ud.) y
+  `compradoAt` en lugar de booleano. Comprado y cantidad se cambian con
+  un único `UpdateItemCommand` (PATCH atómico)
 - **Recipes**: recetas e ingredientes de receta (referencian Ingredient)
 - **Suggestions** (core): motor de puntuación de recetas según despensa,
   caducidades próximas y preferencias. Detalle en
@@ -166,7 +196,9 @@ con hogar activo en el `AuthContext`>
   `/api/v1/auth/token`>.
 - `getAuthContext(): Promise<Result<AuthContext>>`, sin parámetros: lee
   cookie o Bearer con `next/headers` y devuelve el mismo
-  `AuthContext { userId, hogarId }`. Los handlers no distinguen. Hasta la
+  `AuthContext { userId, hogarId }`. Los handlers no distinguen.
+  <PENDING: envolverlo en `cache()` de React, como los loaders, antes de
+  la fase 5>. Hasta la
   fase 5 devuelve una identidad de desarrollo
   (`shared/kernel/dev-identity.ts`, creada por `prisma/seed.ts`),
   bloqueada si `NODE_ENV === "production"`.
@@ -178,7 +210,9 @@ con hogar activo en el `AuthContext`>
 Los clientes offline-first envían una cola de mutaciones. El backend:
 
 - Toda entidad sincronizable tiene `updatedAt` (lo pone el servidor) y
-  `deletedAt` (soft delete; los borrados viajan como tombstones).
+  `deletedAt` (soft delete; los borrados viajan como tombstones). Hoy cada
+  repositorio filtra `deletedAt: null` a mano <PENDING: ¿extensión de
+  Prisma?>.
 - `GET /api/v1/sync?since=<cursor>` devuelve cambios + tombstones.
 - `POST /api/v1/sync/push` recibe un lote de mutaciones, cada una con
   `clientMutationId`; aplicarla dos veces no tiene efecto (idempotencia).
@@ -244,6 +278,11 @@ a otros hogares>
 - No escribir un Route Handler sin `apiRoute`.
 - No añadir comportamiento a un fake sin cubrirlo en la suite de contrato.
 - No aceptar un reset de `prisma migrate dev` mientras local use `main`.
+- No escribir una Server Action sin validar **todos** sus argumentos con
+  Zod (ids incluidos): son endpoints públicos aunque no lo parezcan.
+- No añadir un modelo con `hogarId` sin ponerlo en `TENANT_MODELS` o en
+  `TENANT_EXCLUDED`.
+- No usar `uuid` aleatorios ni `new Date()` en dominio: `newId()` y `Clock`.
 
 ## Seguridad y configuración
 
@@ -257,7 +296,8 @@ a otros hogares>
 **Decisión tomada:**
 
 - **Versionado:** GitHub. `main` = producción (protegida, PR + checks),
-  `develop` = staging.
+  `develop` = staging <PENDING: la rama `develop` aún no existe; hoy se
+  trabaja en ramas de feature con PR a `main`>.
 - **Hosting:** Vercel (PR → preview, `develop` → staging, `main` →
   producción). Microservicio Python futuro <PENDING: VPS propio o
   proveedor gestionado>.
@@ -281,6 +321,14 @@ usuario real: `.env.local` pasa a la rama `development` y se borran de
   En Prisma 7, `generate` y `db seed` se ejecutan siempre a mano.
 - CI: necesita `DATABASE_URL`/`DATABASE_URL_UNPOOLED` falsas porque
   `prisma generate` (postinstall) carga `prisma.config.ts`.
+
+## Estado de las vistas
+
+1. Lista de la compra (`/listas/[listId]`): hecha, pendiente de PR a `main`.
+2. Mis listas: siguiente (paginación por cursor, `<form action>`).
+
+Plan completo y orden en la guía de vistas (`docs/shoplab-guia-vista.pdf`).
+Antes de empezar una vista nueva, preguntar a Manuel.
 
 ## How to evolve this file
 
