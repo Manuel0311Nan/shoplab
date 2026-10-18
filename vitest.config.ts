@@ -25,7 +25,7 @@ export default defineConfig({
       exclude: [
         "**/*.test.ts",
         "src/domains/*/application/ports/**", // solo interfaces
-        "src/shared/kernel/{prisma,tenant-prisma,tenant-repository,auth-context,dev-identity,clock}.ts",
+        "src/shared/kernel/{prisma,tenant-prisma,tenant-repository,auth,auth-context,dev-identity,clock}.ts",
       ],
       // La CI falla si la cobertura de la lógica baja de aquí.
       thresholds: { statements: 95, lines: 95, functions: 90, branches: 90 },

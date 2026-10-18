@@ -1,18 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { errorResponseSchema } from "@/contracts/error";
-import { getAuthContext } from "@/shared/kernel/auth-context";
-import { unauthorizedError } from "@/shared/kernel/errors";
+import { getAuthContext, getIdentity } from "@/shared/kernel/auth-context";
+import { forbiddenError, unauthorizedError } from "@/shared/kernel/errors";
 import { err, ok } from "@/shared/kernel/result";
 import { apiRoute } from "./api-route";
 
 // auth-context importa "server-only" y env.ts, que no se pueden cargar en Vitest.
-vi.mock("@/shared/kernel/auth-context", () => ({ getAuthContext: vi.fn() }));
+vi.mock("@/shared/kernel/auth-context", () => ({ getAuthContext: vi.fn(), getIdentity: vi.fn() }));
 
 const AUTH = {
   userId: "0199c000-0000-7000-8000-000000000003",
   hogarId: "0199c000-0000-7000-8000-000000000009",
 };
+const IDENTIDAD = { userId: AUTH.userId, nombre: "Ana", email: "ana@example.com" };
 const LIST_ID = "0199c000-0000-7000-8000-000000000001";
 
 function peticion(body?: unknown): Request {
@@ -27,6 +28,7 @@ const params = <T>(value: T) => ({ params: Promise.resolve(value) });
 describe("apiRoute", () => {
   beforeEach(() => {
     vi.mocked(getAuthContext).mockResolvedValue(ok(AUTH));
+    vi.mocked(getIdentity).mockResolvedValue(ok(IDENTIDAD));
   });
 
   afterEach(() => {
@@ -54,6 +56,38 @@ describe("apiRoute", () => {
 
     expect(response.status).toBe(401);
     expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("apiRoute_UsuarioSinHogar_Devuelve403SinHogar", async () => {
+    vi.mocked(getAuthContext).mockResolvedValue(err(forbiddenError("SIN_HOGAR", "Sin hogar")));
+    const handler = vi.fn(async () => new Response());
+    const route = apiRoute({}, handler);
+
+    const response = await route(peticion(), params({}));
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toMatchObject({ error: { code: "SIN_HOGAR" } });
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("apiRoute_NivelIdentidad_PasaLaIdentidadSinExigirHogar", async () => {
+    vi.mocked(getAuthContext).mockResolvedValue(err(forbiddenError("SIN_HOGAR", "Sin hogar")));
+    const handler = vi.fn(async () => new Response(null, { status: 204 }));
+    const route = apiRoute({ auth: "identidad" }, handler);
+
+    const response = await route(peticion(), params({}));
+
+    expect(response.status).toBe(204);
+    expect(handler).toHaveBeenCalledWith(expect.objectContaining({ auth: IDENTIDAD }));
+  });
+
+  it("apiRoute_NivelIdentidadSinSesion_Devuelve401", async () => {
+    vi.mocked(getIdentity).mockResolvedValue(err(unauthorizedError("NO_AUTENTICADO", "No")));
+    const route = apiRoute({ auth: "identidad" }, async () => new Response());
+
+    const response = await route(peticion(), params({}));
+
+    expect(response.status).toBe(401);
   });
 
   it("apiRoute_ConIdNoUuid_Devuelve400IdNoValido", async () => {
