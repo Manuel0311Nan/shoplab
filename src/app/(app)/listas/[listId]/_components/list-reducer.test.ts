@@ -7,6 +7,7 @@ const leche: ShoppingItemResponse = {
   cantidad: { valor: 2, unidad: "l" },
   nota: null,
   ingredientId: null,
+  productoBaseId: null,
   compradoAt: null,
   updatedAt: "2026-10-10T10:00:00.000Z",
 };

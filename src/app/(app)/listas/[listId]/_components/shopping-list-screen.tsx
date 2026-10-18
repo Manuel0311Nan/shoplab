@@ -44,6 +44,7 @@ export function ShoppingListScreen({ list }: Props) {
       cantidad: values.cantidad,
       nota: values.nota ?? null,
       ingredientId: null,
+      productoBaseId: null,
       compradoAt: null,
       updatedAt: new Date().toISOString(),
     };

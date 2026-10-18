@@ -1,5 +1,10 @@
-import type { ShoppingItemResponse, ShoppingListResponse } from "@/contracts/shopping";
+import type {
+  ShoppingItemResponse,
+  ShoppingListResponse,
+  ShoppingListSummary,
+} from "@/contracts/shopping";
 import type { ShoppingListView } from "@/domains/shopping/application/queries/get-shopping-list.query";
+import type { TarjetaLista } from "@/domains/shopping/application/queries/list-shopping-lists.query";
 import type { ShoppingItemSnapshot } from "@/domains/shopping/domain/shopping-item";
 
 export function toShoppingItemResponse(item: ShoppingItemSnapshot): ShoppingItemResponse {
@@ -9,6 +14,7 @@ export function toShoppingItemResponse(item: ShoppingItemSnapshot): ShoppingItem
     cantidad: { valor: item.cantidad.valor, unidad: item.cantidad.unidad },
     nota: item.nota,
     ingredientId: item.ingredientId,
+    productoBaseId: item.productoBaseId,
     compradoAt: item.compradoAt?.toISOString() ?? null,
     updatedAt: item.updatedAt.toISOString(),
   };
@@ -21,5 +27,18 @@ export function toShoppingListResponse(view: ShoppingListView): ShoppingListResp
     archivada: view.archivadaAt !== null,
     updatedAt: view.updatedAt.toISOString(),
     items: view.items.map(toShoppingItemResponse),
+  };
+}
+
+export function toShoppingListSummary(lista: TarjetaLista): ShoppingListSummary {
+  return {
+    id: lista.id,
+    nombre: lista.nombre,
+    archivada: lista.archivadaAt !== null,
+    archivadaAt: lista.archivadaAt?.toISOString() ?? null,
+    caducaEl: lista.caducaEl?.toISOString() ?? null,
+    pendientes: lista.pendientes,
+    total: lista.total,
+    updatedAt: lista.updatedAt.toISOString(),
   };
 }

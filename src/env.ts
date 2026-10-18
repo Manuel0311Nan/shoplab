@@ -13,6 +13,11 @@ const envSchema = z.object({
   BETTER_AUTH_URL: z.url(),
   /** La define Vercel en cada despliegue (sin protocolo). Se añade a los orígenes de confianza. */
   VERCEL_URL: z.string().optional(),
+  /**
+   * Vercel la envía como `Authorization: Bearer …` al llamar a los crons de vercel.json.
+   * Opcional para no exigirla en local; sin ella, las rutas de cron responden 401.
+   */
+  CRON_SECRET: z.string().min(16, "CRON_SECRET debe tener al menos 16 caracteres").optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
