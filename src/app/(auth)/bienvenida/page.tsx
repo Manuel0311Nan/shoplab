@@ -4,7 +4,7 @@ import { getAuthContext, getIdentity } from "@/shared/kernel/auth-context";
 import { newId } from "@/shared/kernel/ids";
 import { BienvenidaForm } from "../_components/bienvenida-form";
 
-export const metadata: Metadata = { title: "Bienvenida · ShopList" };
+export const metadata: Metadata = { title: "Bienvenida · Migas" };
 
 export default async function BienvenidaPage() {
   const identity = await getIdentity();

@@ -1,4 +1,4 @@
-# ShopLab
+# Migas
 
 Aplicación de hogar para gestionar la **lista de la compra**, la
 **despensa** (existencias y caducidades) y las **recetas**, con
@@ -110,7 +110,7 @@ pnpm install
 cp .env.example .env.local   # rellenar valores (BETTER_AUTH_SECRET incluido)
 pnpm db:migrate              # aplica las migraciones (nunca aceptes un reset)
 pnpm db:generate             # Prisma 7 no genera el cliente al migrar
-pnpm prisma db seed          # usuario dev@shoplab.local / dev-shoplab-1234
+pnpm prisma db seed          # usuario dev@migas.local / dev-migas-1234
 pnpm dev
 ```
 

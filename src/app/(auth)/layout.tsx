@@ -8,7 +8,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="flex min-h-dvh flex-col items-center px-5 pt-10 pb-10 sm:justify-center sm:pt-0">
       <div className="flex w-full max-w-sm flex-col gap-6">
-        <p className="text-center font-heading text-3xl font-bold text-primary">ShopList</p>
+        <p className="text-center font-heading text-3xl font-bold text-primary">Migas</p>
         <main className="rounded-xl bg-card p-6 shadow-card">{children}</main>
       </div>
     </div>

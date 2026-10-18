@@ -25,7 +25,7 @@ const inicial: Estado = { error: null, campos: {}, email: "" };
  * `/api/v1/auth/sign-in/email` desde el navegador, así el login pasa por el
  * límite de peticiones (una Server Action con `auth.api` se lo saltaría).
  */
-export function LoginForm({ destino }: { destino: string }) {
+export function LoginForm({ destino }: Readonly<{ destino: string }>) {
   const router = useRouter();
 
   const [estado, accion] = useActionState(async (_: Estado, formData: FormData) => {

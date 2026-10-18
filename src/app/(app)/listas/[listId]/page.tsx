@@ -8,7 +8,7 @@ type Props = { params: Promise<{ listId: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { listId } = await params;
   const result = await loadShoppingList(listId);
-  return { title: result.ok ? `${result.value.nombre} · ShopList` : "Lista · ShopList" };
+  return { title: result.ok ? `${result.value.nombre} · Migas` : "Lista · Migas" };
 }
 
 export default async function ShoppingListPage({ params }: Props) {

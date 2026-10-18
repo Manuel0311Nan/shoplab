@@ -3,8 +3,8 @@ import { cn } from "@/shared/lib/utils";
 
 type Props = Omit<React.ComponentProps<"input">, "id"> & {
   etiqueta: string;
-  error?: string | undefined;
-  pista?: string | undefined;
+  error?: string;
+  pista?: string;
   /** Para meter un botón dentro del campo (mostrar contraseña). */
   accesorio?: React.ReactNode;
 };
