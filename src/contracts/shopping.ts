@@ -23,6 +23,8 @@ export const shoppingListResponseSchema = z.object({
   id: z.uuid(),
   nombre: z.string(),
   archivada: z.boolean(),
+  /** Solo archivadas: cuándo se borrará (archivadaAt + 15 días). */
+  caducaEl: z.iso.datetime().nullable(),
   updatedAt: z.iso.datetime(),
   items: z.array(shoppingItemSchema),
 });

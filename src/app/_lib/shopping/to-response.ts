@@ -6,6 +6,10 @@ import type {
 import type { ShoppingListView } from "@/domains/shopping/application/queries/get-shopping-list.query";
 import type { TarjetaLista } from "@/domains/shopping/application/queries/list-shopping-lists.query";
 import type { ShoppingItemSnapshot } from "@/domains/shopping/domain/shopping-item";
+import { DIAS_EN_ARCHIVADAS } from "@/domains/shopping/domain/shopping-list";
+
+const caducaEl = (archivadaAt: Date | null) =>
+  archivadaAt === null ? null : new Date(archivadaAt.getTime() + DIAS_EN_ARCHIVADAS * 86_400_000);
 
 export function toShoppingItemResponse(item: ShoppingItemSnapshot): ShoppingItemResponse {
   return {
@@ -25,6 +29,7 @@ export function toShoppingListResponse(view: ShoppingListView): ShoppingListResp
     id: view.id,
     nombre: view.nombre,
     archivada: view.archivadaAt !== null,
+    caducaEl: caducaEl(view.archivadaAt)?.toISOString() ?? null,
     updatedAt: view.updatedAt.toISOString(),
     items: view.items.map(toShoppingItemResponse),
   };

@@ -39,11 +39,16 @@ export async function addItemAction(
     nombre: body.data.nombre,
     cantidad: body.data.cantidad,
     nota: body.data.nota ?? null,
+    productoBaseId: body.data.productoBaseId ?? null,
+    ...(body.data.duplicado === undefined ? {} : { duplicado: body.data.duplicado }),
+    ...(body.data.unidadFinal === undefined ? {} : { unidadFinal: body.data.unidadFinal }),
+    ...(body.data.cantidadFinal === undefined ? {} : { cantidadFinal: body.data.cantidadFinal }),
   });
 
   if (!result.ok) return result;
 
   revalidatePath(`/listas/${id.data}`);
+  revalidatePath("/listas");
   return ok(toShoppingItemResponse(result.value));
 }
 
@@ -66,6 +71,7 @@ export async function setItemPurchasedAction(
   if (!result.ok) return result;
 
   revalidatePath(`/listas/${ids.data.listId}`);
+  revalidatePath("/listas");
   return ok(toShoppingItemResponse(result.value));
 }
 
@@ -89,6 +95,7 @@ export async function updateItemQuantityAction(
   if (!result.ok) return result;
 
   revalidatePath(`/listas/${ids.data.listId}`);
+  revalidatePath("/listas");
   return ok(toShoppingItemResponse(result.value));
 }
 
@@ -103,5 +110,6 @@ export async function removeItemAction(listId: string, itemId: string): Promise<
   if (!result.ok) return result;
 
   revalidatePath(`/listas/${ids.data.listId}`);
+  revalidatePath("/listas");
   return ok(undefined);
 }
