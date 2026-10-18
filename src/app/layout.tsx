@@ -19,7 +19,7 @@ const beVietnam = Be_Vietnam_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "ShopList",
+  title: "ShoppingLab",
   description: "Lista de la compra, despensa y recetas del hogar",
 };
 
