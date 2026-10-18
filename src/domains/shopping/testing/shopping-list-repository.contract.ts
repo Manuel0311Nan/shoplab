@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ShoppingListRepository } from "@/domains/shopping/application/ports/shopping-list-repository";
-import type { ShoppingList } from "@/domains/shopping/domain/shopping-list";
+import { ShoppingList } from "@/domains/shopping/domain/shopping-list";
 import {
   AHORA,
   DESPUES,
@@ -36,6 +36,23 @@ export function shoppingListRepositoryContract(nombre: string, crear: CrearRepos
 
       expect(encontrada?.toSnapshot()).toMatchObject({ id: LISTA_ID, nombre: "Semana" });
       expect(encontrada?.itemsActivos().map((i) => i.id)).toEqual([ITEM_ID]);
+    });
+
+    it("save_ListaNueva_SeRecuperaVacia", async () => {
+      const repo = await crear([]);
+      const nueva = ShoppingList.create({ id: LISTA_ID, nombre: "Semana" }, AHORA);
+
+      if (nueva.ok) await repo.save(nueva.value);
+      const recargada = await repo.findById(LISTA_ID);
+
+      expect(recargada?.toSnapshot()).toEqual({
+        id: LISTA_ID,
+        nombre: "Semana",
+        archivadaAt: null,
+        createdAt: AHORA,
+        updatedAt: AHORA,
+      });
+      expect(recargada?.itemsActivos()).toEqual([]);
     });
 
     it("save_ItemNuevo_SeRecuperaConTodosSusCampos", async () => {

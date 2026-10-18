@@ -17,9 +17,15 @@ export class PrismaShoppingListRepository
   async save(list: ShoppingList): Promise<void> {
     const lista = list.toSnapshot();
     await this.db.$transaction([
-      this.db.shoppingList.update({
+      // upsert: la misma llamada guarda una lista nueva (CreateShoppingList) o una existente.
+      this.db.shoppingList.upsert({
         where: { id: lista.id },
-        data: { nombre: lista.nombre, archivadaAt: lista.archivadaAt, updatedAt: lista.updatedAt },
+        create: { ...lista, hogarId: this.hogarId },
+        update: {
+          nombre: lista.nombre,
+          archivadaAt: lista.archivadaAt,
+          updatedAt: lista.updatedAt,
+        },
       }),
       ...list.itemsModificados().map((item) => {
         const datos = {
