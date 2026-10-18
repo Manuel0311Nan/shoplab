@@ -211,8 +211,9 @@ con hogar activo en el `AuthContext`>
   (403 → la web manda a `/bienvenida`). Ambas con `cache()`; leen cookie o
   Bearer sin distinguir. Hogar activo: el más antiguo (`elegirHogarActivo`).
 - Protección en dos capas: `middleware.ts` solo mira si existe la cookie
-  (redirección rápida, runtime Node); la seguridad real es `getAuthContext()`
-  / `getIdentity()` en cada página, Server Action y endpoint.
+  (sin ella, a `/login`; runtime Node); la seguridad real es `getAuthContext()`
+  / `getIdentity()` en cada página, Server Action y endpoint. El middleware
+  nunca saca de `/login` por tener cookie: con una caducada habría bucle.
 - Login y registro desde el navegador con `authClient` (acción de cliente en
   `useActionState`): así pasan por el límite de peticiones.
 - Variables: `BETTER_AUTH_SECRET` (≥ 32 caracteres, una por entorno) y
