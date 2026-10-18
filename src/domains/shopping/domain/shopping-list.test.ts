@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   AHORA,
+  DESPUES,
   ITEM_ID,
   LISTA_ID,
+  OTRO_ID,
   USUARIO_ID,
   cantidad,
   item,
@@ -137,5 +139,34 @@ describe("ShoppingList", () => {
     const result = conItem.actualizarItem(ITEM_ID, { comprado: true }, USUARIO_ID, AHORA);
 
     expect(result).toMatchObject({ ok: false, error: { code: "ITEM_NO_ENCONTRADO" } });
+  });
+
+  it("terminarCompra_ConservarPendientes_QuitaSoloLosComprados", () => {
+    const conItems = lista([item({ compradoAt: AHORA }), item({ id: OTRO_ID, nombre: "Leche" })]);
+
+    const result = conItems.terminarCompra("conservarPendientes", DESPUES);
+
+    expect(result.ok).toBe(true);
+    expect(conItems.itemsActivos().map((i) => i.id)).toEqual([OTRO_ID]);
+    expect(conItems.itemsModificados()).toMatchObject([{ id: ITEM_ID, deletedAt: DESPUES }]);
+    expect(conItems.toSnapshot().updatedAt).toEqual(DESPUES);
+  });
+
+  it("terminarCompra_Vaciar_QuitaTodosLosItems", () => {
+    const conItems = lista([item({ compradoAt: AHORA }), item({ id: OTRO_ID, nombre: "Leche" })]);
+
+    conItems.terminarCompra("vaciar", DESPUES);
+
+    expect(conItems.itemsActivos()).toEqual([]);
+    expect(conItems.itemsModificados()).toHaveLength(2);
+  });
+
+  it("terminarCompra_EnListaArchivada_DevuelveListaArchivadaSinQuitarNada", () => {
+    const archivada = lista([item({ compradoAt: AHORA })], { archivada: true });
+
+    const result = archivada.terminarCompra("vaciar", DESPUES);
+
+    expect(result).toMatchObject({ ok: false, error: { code: "LISTA_ARCHIVADA" } });
+    expect(archivada.itemsActivos()).toHaveLength(1);
   });
 });

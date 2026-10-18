@@ -7,10 +7,16 @@ import {
   setItemPurchasedAction,
   updateItemQuantityAction,
 } from "@/app/actions/shopping-items";
-import type { CantidadDto, ShoppingListResponse } from "@/contracts/shopping";
+import { finishShoppingAction } from "@/app/actions/shopping-lists";
+import type {
+  CantidadDto,
+  ModoTerminarCompraDto,
+  ShoppingListResponse,
+} from "@/contracts/shopping";
 import type { Result } from "@/shared/kernel/result";
 import { newId } from "@/shared/kernel/ids";
 import { AddItemForm, NUEVO_PRODUCTO_ID, type NewItemValues } from "./add-item-form";
+import { FinishShoppingButton } from "./finish-shopping-button";
 import { ItemList } from "./item-list";
 import { type AccionLista, aplicarAccion } from "./list-reducer";
 
@@ -54,6 +60,8 @@ export function ShoppingListScreen({ list }: Props) {
     );
   const quitar = (itemId: string) =>
     ejecutar({ tipo: "quitar", itemId }, () => removeItemAction(list.id, itemId));
+  const terminar = (modo: ModoTerminarCompraDto) =>
+    ejecutar({ tipo: "terminar", modo }, () => finishShoppingAction(list.id, modo));
 
   // El FAB del diseño lleva al formulario: en móvil suele quedar fuera de vista.
   function irAlFormulario() {
@@ -107,6 +115,10 @@ export function ShoppingListScreen({ list }: Props) {
         onCantidad={cambiarCantidad}
         onQuitar={quitar}
       />
+
+      {enElCarro.length > 0 && (
+        <FinishShoppingButton pendientes={pendientes.length} onTerminar={terminar} />
+      )}
 
       <button
         type="button"
