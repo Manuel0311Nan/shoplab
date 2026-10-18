@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getIdentity } from "@/shared/kernel/auth-context";
 import { RegistroForm } from "../_components/registro-form";
 
-export const metadata: Metadata = { title: "Crear cuenta · ShopList" };
+export const metadata: Metadata = { title: "Crear cuenta · Migas" };
 
 export default async function RegistroPage() {
   if ((await getIdentity()).ok) redirect("/");

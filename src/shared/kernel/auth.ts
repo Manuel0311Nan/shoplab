@@ -23,7 +23,7 @@ if (env.VERCEL_URL !== undefined) trustedOrigins.push(`https://${env.VERCEL_URL}
  *   desde el servidor: las llamadas de servidor no pasan por el límite de peticiones.
  */
 export const auth = betterAuth({
-  appName: "ShopList",
+  appName: "Migas",
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BETTER_AUTH_URL,
   basePath: "/api/v1/auth",

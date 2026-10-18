@@ -9,5 +9,5 @@ export const DEV_USER_ID = "0199b000-0000-7000-8000-000000000001";
 export const DEV_HOGAR_ID = "0199b000-0000-7000-8000-000000000002";
 export const DEV_LISTA_ID = "0199b000-0000-7000-8000-000000000003";
 export const DEV_ACCOUNT_ID = "0199b000-0000-7000-8000-000000000004";
-export const DEV_EMAIL = "dev@shoplab.local";
-export const DEV_PASSWORD = "dev-shoplab-1234";
+export const DEV_EMAIL = "dev@migas.local";
+export const DEV_PASSWORD = "dev-migas-1234";

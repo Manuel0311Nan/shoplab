@@ -5,12 +5,12 @@ decisiones tomadas, no aspiraciones. Si el código contradice este archivo,
 el código manda y este archivo debe actualizarse (ver sección final).
 
 Las buenas prácticas generales (reutilizables en otros proyectos) están en
-@AGENTS.md. Este archivo recoge solo lo específico de ShopLab.
+@AGENTS.md. Este archivo recoge solo lo específico de Migas.
 
 ## Proyecto
 
-**Nombre:** paquete y carpeta `shoplab`; nombre público
-<PENDING: ShopLab o ShoppingLab>
+**Nombre:** Migas (marca pública y paquete `migas`). La carpeta local y el
+repositorio de GitHub conservan por ahora el nombre `shoplab`.
 **Descripción:** App de hogar para gestionar lista de la compra, despensa
 (existencias y caducidades) y recetas, con sugerencias de recetas según lo
 que hay en casa.
@@ -336,7 +336,7 @@ app) y `DATABASE_URL_UNPOOLED` (directa, CLI de Prisma vía
 de firma de tokens de la API.
 
 <PENDING, OBLIGATORIO ANTES DE DESPLEGAR: local trabaja contra la rama
-`main` de Neon y el seed crea `dev@shoplab.local` con contraseña conocida.
+`main` de Neon y el seed crea `dev@migas.local` con contraseña conocida.
 `.env.local` pasa a la rama `development` y se borran de `main` las filas
 del seed>
 

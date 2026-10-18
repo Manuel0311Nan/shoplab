@@ -2,7 +2,7 @@
 
 Buenas prácticas para construir código de calidad con agentes de IA (Claude
 Code, Codex, Cursor, Copilot…) sobre un stack **Next.js full-stack + Clean
-Architecture + DDD**. Sale de lo aplicado y comprobado en ShopLab.
+Architecture + DDD**. Sale de lo aplicado y comprobado en Migas.
 
 - **Este archivo es genérico y reutilizable.** Lo específico del proyecto
   (dominio, decisiones, pendientes) va en `CLAUDE.md`. Si se contradicen,
@@ -10,7 +10,7 @@ Architecture + DDD**. Sale de lo aplicado y comprobado en ShopLab.
   hay que actualizar el documento.
 - **Para reutilizarlo en otro proyecto:** cópialo, revisa la sección 2
   (stack) y la 13 (checklist de arranque) y borra lo que no aplique. Los
-  ejemplos citan nombres de ShopLab (`hogarId`, `ShoppingList`…); en otro
+  ejemplos citan nombres de Migas (`hogarId`, `ShoppingList`…); en otro
   proyecto serán `tenantId`, `Order`, etc.
 
 ---
@@ -44,7 +44,7 @@ Architecture + DDD**. Sale de lo aplicado y comprobado en ShopLab.
   instalada** o en el propio paquete (`node_modules/<pkg>`, su `.d.ts`, el
   `--help` del CLI). Las versiones mayores cambian la sintaxis: pasó con
   Prisma 7 (`migrate diff`) y con `eslint-plugin-boundaries` 7.
-- **Antes de corregir algo, confirmar que es un error.** En ShopLab se
+- **Antes de corregir algo, confirmar que es un error.** En Migas se
   marcó como fallo un paquete (`cn`) que en realidad es el que recomienda
   la versión actual de shadcn. Si te equivocas, dilo y corrígelo.
 - **Preguntar antes de cualquier cosa irreversible:** borrar archivos,
@@ -239,7 +239,7 @@ comprueban `next typegen` y `tsc`.
 
 ## 5. Datos, Prisma y multi-tenancy
 
-- **Row-level tenancy:** columna `tenantId` (en ShopLab, `hogarId`) en
+- **Row-level tenancy:** columna `tenantId` (en Migas, `hogarId`) en
   cada modelo del tenant. Una Prisma Client Extension la inyecta en toda
   consulta de los modelos de `TENANT_MODELS`, y los repositorios heredan
   de `TenantRepository` y usan `this.db`.

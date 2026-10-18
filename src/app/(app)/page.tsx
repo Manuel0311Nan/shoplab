@@ -5,7 +5,7 @@ import { shoppingModule } from "@/domains/shopping/infrastructure/shopping-modul
 import { getAuthContext } from "@/shared/kernel/auth-context";
 import { Button } from "@/shared/ui/button";
 
-export const metadata: Metadata = { title: "ShopList" };
+export const metadata: Metadata = { title: "Migas" };
 
 /**
  * Portada: decide a dónde ir según la sesión. Hasta la vista 2 ("Mis listas")

@@ -32,7 +32,8 @@ async function main() {
 
   await prisma.usuario.upsert({
     where: { id: DEV_USER_ID },
-    update: {},
+    // Si ya existía con el email antiguo (dev@shoplab.local), se actualiza.
+    update: { email: DEV_EMAIL },
     create: { id: DEV_USER_ID, email: DEV_EMAIL, nombre: "Usuario de desarrollo" },
   });
 

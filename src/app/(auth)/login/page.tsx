@@ -5,11 +5,11 @@ import { rutaSegura } from "@/app/_lib/auth/ruta-segura";
 import { getIdentity } from "@/shared/kernel/auth-context";
 import { LoginForm } from "../_components/login-form";
 
-export const metadata: Metadata = { title: "Entrar · ShopList" };
+export const metadata: Metadata = { title: "Entrar · Migas" };
 
 type Props = { searchParams: Promise<{ next?: string | string[] }> };
 
-export default async function LoginPage({ searchParams }: Props) {
+export default async function LoginPage({ searchParams }: Readonly<Props>) {
   // Comprobación real (capa 2): el middleware solo miró si había cookie.
   if ((await getIdentity()).ok) redirect("/");
 

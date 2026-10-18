@@ -74,13 +74,13 @@ Content-Type: application/json
 POST {{base}}/auth/sign-in/email
 Content-Type: application/json
 
-{ "email": "dev@shoplab.local", "password": "dev-shoplab-1234" }
+{ "email": "dev@migas.local", "password": "dev-migas-1234" }
 
 ### Contraseña incorrecta: 401 INVALID_EMAIL_OR_PASSWORD
 POST {{base}}/auth/sign-in/email
 Content-Type: application/json
 
-{ "email": "dev@shoplab.local", "password": "no-es-esta" }
+{ "email": "dev@migas.local", "password": "no-es-esta" }
 
 ### Quién soy (hogarId null si aún no ha creado su hogar)
 GET {{base}}/me
