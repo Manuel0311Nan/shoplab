@@ -4,9 +4,13 @@ Memoria persistente del proyecto. Léelo al inicio de cada sesión. Documenta
 decisiones tomadas, no aspiraciones. Si el código contradice este archivo,
 el código manda y este archivo debe actualizarse (ver sección final).
 
+Las buenas prácticas generales (reutilizables en otros proyectos) están en
+@AGENTS.md. Este archivo recoge solo lo específico de Migas.
+
 ## Proyecto
 
-**Nombre:** ShopLab
+**Nombre:** Migas (marca pública y paquete `migas`). La carpeta local y el
+repositorio de GitHub conservan por ahora el nombre `shoplab`.
 **Descripción:** App de hogar para gestionar lista de la compra, despensa
 (existencias y caducidades) y recetas, con sugerencias de recetas según lo
 que hay en casa.
@@ -25,15 +29,16 @@ API HTTP: todo lo que haga la web debe poder hacerse vía `/api/v1`.
 - **ORM / BD:** Prisma 7 (fijado; migrar a Prisma 8 es decisión aparte)
   con PostgreSQL en Neon vía `@prisma/adapter-neon`. Cliente generado en
   `src/generated/prisma` (no se versiona; `postinstall` lo genera)
-- **Autenticación:** Auth.js (NextAuth v5) para la web; tokens Bearer
-  para clientes de la API (ver Identity)
-- **Estado de cliente:** Zustand para estado UI local; estado de servidor
-  vía Server Components. TanStack Query donde haya mutaciones optimistas
-  (marcar comprado, ajustar cantidades) o revalidación fina
-- **Estilos:** Tailwind CSS + shadcn/ui
-- **Formularios:** React Hook Form + Zod resolver
-- **Testing:** Vitest (dominio) + Testing Library + Playwright (e2e
-  críticos: login, lista → comprado → despensa, sugerencias, sync)
+- **Autenticación:** Better Auth (versión exacta fijada): cookie en la web
+  y `Authorization: Bearer` para la app (ver Identity)
+- **Estado:** lectura en Server Components; mutaciones con Server
+  Actions + `useOptimistic` (React 19). TanStack Query solo para polling
+  y revalidación sin acción del usuario. Zustand para estado UI local
+- **Estilos:** Tailwind CSS v4 + shadcn/ui (alias a `@/shared/ui`)
+- **Formularios:** ricos con React Hook Form + Zod; sencillos (login,
+  crear lista) con `<form action>` + `useActionState`
+- **Testing:** Vitest (`src/**/*.test.ts`, entorno node) + Playwright
+  <PENDING: e2e del flujo principal de cada vista>
 - **Linter/formatter:** ESLint + Prettier (con `prettier-plugin-tailwindcss`),
   Husky + lint-staged en pre-commit
 - **Documentación API:** OpenAPI generado desde `src/contracts`
@@ -59,15 +64,30 @@ src/
   shared/
     kernel/           → Result, errores, Unidad/Cantidad, auth-context,
                         prisma (singleton), tenant-prisma, tenant-models, TenantRepository
+    kernel/           → también Clock, newId() (UUIDv7, válido en cliente) y auth.ts (Better Auth)
     lib/              → utilidades de UI (cn)
     sync/             → motor de sincronización (ver Sync)
-    ui/               → componentes UI agnósticos de dominio
+    ui/               → componentes UI agnósticos de dominio (shadcn)
   app/
+    _lib/<contexto>/    → mappers dominio → DTO, compartidos por API, actions y páginas
+    _lib/auth/          → authClient (navegador), rutaSegura, mensajes de error de login
+    (auth)/             → /login, /registro, /bienvenida (sin cabecera de la app)
     api/_lib/           → apiRoute(), parse, Result → HTTP
-    api/v1/.../route.ts → API pública
-    (rutas)/page.tsx    → Server Components que llaman use cases
+    api/v1/.../route.ts → API pública (rutas en inglés: /api/v1/lists)
     actions/            → Server Actions (solo web), delgadas
+    (app)/<ruta>/       → UI (rutas en español: /listas)
+      page.tsx          → Server Component: loader → DTO → pantalla
+      _data.ts          → loader envuelto en cache(), compartido con generateMetadata
+      loading.tsx, error.tsx, not-found.tsx → obligatorios en rutas con datos
+      _components/      → componentes de esa ruta; reciben solo DTO de contracts
 ```
+
+Plantilla por vista (la vista 1, `listas/[listId]`, es la referencia):
+`<contexto>-errors.ts` → agregado → puerto → commands/queries → fake y
+builders en `testing/` → repositorio Prisma → `<contexto>-module.ts` →
+`contracts/<contexto>.ts` → `api/v1/<recurso>/` → `actions/<recurso>.ts`
+→ `(app)/<ruta>/`. Los enums del contrato duplican los del kernel y un
+test de paridad los mantiene iguales.
 
 Regla dura: ni `route.ts` ni `page.tsx` ni una Server Action contienen
 lógica de negocio. Validan input → llaman a un use case → mapean
@@ -83,10 +103,25 @@ Reglas aplicadas por ESLint:
   `domains/`, solo dentro del mismo contexto. Los tests pueden importar
   `testing/` y el kernel.
 
-Route Handlers: siempre con `apiRoute({ ids, body }, handler)`, que
+Route Handlers: siempre con `apiRoute({ ids, body, auth }, handler)`, que
 autentica, valida ids (UUID) y cuerpo, y convierte excepciones en 500
 con el contrato de error. El handler solo llama al use case y mapea con
-`mapResult`.
+`mapResult`. `auth: "identidad"` para rutas que no exigen hogar (crearlo).
+Única excepción: `/api/v1/auth/[...all]`, que son las rutas de Better Auth
+con su propio formato de error.
+
+## UI: mobile first (decisión tomada)
+
+El producto nace para el móvil, aunque hoy solo exista la web.
+
+- Se diseña para 360 px de ancho y se amplía con `sm:`/`md:`; nunca al revés.
+- Objetivo táctil mínimo de 44 × 44 px en todo lo pulsable (botón visible
+  de 40 px + área invisible con `after:` si el espacio no da para más).
+  Acciones principales e inputs: `h-11`.
+- Nada depende solo de `hover`; el texto importante no se trunca (salta
+  de línea).
+- Sistema visual del diseño de Stitch en `globals.css` (tokens de shadcn);
+  los componentes nunca usan hex.
 
 ## API pública (decisión tomada)
 
@@ -112,12 +147,18 @@ hay en casa: cantidad, caducidad, ubicación).
 - **Pantry** (core): InventoryItem, caducidades, consumo
 - **Shopping**: listas, ítems, estado comprado, lista por tienda/pasillo.
   Un ítem tiene `nombre` libre + `ingredientId` opcional (se vincula con
-  Catalog cuando exista)
+  Catalog cuando exista), cantidad obligatoria (la UI propone 1 ud.) y
+  `compradoAt` en lugar de booleano. Comprado y cantidad se cambian con
+  un único `UpdateItemCommand` (PATCH atómico)
 - **Recipes**: recetas e ingredientes de receta (referencian Ingredient)
 - **Suggestions** (core): motor de puntuación de recetas según despensa,
   caducidades próximas y preferencias. Detalle en
   `src/domains/suggestions/README.md`
-- **Households**: hogar, miembros, invitaciones (tenant)
+- **Households**: hogar, miembros, invitaciones (tenant). El hogar se crea
+  después del registro, en `/bienvenida` (`CreateHouseholdCommand`, id
+  generado en el cliente para que un doble envío no cree dos). La primera
+  lista se crea en `app/_lib/households/alta-hogar.ts`, llamando a Shopping:
+  excepción temporal hasta tener eventos de dominio (vista 4)
 - **Identity**: autenticación web y por token
 
 Conceptos compartidos entre contextos (Unidad, Cantidad) viven en
@@ -155,27 +196,39 @@ con hogar activo en el `AuthContext`>
 
 ## Identity
 
-- Registro crea Usuario + Hogar en una transacción
-  (`RegisterHouseholdCommand`). Otros miembros entran por invitación.
-- Web: Auth.js, `Credentials` + `jwt` en cookie.
-- Clientes de la API: <PENDING: mecanismo concreto — por defecto access
-  token JWT corto + refresh token rotativo persistido, emitidos por
-  `/api/v1/auth/token`>.
-- `getAuthContext(): Promise<Result<AuthContext>>`, sin parámetros: lee
-  cookie o Bearer con `next/headers` y devuelve el mismo
-  `AuthContext { userId, hogarId }`. Los handlers no distinguen. Hasta la
-  fase 5 devuelve una identidad de desarrollo
-  (`shared/kernel/dev-identity.ts`, creada por `prisma/seed.ts`),
-  bloqueada si `NODE_ENV === "production"`.
-- Email (invitaciones, reset) detrás del puerto `EmailSender`
-  <PENDING: proveedor>.
+**Decisión tomada:** Better Auth (no Auth.js, en mantenimiento desde 09/2025).
+
+- Instancia en `shared/kernel/auth.ts`: email y contraseña (8-128, scrypt),
+  `Usuario` hace de tabla `user` (`modelName: "usuario"`, `name` → `nombre`),
+  sesiones en BD de 30 días (tabla `Session`), hash en `Account.password`,
+  ids con `newId()`, límite de peticiones en Postgres (`RateLimit`).
+- Endpoints en `/api/v1/auth/*` (`basePath`). La web y la app usan los mismos.
+- Registro = solo el usuario (`autoSignIn`); el hogar se crea en `/bienvenida`.
+- App móvil: plugin `bearer`. Tras el login, la cabecera `set-auth-token` es
+  el token; se envía como `Authorization: Bearer`. Misma sesión, revocable.
+- `getIdentity()` → `{ userId, nombre, email }` o `NO_AUTENTICADO` (401).
+  `getAuthContext()` → `{ userId, hogarId }`, `NO_AUTENTICADO` o `SIN_HOGAR`
+  (403 → la web manda a `/bienvenida`). Ambas con `cache()`; leen cookie o
+  Bearer sin distinguir. Hogar activo: el más antiguo (`elegirHogarActivo`).
+- Protección en dos capas: `middleware.ts` solo mira si existe la cookie
+  (sin ella, a `/login`; runtime Node); la seguridad real es `getAuthContext()`
+  / `getIdentity()` en cada página, Server Action y endpoint. El middleware
+  nunca saca de `/login` por tener cookie: con una caducada habría bucle.
+- Login y registro desde el navegador con `authClient` (acción de cliente en
+  `useActionState`): así pasan por el límite de peticiones.
+- Variables: `BETTER_AUTH_SECRET` (≥ 32 caracteres, una por entorno) y
+  `BETTER_AUTH_URL`. En Vercel, `VERCEL_URL` se añade a `trustedOrigins`.
+- Fuera de alcance hasta la vista 6: verificación de email, restablecer
+  contraseña (`EmailSender` <PENDING: proveedor>) e invitaciones.
 
 ## Sync
 
 Los clientes offline-first envían una cola de mutaciones. El backend:
 
 - Toda entidad sincronizable tiene `updatedAt` (lo pone el servidor) y
-  `deletedAt` (soft delete; los borrados viajan como tombstones).
+  `deletedAt` (soft delete; los borrados viajan como tombstones). Hoy cada
+  repositorio filtra `deletedAt: null` a mano <PENDING: ¿extensión de
+  Prisma?>.
 - `GET /api/v1/sync?since=<cursor>` devuelve cambios + tombstones.
 - `POST /api/v1/sync/push` recibe un lote de mutaciones, cada una con
   `clientMutationId`; aplicarla dos veces no tiene efecto (idempotencia).
@@ -212,7 +265,8 @@ a otros hogares>
 12. **Tests**: junto al archivo que prueban (`x.ts` → `x.test.ts`).
     Cada puerto de repositorio tiene una suite de contrato en `testing/`
     que pasan el fake en memoria (`pnpm test`) y Prisma
-    (`pnpm test:integration`, contra `TEST_DATABASE_URL`). La CI exige
+    (`pnpm test:integration`, contra `TEST_DATABASE_URL`; antes,
+    `pnpm db:migrate:test`, que se niega si apunta a la rama de la app). La CI exige
     cobertura ≥ 95 % de líneas en domain, application, kernel y `api/_lib`.
 13. **Value Objects**: tipo marcado (`unique symbol`) para que solo
     `create()` pueda producirlos.
@@ -235,23 +289,38 @@ a otros hogares>
   `hogarId` explícitamente.
 - No incluir `hogarId` en los datos de un `update`.
 - No editar ni borrar una migración ya aplicada: siempre una nueva.
+- No cambiar `schema.prisma` sin su migración: el job `migrations` de la CI
+  aplica todas sobre un Postgres vacío y falla si hay drift.
 - No escribir un Route Handler sin `apiRoute`.
 - No añadir comportamiento a un fake sin cubrirlo en la suite de contrato.
 - No aceptar un reset de `prisma migrate dev` mientras local use `main`.
+- No escribir una Server Action sin validar **todos** sus argumentos con
+  Zod (ids incluidos): son endpoints públicos aunque no lo parezcan.
+- No añadir un modelo con `hogarId` sin ponerlo en `TENANT_MODELS` o en
+  `TENANT_EXCLUDED`.
+- No usar `uuid` aleatorios ni `new Date()` en dominio: `newId()` y `Clock`.
+- No hacer login o registro con `auth.api.*` desde el servidor (Server
+  Action): esas llamadas no pasan por el límite de peticiones.
+- No confiar en `middleware.ts` para la seguridad: la cookie se puede
+  inventar. Cada página, acción y endpoint valida con `getAuthContext()`.
+- No redirigir a un `?next=` sin `rutaSegura()` (redirección abierta).
+- No importar `shared/kernel/auth.ts` desde un componente de cliente: el
+  navegador usa `app/_lib/auth/auth-client.ts`.
 
 ## Seguridad y configuración
 
 - Variables de entorno validadas con Zod en un único `env.ts`.
 - Secretos en `.env.local` (gitignored) y en Vercel por entorno.
-- Rate limiting en login, emisión de tokens y sync <PENDING: proveedor —
-  Upstash Ratelimit por defecto>.
+- Rate limiting: el de Better Auth en `/api/v1/auth/*` (solo en producción,
+  contadores en la tabla `RateLimit`). Sync <PENDING: cuando exista>.
 
 ## Infraestructura
 
 **Decisión tomada:**
 
 - **Versionado:** GitHub. `main` = producción (protegida, PR + checks),
-  `develop` = staging.
+  `develop` = staging <PENDING: la rama `develop` aún no existe; hoy se
+  trabaja en ramas de feature con PR a `main`>.
 - **Hosting:** Vercel (PR → preview, `develop` → staging, `main` →
   producción). Microservicio Python futuro <PENDING: VPS propio o
   proveedor gestionado>.
@@ -266,15 +335,27 @@ app) y `DATABASE_URL_UNPOOLED` (directa, CLI de Prisma vía
 `AUTH_SECRET`, `AUTH_URL`, credenciales del proveedor de email, secretos
 de firma de tokens de la API.
 
-<PENDING: local trabaja contra la rama `main` de Neon. Antes del primer
-usuario real: `.env.local` pasa a la rama `development` y se borran de
-`main` las filas del seed>
+<PENDING, OBLIGATORIO ANTES DE DESPLEGAR: local trabaja contra la rama
+`main` de Neon y el seed crea `dev@migas.local` con contraseña conocida.
+`.env.local` pasa a la rama `development` y se borran de `main` las filas
+del seed>
 
 - Migraciones: `migrate dev` solo en local; producción con
   `migrate deploy` en el despliegue <PENDING: script en el build de Vercel>.
   En Prisma 7, `generate` y `db seed` se ejecutan siempre a mano.
 - CI: necesita `DATABASE_URL`/`DATABASE_URL_UNPOOLED` falsas porque
   `prisma generate` (postinstall) carga `prisma.config.ts`.
+
+## Estado de las vistas
+
+1. Lista de la compra (`/listas/[listId]`): hecha, pendiente de PR a `main`.
+2. Registro y login (adelantada): hecha en `feat/auth`; pendiente aplicar
+   la migración `auth`, probar en el navegador y PR.
+3. Mis listas: siguiente (paginación por cursor, `<form action>`). Ya
+   existen `CreateShoppingListCommand` y `ListShoppingListsQuery`.
+
+Plan completo y orden en la guía de vistas (`docs/shoplab-guia-vista.pdf`).
+Antes de empezar una vista nueva, preguntar a Manuel.
 
 ## How to evolve this file
 

@@ -7,9 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --shadow-card: 0 2px 8px rgb(45 41 38 / 0.06);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,73 +49,85 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * Paleta del diseño de Stitch ("Home & Harvest", Material 3) traducida a los
+ * tokens semánticos de shadcn. Los componentes usan solo los tokens
+ * (bg-primary, text-muted-foreground…), nunca los hex.
+ *   primary     harvest-red        #bd4444
+ *   background  surface            #fff8f3
+ *   card        surface-lowest     #ffffff
+ *   muted       surface-low        #fff2e2
+ *   accent      surface-high       #f9e5cb
+ *   secondary   secondary-cont.    #c3eab7 (verde salvia)
+ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: #fff8f3;
+  --foreground: #231a0a;
+  --card: #ffffff;
+  --card-foreground: #231a0a;
+  --popover: #ffffff;
+  --popover-foreground: #231a0a;
+  --primary: #bd4444;
+  --primary-foreground: #ffffff;
+  --secondary: #c3eab7;
+  --secondary-foreground: #2e4e28;
+  --muted: #fff2e2;
+  --muted-foreground: #574140;
+  --accent: #f9e5cb;
+  --accent-foreground: #231a0a;
+  --destructive: #ba1a1a;
+  --border: #ecd6c4;
+  --input: #dfbfbd;
+  --ring: #bd4444;
+  --chart-1: #bd4444;
+  --chart-2: #45673e;
+  --chart-3: #73976a;
+  --chart-4: #8b716f;
+  --chart-5: #3a2f1d;
+  --radius: 0.5rem;
+  --sidebar: #fff2e2;
+  --sidebar-foreground: #231a0a;
+  --sidebar-primary: #bd4444;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f9e5cb;
+  --sidebar-accent-foreground: #231a0a;
+  --sidebar-border: #ecd6c4;
+  --sidebar-ring: #bd4444;
 }
 
+/* Stitch no trae modo oscuro completo: derivado de sus tonos "inverse" y "fixed". */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #1c140b;
+  --foreground: #f3e0c6;
+  --card: #2a2015;
+  --card-foreground: #f3e0c6;
+  --popover: #2a2015;
+  --popover-foreground: #f3e0c6;
+  --primary: #ffb3af;
+  --primary-foreground: #410005;
+  --secondary: #2e4e28;
+  --secondary-foreground: #c6edba;
+  --muted: #241a10;
+  --muted-foreground: #dfbfbd;
+  --accent: #3a2f1d;
+  --accent-foreground: #f3e0c6;
+  --destructive: #ffb4ab;
+  --border: rgb(243 224 198 / 12%);
+  --input: rgb(243 224 198 / 18%);
+  --ring: #ffb3af;
+  --chart-1: #ffb3af;
+  --chart-2: #abd19f;
+  --chart-3: #b5ceac;
+  --chart-4: #dfbfbd;
+  --chart-5: #f3e0c6;
+  --sidebar: #241a10;
+  --sidebar-foreground: #f3e0c6;
+  --sidebar-primary: #ffb3af;
+  --sidebar-primary-foreground: #410005;
+  --sidebar-accent: #3a2f1d;
+  --sidebar-accent-foreground: #f3e0c6;
+  --sidebar-border: rgb(243 224 198 / 12%);
+  --sidebar-ring: #ffb3af;
 }
 
 @layer base {
@@ -123,6 +136,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-heading;
   }
   html {
     @apply font-sans;

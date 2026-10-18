@@ -10,23 +10,22 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Falsas: `prisma generate` (postinstall) y el build cargan la config, pero no conectan.
+env:
+  DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+  DATABASE_URL_UNPOOLED: postgresql://ci:ci@localhost:5432/ci
+  BETTER_AUTH_SECRET: ci-secreto-falso-de-al-menos-32-caracteres
+  BETTER_AUTH_URL: http://localhost:3000
+  NEXT_TELEMETRY_DISABLED: 1
+
 jobs:
   check:
+    name: Lint, tipos, tests y build
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      # Falsas: `prisma generate` (postinstall) y el build cargan la config, pero no conectan.
-      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
-      DATABASE_URL_UNPOOLED: postgresql://ci:ci@localhost:5432/ci
-      NEXT_TELEMETRY_DISABLED: 1
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/setup
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
@@ -34,3 +33,70 @@ jobs:
       - name: Schema de Prisma válido y formateado
         run: pnpm exec prisma validate && pnpm exec prisma format --check
       - run: pnpm build
+
+  migrations:
+    name: Migraciones sin drift
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      # Si una migración tiene SQL que no aplica sobre una BD vacía, falla aquí.
+      - name: Aplicar todas las migraciones a una base de datos vacía
+        run: pnpm exec prisma migrate deploy
+      - name: Comprobar que schema.prisma coincide con las migraciones
+        run: |
+          set +e
+          pnpm exec prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code --script
+          code=$?
+          if [ "$code" -eq 2 ]; then
+            echo "::error title=Drift de migraciones::schema.prisma tiene cambios sin migración (el SQL de arriba es lo que falta). Ejecuta 'pnpm db:migrate' y haz commit de la migración."
+          fi
+          exit $code
+
+  integration:
+    name: Tests de integración (Neon)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: migrations
+    # Una sola ejecución a la vez contra la rama de test: comparten datos.
+    concurrency:
+      group: neon-test-branch
+      cancel-in-progress: false
+    env:
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      TEST_DATABASE_URL_UNPOOLED: ${{ secrets.TEST_DATABASE_URL_UNPOOLED }}
+    steps:
+      # PRs desde forks y Dependabot no reciben secretos: se omite sin fallar.
+      - name: Comprobar los secretos
+        id: secretos
+        run: |
+          if [ -n "$TEST_DATABASE_URL" ] && [ -n "$TEST_DATABASE_URL_UNPOOLED" ]; then
+            echo "configurados=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice title=Tests de integración omitidos::Faltan los secretos TEST_DATABASE_URL y TEST_DATABASE_URL_UNPOOLED."
+            echo "configurados=false" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.secretos.outputs.configurados == 'true'
+        uses: actions/checkout@v4
+      - if: steps.secretos.outputs.configurados == 'true'
+        uses: ./.github/actions/setup
+      - if: steps.secretos.outputs.configurados == 'true'
+        name: Aplicar migraciones a la rama de test
+        run: pnpm db:migrate:test
+      - if: steps.secretos.outputs.configurados == 'true'
+        run: pnpm test:integration

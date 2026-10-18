@@ -1,23 +1,104 @@
 @base = http://localhost:3000/api/v1
+# Todo menos /health y /auth/* necesita sesión: ejecuta antes "Entrar (app móvil)" (al final).
+# Token de sesión para probar como la app móvil: copia la cabecera
+# `set-auth-token` de la respuesta de "Entrar (app móvil)".
+@token = PEGA-AQUI-EL-TOKEN
 @lista = 0199b000-0000-7000-8000-000000000003
+# Pega aquí el id que devuelve "Añadir un producto"
+@item = PEGA-AQUI-EL-ID
 
 ### Ver la lista
 GET {{base}}/lists/{{lista}}
+Authorization: Bearer {{token}}
 
 ### Añadir un producto
 POST {{base}}/lists/{{lista}}/items
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 { "nombre": "Leche", "cantidad": { "valor": 2, "unidad": "l" } }
 
-### Marcar como comprado (sustituye el id)
-PATCH {{base}}/lists/{{lista}}/items/PEGA-AQUI-EL-ID
+### Marcar como comprado
+PATCH {{base}}/lists/{{lista}}/items/{{item}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 { "comprado": true }
 
+### Desmarcar (volver a "por comprar")
+PATCH {{base}}/lists/{{lista}}/items/{{item}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "comprado": false }
+
+### Cambiar la cantidad
+PATCH {{base}}/lists/{{lista}}/items/{{item}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "cantidad": { "valor": 3, "unidad": "l" } }
+
+### Quitar un producto (soft delete): 204
+DELETE {{base}}/lists/{{lista}}/items/{{item}}
+Authorization: Bearer {{token}}
+
 ### Error de validación esperado: 400
 POST {{base}}/lists/{{lista}}/items
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 { "nombre": "", "cantidad": { "valor": -1, "unidad": "docena" } }
+
+### PATCH sin campos: 400
+PATCH {{base}}/lists/{{lista}}/items/{{item}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}
+
+### Lista que no existe (o de otro hogar): 404
+GET {{base}}/lists/0199b000-0000-7000-8000-0000000000ff
+Authorization: Bearer {{token}}
+
+# ─── Autenticación (Better Auth) ─────────────────────────────
+# La web usa cookies; estas peticiones simulan la app móvil (Bearer).
+
+### Registro (devuelve la cabecera set-auth-token)
+POST {{base}}/auth/sign-up/email
+Content-Type: application/json
+
+{ "name": "Ana", "email": "ana@example.com", "password": "clave-segura-1" }
+
+### Entrar (app móvil): copia `set-auth-token` en @token
+POST {{base}}/auth/sign-in/email
+Content-Type: application/json
+
+{ "email": "dev@migas.local", "password": "dev-migas-1234" }
+
+### Contraseña incorrecta: 401 INVALID_EMAIL_OR_PASSWORD
+POST {{base}}/auth/sign-in/email
+Content-Type: application/json
+
+{ "email": "dev@migas.local", "password": "no-es-esta" }
+
+### Quién soy (hogarId null si aún no ha creado su hogar)
+GET {{base}}/me
+Authorization: Bearer {{token}}
+
+### Crear mi hogar (y su primera lista). 409 YA_TIENE_HOGAR si ya tiene uno
+POST {{base}}/households
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nombre": "Casa de Ana" }
+
+### Sin sesión: 401 NO_AUTENTICADO
+GET {{base}}/me
+
+### Cerrar sesión (revoca el token)
+POST {{base}}/auth/sign-out
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}

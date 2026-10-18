@@ -1,4 +1,4 @@
-# ShopLab
+# Migas
 
 Aplicación de hogar para gestionar la **lista de la compra**, la
 **despensa** (existencias y caducidades) y las **recetas**, con
@@ -8,7 +8,8 @@ Es a la vez la aplicación web y la **API pública** (`/api/v1`) que
 consumirán otros clientes, como una futura app móvil (proyecto aparte).
 
 > Las decisiones de arquitectura y convenciones para desarrollar están en
-> [`CLAUDE.md`](./CLAUDE.md). Este README es la visión general.
+> [`CLAUDE.md`](./CLAUDE.md), y las buenas prácticas generales en
+> [`AGENTS.md`](./AGENTS.md). Este README es la visión general.
 
 ---
 
@@ -87,17 +88,17 @@ prisma/           schema y migraciones
 
 ## Stack
 
-| Área         | Tecnología                                   |
-| ------------ | -------------------------------------------- |
-| Framework    | Next.js 15 (App Router), TypeScript estricto |
-| Datos        | Prisma + PostgreSQL (Neon)                   |
-| Auth         | Auth.js v5 + tokens Bearer para la API       |
-| Validación   | Zod                                          |
-| UI           | Tailwind CSS, shadcn/ui, React Hook Form     |
-| Estado       | Zustand, TanStack Query (donde aporta)       |
-| Tests        | Vitest, Testing Library, Playwright          |
-| Calidad      | ESLint, Prettier, Husky + lint-staged        |
-| Hosting / CI | Vercel, GitHub Actions                       |
+| Área         | Tecnología                                    |
+| ------------ | --------------------------------------------- |
+| Framework    | Next.js 15 (App Router), TypeScript estricto  |
+| Datos        | Prisma + PostgreSQL (Neon)                    |
+| Auth         | Better Auth (cookie web + Bearer para la API) |
+| Validación   | Zod                                           |
+| UI           | Tailwind CSS, shadcn/ui, React Hook Form      |
+| Estado       | Zustand, TanStack Query (donde aporta)        |
+| Tests        | Vitest, Testing Library, Playwright           |
+| Calidad      | ESLint, Prettier, Husky + lint-staged         |
+| Hosting / CI | Vercel, GitHub Actions                        |
 
 ## Puesta en marcha
 
@@ -106,19 +107,21 @@ local).
 
 ```bash
 pnpm install
-cp .env.example .env.local   # rellenar valores
-pnpm prisma migrate dev
+cp .env.example .env.local   # rellenar valores (BETTER_AUTH_SECRET incluido)
+pnpm db:migrate              # aplica las migraciones (nunca aceptes un reset)
+pnpm db:generate             # Prisma 7 no genera el cliente al migrar
+pnpm prisma db seed          # usuario dev@migas.local / dev-migas-1234
 pnpm dev
 ```
 
 ### Variables de entorno
 
-| Variable       | Uso                               |
-| -------------- | --------------------------------- |
-| `DATABASE_URL` | Conexión pooled a Postgres        |
-| `DIRECT_URL`   | Conexión directa (Prisma Migrate) |
-| `AUTH_SECRET`  | Firma de sesiones de Auth.js      |
-| `AUTH_URL`     | URL base de la app                |
+| Variable                | Uso                                             |
+| ----------------------- | ----------------------------------------------- |
+| `DATABASE_URL`          | Conexión pooled a Postgres (la app)             |
+| `DATABASE_URL_UNPOOLED` | Conexión directa (CLI de Prisma)                |
+| `BETTER_AUTH_SECRET`    | Firma de sesiones (≥ 32 caracteres)             |
+| `BETTER_AUTH_URL`       | URL pública de la app (`http://localhost:3000`) |
 
 Se validan al arrancar en `src/env.ts`; si falta alguna, la app no
 inicia.
@@ -146,11 +149,9 @@ inicia.
 
 ## Pendiente de decidir
 
-- Mecanismo de tokens para clientes de la API (propuesta: access JWT
-  corto + refresh rotativo)
 - Resolución de conflictos en sync (propuesta: last-write-wins por campo)
 - Pertenencia de un usuario a varios hogares
-- Proveedor de email y de rate limiting
+- Proveedor de email (verificación y restablecer contraseña)
 - Origen y licencia del catálogo de recetas
 - Alojamiento del futuro microservicio Python (canonicalización/NLP)
 

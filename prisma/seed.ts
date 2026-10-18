@@ -1,7 +1,15 @@
 import nextEnv from "@next/env";
 import { PrismaNeon } from "@prisma/adapter-neon";
+import { hashPassword } from "better-auth/crypto";
 import { PrismaClient } from "../src/generated/prisma/client";
-import { DEV_HOGAR_ID, DEV_LISTA_ID, DEV_USER_ID } from "../src/shared/kernel/dev-identity";
+import {
+  DEV_ACCOUNT_ID,
+  DEV_EMAIL,
+  DEV_HOGAR_ID,
+  DEV_LISTA_ID,
+  DEV_PASSWORD,
+  DEV_USER_ID,
+} from "../src/shared/kernel/dev-identity";
 
 const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd());
@@ -24,8 +32,23 @@ async function main() {
 
   await prisma.usuario.upsert({
     where: { id: DEV_USER_ID },
-    update: {},
-    create: { id: DEV_USER_ID, email: "dev@shoplab.local", nombre: "Usuario de desarrollo" },
+    // Si ya existía con el email antiguo (dev@shoplab.local), se actualiza.
+    update: { email: DEV_EMAIL },
+    create: { id: DEV_USER_ID, email: DEV_EMAIL, nombre: "Usuario de desarrollo" },
+  });
+
+  // Cuenta de email y contraseña, como la crearía Better Auth al registrarse
+  // (providerId "credential", accountId = id del usuario, hash scrypt).
+  await prisma.account.upsert({
+    where: { id: DEV_ACCOUNT_ID },
+    update: { password: await hashPassword(DEV_PASSWORD) },
+    create: {
+      id: DEV_ACCOUNT_ID,
+      usuarioId: DEV_USER_ID,
+      accountId: DEV_USER_ID,
+      providerId: "credential",
+      password: await hashPassword(DEV_PASSWORD),
+    },
   });
 
   await prisma.miembroHogar.upsert({
@@ -40,7 +63,7 @@ async function main() {
     create: { id: DEV_LISTA_ID, hogarId: DEV_HOGAR_ID, nombre: "Lista de la compra" },
   });
 
-  console.log("Seed completado: hogar, usuario y lista de desarrollo listos");
+  console.log(`Seed completado. Entra con ${DEV_EMAIL} / ${DEV_PASSWORD}`);
 }
 
 try {
