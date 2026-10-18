@@ -1,6 +1,11 @@
 import { unstable_rethrow } from "next/navigation";
 import type { z } from "zod";
-import { getAuthContext, type AuthContext } from "@/shared/kernel/auth-context";
+import {
+  getAuthContext,
+  getIdentity,
+  type AuthContext,
+  type Identity,
+} from "@/shared/kernel/auth-context";
 import { parseId, parseJson } from "./parse";
 import { errorResponse, internalErrorResponse } from "./responses";
 
@@ -8,7 +13,18 @@ type Ids<K extends string> = { readonly [P in K]: string };
 
 type Body<S> = S extends z.ZodType ? z.output<S> : undefined;
 
-export interface ApiRouteOptions<K extends string, S extends z.ZodType | undefined> {
+/** "hogar" (por defecto): sesión + hogar activo. "identidad": basta la sesión (crear el hogar). */
+export type NivelAuth = "hogar" | "identidad";
+
+type AuthDe<N extends NivelAuth> = N extends "identidad" ? Identity : AuthContext;
+
+export interface ApiRouteOptions<
+  K extends string,
+  S extends z.ZodType | undefined,
+  N extends NivelAuth = "hogar",
+> {
+  /** Qué exige la ruta. Por defecto, un usuario con hogar. */
+  readonly auth?: N;
   /**
    * Segmentos dinámicos de la ruta que son UUID. Deben llamarse igual que las
    * carpetas (`[listId]` → `"listId"`): `next typegen` + `tsc` lo comprueban.
@@ -18,9 +34,9 @@ export interface ApiRouteOptions<K extends string, S extends z.ZodType | undefin
   readonly body?: S;
 }
 
-export interface ApiRouteContext<K extends string, S> {
+export interface ApiRouteContext<K extends string, S, N extends NivelAuth = "hogar"> {
   readonly request: Request;
-  readonly auth: AuthContext;
+  readonly auth: AuthDe<N>;
   readonly ids: Ids<K>;
   readonly body: Body<S>;
 }
@@ -39,10 +55,14 @@ export interface ApiRouteContext<K extends string, S> {
 export function apiRoute<
   const K extends string = never,
   S extends z.ZodType | undefined = undefined,
->(options: ApiRouteOptions<K, S>, handler: (ctx: ApiRouteContext<K, S>) => Promise<Response>) {
+  const N extends NivelAuth = "hogar",
+>(
+  options: ApiRouteOptions<K, S, N>,
+  handler: (ctx: ApiRouteContext<K, S, N>) => Promise<Response>,
+) {
   return async (request: Request, context: { params: Promise<Ids<K>> }): Promise<Response> => {
     try {
-      const auth = await getAuthContext();
+      const auth = options.auth === "identidad" ? await getIdentity() : await getAuthContext();
       if (!auth.ok) return errorResponse(auth.error);
 
       const params = await context.params;
@@ -60,7 +80,12 @@ export function apiRoute<
         body = parsed.value;
       }
 
-      return await handler({ request, auth: auth.value, ids, body: body as Body<S> });
+      return await handler({
+        request,
+        auth: auth.value as AuthDe<N>,
+        ids,
+        body: body as Body<S>,
+      });
     } catch (error) {
       // Deja pasar redirect(), notFound() y similares: Next los implementa con throw.
       unstable_rethrow(error);
