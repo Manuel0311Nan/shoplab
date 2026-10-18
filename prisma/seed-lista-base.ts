@@ -17,26 +17,54 @@ export function uuidV5(nombre: string, namespace = NAMESPACE_LISTA_BASE): string
 }
 
 /**
- * Carga la lista base. Idempotente: upsert por nombre normalizado, así que volver a
- * sembrar actualiza categoría y unidad sin duplicar ni cambiar ids (los ítems que ya
- * apuntan a un producto siguen apuntando a él).
+ * Carga la lista base. Idempotente: la clave es el nombre normalizado, así que volver a
+ * sembrar no duplica ni cambia ids (los ítems que ya apuntan a un producto siguen
+ * apuntando a él).
+ *
+ * Sin una transacción con 328 upserts: contra Neon cada consulta es un viaje de red y
+ * se pasaba del límite de 5 s de Prisma. En su lugar: una lectura, un createMany con
+ * los nuevos y un update solo por cada producto que haya cambiado (normalmente ninguno).
  */
 export async function sembrarListaBase(prisma: PrismaClient): Promise<number> {
-  await prisma.$transaction(
-    LISTA_BASE.map(([nombre, categoria, unidad]) => {
-      const nombreNormalizado = normalizarNombre(nombre);
-      return prisma.productoBase.upsert({
-        where: { nombreNormalizado },
-        update: { nombre, categoria, unidadPorDefecto: unidad },
-        create: {
-          id: uuidV5(nombreNormalizado),
-          nombre,
-          nombreNormalizado,
-          categoria,
-          unidadPorDefecto: unidad,
-        },
+  const existentes = new Map(
+    (
+      await prisma.productoBase.findMany({
+        select: { nombreNormalizado: true, nombre: true, categoria: true, unidadPorDefecto: true },
+      })
+    ).map((p) => [p.nombreNormalizado, p]),
+  );
+
+  const nuevos = [];
+  const cambiados = [];
+  for (const [nombre, categoria, unidad] of LISTA_BASE) {
+    const nombreNormalizado = normalizarNombre(nombre);
+    const actual = existentes.get(nombreNormalizado);
+    if (actual === undefined) {
+      nuevos.push({
+        id: uuidV5(nombreNormalizado),
+        nombre,
+        nombreNormalizado,
+        categoria,
+        unidadPorDefecto: unidad,
       });
-    }),
+    } else if (
+      actual.nombre !== nombre ||
+      actual.categoria !== categoria ||
+      actual.unidadPorDefecto !== unidad
+    ) {
+      cambiados.push({ nombreNormalizado, nombre, categoria, unidadPorDefecto: unidad });
+    }
+  }
+
+  // skipDuplicates: si otro seed corre a la vez, no falla por la clave única.
+  if (nuevos.length > 0)
+    await prisma.productoBase.createMany({ data: nuevos, skipDuplicates: true });
+  for (const { nombreNormalizado, ...datos } of cambiados) {
+    await prisma.productoBase.update({ where: { nombreNormalizado }, data: datos });
+  }
+
+  console.log(
+    `Lista base: ${nuevos.length} nuevos, ${cambiados.length} actualizados, ${LISTA_BASE.length} en total`,
   );
   return LISTA_BASE.length;
 }

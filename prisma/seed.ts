@@ -64,8 +64,7 @@ async function main() {
     create: { id: DEV_LISTA_ID, hogarId: DEV_HOGAR_ID, nombre: "Lista de la compra" },
   });
 
-  const productos = await sembrarListaBase(prisma);
-  console.log(`Lista base: ${productos} productos`);
+  await sembrarListaBase(prisma);
 
   console.log(`Seed completado. Entra con ${DEV_EMAIL} / ${DEV_PASSWORD}`);
 }
