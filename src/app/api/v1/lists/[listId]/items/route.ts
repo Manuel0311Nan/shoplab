@@ -14,6 +14,10 @@ export const POST = apiRoute(
       nombre: body.nombre,
       cantidad: body.cantidad,
       nota: body.nota ?? null,
+      productoBaseId: body.productoBaseId ?? null,
+      ...(body.duplicado === undefined ? {} : { duplicado: body.duplicado }),
+      ...(body.unidadFinal === undefined ? {} : { unidadFinal: body.unidadFinal }),
+      ...(body.cantidadFinal === undefined ? {} : { cantidadFinal: body.cantidadFinal }),
     });
 
     return resultResponse(mapResult(result, toShoppingItemResponse), 201);

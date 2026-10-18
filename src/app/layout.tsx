@@ -29,7 +29,10 @@ export const metadata: Metadata = {
 };
 
 // Color de la barra del sistema en el móvil: el fondo de la app en cada tema.
+// viewportFit "cover": la app ocupa también la zona del notch; la barra inferior
+// se aparta con env(safe-area-inset-bottom).
 export const viewport: Viewport = {
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#fff8f3" },
     { media: "(prefers-color-scheme: dark)", color: "#1c140b" },

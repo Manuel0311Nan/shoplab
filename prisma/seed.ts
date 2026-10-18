@@ -10,6 +10,7 @@ import {
   DEV_PASSWORD,
   DEV_USER_ID,
 } from "../src/shared/kernel/dev-identity";
+import { sembrarListaBase } from "./seed-lista-base";
 
 const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd());
@@ -62,6 +63,8 @@ async function main() {
     update: {},
     create: { id: DEV_LISTA_ID, hogarId: DEV_HOGAR_ID, nombre: "Lista de la compra" },
   });
+
+  await sembrarListaBase(prisma);
 
   console.log(`Seed completado. Entra con ${DEV_EMAIL} / ${DEV_PASSWORD}`);
 }

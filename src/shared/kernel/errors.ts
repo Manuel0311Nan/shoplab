@@ -13,10 +13,15 @@ export const notFoundError = (code: string, message: string): AppError => ({
   message,
 });
 
-export const conflictError = (code: string, message: string): AppError => ({
+export const conflictError = (
+  code: string,
+  message: string,
+  details?: Readonly<Record<string, unknown>>,
+): AppError => ({
   type: "conflict",
   code,
   message,
+  ...(details === undefined ? {} : { details }),
 });
 
 export const forbiddenError = (code: string, message: string): AppError => ({

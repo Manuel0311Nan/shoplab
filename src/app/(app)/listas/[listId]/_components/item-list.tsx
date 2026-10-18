@@ -9,9 +9,19 @@ type Props = {
   onToggle: (itemId: string, comprado: boolean) => void;
   onCantidad: (itemId: string, cantidad: CantidadDto) => void;
   onQuitar: (itemId: string) => void;
+  /** Lista archivada: se ve, pero no se puede cambiar. */
+  soloLectura?: boolean;
 };
 
-export function ItemList({ titulo, vacio, items, onToggle, onCantidad, onQuitar }: Props) {
+export function ItemList({
+  titulo,
+  vacio,
+  items,
+  onToggle,
+  onCantidad,
+  onQuitar,
+  soloLectura = false,
+}: Props) {
   const tituloId = useId();
   return (
     <section aria-labelledby={tituloId} className="flex flex-col gap-3">
@@ -36,6 +46,7 @@ export function ItemList({ titulo, vacio, items, onToggle, onCantidad, onQuitar 
               onToggle={(comprado) => onToggle(item.id, comprado)}
               onCantidad={(cantidad) => onCantidad(item.id, cantidad)}
               onQuitar={() => onQuitar(item.id)}
+              soloLectura={soloLectura}
             />
           ))}
         </ul>

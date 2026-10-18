@@ -3,5 +3,5 @@ import { shoppingListRepositoryContract } from "./shopping-list-repository.contr
 
 shoppingListRepositoryContract(
   "en memoria",
-  async (listas) => new InMemoryShoppingListRepository(listas),
+  async (listas, clock) => new InMemoryShoppingListRepository(listas, clock),
 );

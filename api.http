@@ -61,6 +61,88 @@ Content-Type: application/json
 GET {{base}}/lists/0199b000-0000-7000-8000-0000000000ff
 Authorization: Bearer {{token}}
 
+# ─── Mis listas (vista 2) ────────────────────────────────────
+# Pega aquí el nextCursor de "Archivadas"
+@cursor = PEGA-AQUI-EL-CURSOR
+# Pega aquí el id de una lista activa para archivarla a cambio (límite de 15)
+@archivar = PEGA-AQUI-EL-ID
+
+### Activas: todas (máx. 15), la última modificada primero
+GET {{base}}/lists
+Authorization: Bearer {{token}}
+
+### Archivadas: paginadas; incluyen caducaEl (se borran a los 15 días)
+GET {{base}}/lists?estado=archivadas&limite=5
+Authorization: Bearer {{token}}
+
+### Siguiente página de archivadas
+GET {{base}}/lists?estado=archivadas&limite=5&cursor={{cursor}}
+Authorization: Bearer {{token}}
+
+### Crear lista: 201. Con 15 activas, 409 LIMITE_DE_LISTAS con details.activas
+POST {{base}}/lists
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nombre": "Barbacoa" }
+
+### Crear con 15 activas archivando otra a cambio
+POST {{base}}/lists
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nombre": "Barbacoa", "archivarListaId": "{{archivar}}" }
+
+### Renombrar
+PATCH {{base}}/lists/{{lista}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nombre": "Compra de la semana" }
+
+### Archivar (empieza la cuenta de 15 días)
+PATCH {{base}}/lists/{{lista}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "archivada": true }
+
+### Recuperar (con 15 activas: 409 LIMITE_DE_LISTAS; añade archivarListaId)
+PATCH {{base}}/lists/{{lista}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "archivada": false }
+
+### Borrar para siempre: 204 (cuidado: es la lista de @lista)
+DELETE {{base}}/lists/{{lista}}
+Authorization: Bearer {{token}}
+
+### Lista base para autocompletar (Cache-Control: un día)
+GET {{base}}/catalog/products
+Authorization: Bearer {{token}}
+
+### Producto repetido: 409 POSIBLE_DUPLICADO con details.existente (ejecuta antes "Añadir un producto")
+POST {{base}}/lists/{{lista}}/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nombre": "LECHE", "cantidad": { "valor": 500, "unidad": "ml" } }
+
+### Unir: con unidades distintas, 400 UNIDADES_DISTINTAS hasta indicar unidadFinal
+POST {{base}}/lists/{{lista}}/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nombre": "LECHE", "cantidad": { "valor": 500, "unidad": "ml" }, "duplicado": "unir", "unidadFinal": "l" }
+
+### Añadir aparte (otra línea con el mismo nombre)
+POST {{base}}/lists/{{lista}}/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nombre": "Leche", "cantidad": { "valor": 1, "unidad": "unidad" }, "duplicado": "separar" }
+
 # ─── Autenticación (Better Auth) ─────────────────────────────
 # La web usa cookies; estas peticiones simulan la app móvil (Bearer).
 

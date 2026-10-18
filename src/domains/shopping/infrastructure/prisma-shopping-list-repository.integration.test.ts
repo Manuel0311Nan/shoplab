@@ -1,8 +1,18 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { ShoppingList } from "@/domains/shopping/domain/shopping-list";
-import { item, lista, LISTA_ID } from "@/domains/shopping/testing/builders";
+import {
+  AHORA,
+  DESPUES,
+  item,
+  lista,
+  listaCon,
+  listaId,
+  LISTA_ID,
+  USUARIO_ID,
+} from "@/domains/shopping/testing/builders";
 import { shoppingListRepositoryContract } from "@/domains/shopping/testing/shopping-list-repository.contract";
 import { prisma } from "@/shared/kernel/prisma";
+import { PrismaListasCaducadasRepository } from "./prisma-listas-caducadas-repository";
 import { PrismaShoppingListRepository } from "./prisma-shopping-list-repository";
 
 // Hogares propios de esta suite (ids fijos: la rama de test es solo para tests).
@@ -43,17 +53,24 @@ beforeAll(async () => {
     ],
     skipDuplicates: true,
   });
+  // Quien marca productos como comprados en la suite (compradoPorId tiene FK a Usuario).
+  await prisma.usuario.upsert({
+    where: { id: USUARIO_ID },
+    create: { id: USUARIO_ID, email: "contrato-shopping@migas.test", nombre: "Usuario de test" },
+    update: {},
+  });
 });
 
 afterAll(async () => {
   // onDelete: Cascade borra también sus listas e ítems.
   await prisma.hogar.deleteMany({ where: { id: { in: [HOGAR_ID, OTRO_HOGAR_ID] } } });
+  await prisma.usuario.deleteMany({ where: { id: USUARIO_ID } });
   await prisma.$disconnect();
 });
 
-shoppingListRepositoryContract("Prisma", async (listas) => {
+shoppingListRepositoryContract("Prisma", async (listas, clock) => {
   await sembrar(listas);
-  return new PrismaShoppingListRepository({ hogarId: HOGAR_ID });
+  return new PrismaShoppingListRepository({ hogarId: HOGAR_ID }, clock);
 });
 
 describe("PrismaShoppingListRepository: aislamiento entre hogares", () => {
@@ -62,5 +79,24 @@ describe("PrismaShoppingListRepository: aislamiento entre hogares", () => {
     const repoDeOtroHogar = new PrismaShoppingListRepository({ hogarId: OTRO_HOGAR_ID });
 
     expect(await repoDeOtroHogar.findById(LISTA_ID)).toBeNull();
+  });
+});
+
+describe("PrismaListasCaducadasRepository", () => {
+  it("marcarBorradas_SoloLasArchivadasAntesDelLimite", async () => {
+    await sembrar([
+      listaCon({ id: listaId(1), archivadaAt: AHORA }),
+      listaCon({ id: listaId(2), archivadaAt: DESPUES }),
+      listaCon({ id: listaId(3) }),
+    ]);
+
+    await new PrismaListasCaducadasRepository().marcarBorradas(AHORA, DESPUES);
+
+    const filas = await prisma.shoppingList.findMany({
+      where: { hogarId: HOGAR_ID },
+      orderBy: { id: "asc" },
+      select: { deletedAt: true },
+    });
+    expect(filas.map((f) => f.deletedAt)).toEqual([DESPUES, null, null]);
   });
 });

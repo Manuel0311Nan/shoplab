@@ -1,5 +1,6 @@
 "use client";
-import { Plus } from "lucide-react";
+import { ArchiveRestore, ChevronLeft, Plus } from "lucide-react";
+import Link from "next/link";
 import { useOptimistic, useState, useTransition } from "react";
 import {
   addItemAction,
@@ -7,47 +8,109 @@ import {
   setItemPurchasedAction,
   updateItemQuantityAction,
 } from "@/app/actions/shopping-items";
-import { finishShoppingAction } from "@/app/actions/shopping-lists";
+import { actualizarListaAction, finishShoppingAction } from "@/app/actions/shopping-lists";
 import type {
   CantidadDto,
+  LimiteDeListasDetails,
   ModoTerminarCompraDto,
   ShoppingListResponse,
 } from "@/contracts/shopping";
-import type { Result } from "@/shared/kernel/result";
 import { newId } from "@/shared/kernel/ids";
+import type { Result } from "@/shared/kernel/result";
+import { Button } from "@/shared/ui/button";
+import { ElegirListaDialog } from "../../../_components/elegir-lista-dialog";
+import { duplicado, limiteDeListas } from "../../../_components/errores";
+import { formatDiaYMes } from "../../../_components/fechas";
 import { AddItemForm, NUEVO_PRODUCTO_ID, type NewItemValues } from "./add-item-form";
+import { DuplicadoDialog, type EstadoDuplicado, type RespuestaUnir } from "./duplicado-dialog";
 import { FinishShoppingButton } from "./finish-shopping-button";
 import { ItemList } from "./item-list";
 import { type AccionLista, aplicarAccion } from "./list-reducer";
 
 type Props = { list: ShoppingListResponse };
 
+/** Alta que espera respuesta del usuario (producto repetido). */
+type AltaPendiente = EstadoDuplicado & { readonly values: NewItemValues; readonly id: string };
+
 export function ShoppingListScreen({ list }: Props) {
   const [items, aplicarOptimista] = useOptimistic(list.items, aplicarAccion);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [alta, setAlta] = useState<AltaPendiente | null>(null);
+  const [limite, setLimite] = useState<LimiteDeListasDetails | null>(null);
+  const soloLectura = list.archivada;
 
-  function ejecutar(accion: AccionLista, llamada: () => Promise<Result<unknown>>) {
+  function ejecutar(accion: AccionLista | null, llamada: () => Promise<Result<unknown>>) {
     setError(null);
     startTransition(async () => {
-      aplicarOptimista(accion);
+      if (accion !== null) aplicarOptimista(accion);
       const result = await llamada();
       if (!result.ok) setError(result.error.message);
     });
   }
 
-  function anadir(values: NewItemValues) {
-    const id = newId();
-    const item = {
-      id,
-      nombre: values.nombre,
-      cantidad: values.cantidad,
-      nota: values.nota ?? null,
-      ingredientId: null,
-      compradoAt: null,
-      updatedAt: new Date().toISOString(),
-    };
-    ejecutar({ tipo: "anadir", item }, () => addItemAction(list.id, { ...values, id }));
+  /**
+   * Añade (con el ítem optimista) o, tras preguntar, une o separa (sin optimista: el
+   * resultado depende del servidor). Si el servidor ve un repetido, abre el diálogo.
+   */
+  function enviarAlta(
+    values: NewItemValues,
+    id: string,
+    respuesta: RespuestaUnir & { duplicado?: "unir" | "separar" } = {},
+  ) {
+    setError(null);
+    startTransition(async () => {
+      if (respuesta.duplicado === undefined) {
+        aplicarOptimista({
+          tipo: "anadir",
+          item: {
+            id,
+            nombre: values.nombre,
+            cantidad: values.cantidad,
+            nota: values.nota ?? null,
+            ingredientId: null,
+            productoBaseId: values.productoBaseId ?? null,
+            compradoAt: null,
+            updatedAt: new Date().toISOString(),
+          },
+        });
+      }
+      const result = await addItemAction(list.id, { ...values, id, ...respuesta });
+      if (result.ok) return;
+
+      const existente = duplicado(result.error);
+      if (existente === null) {
+        setError(result.error.message);
+        return;
+      }
+      setAlta({
+        values,
+        id,
+        existente,
+        nueva: values.cantidad,
+        paso: result.error.code === "POSIBLE_DUPLICADO" ? "decidir" : "unidad",
+      });
+    });
+  }
+
+  function responderAlta(respuesta: RespuestaUnir & { duplicado: "unir" | "separar" }) {
+    if (alta === null) return;
+    setAlta(null);
+    enviarAlta(alta.values, alta.id, respuesta);
+  }
+
+  function recuperar(archivarListaId?: string) {
+    setError(null);
+    startTransition(async () => {
+      const result = await actualizarListaAction(list.id, {
+        archivada: false,
+        ...(archivarListaId ? { archivarListaId } : {}),
+      });
+      if (result.ok) return;
+      const detalles = limiteDeListas(result.error);
+      if (detalles !== null) setLimite(detalles);
+      else setError(result.error.message);
+    });
   }
 
   const marcar = (itemId: string, comprado: boolean) =>
@@ -74,8 +137,15 @@ export function ShoppingListScreen({ list }: Props) {
   const enElCarro = items.filter((item) => item.compradoAt !== null);
 
   return (
-    <section className="mx-auto flex max-w-3xl flex-col gap-8 px-5 pt-4 pb-28 sm:pb-10">
+    <section className="mx-auto flex max-w-3xl flex-col gap-8 px-5 pt-2 pb-24 sm:pb-10">
       <header className="flex flex-col gap-2">
+        <Link
+          href={soloLectura ? "/listas?estado=archivadas" : "/listas"}
+          className="-ml-2 flex h-11 items-center gap-1 self-start rounded-lg px-2 font-semibold text-primary outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          <ChevronLeft className="size-5" aria-hidden="true" />
+          Mis listas
+        </Link>
         {/* El título ocupa todo el ancho y salta de línea si no cabe: nunca se corta. */}
         <h1 className="text-[28px] leading-9 font-bold text-balance break-words">{list.nombre}</h1>
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
@@ -88,7 +158,31 @@ export function ShoppingListScreen({ list }: Props) {
         </div>
       </header>
 
-      <AddItemForm onAdd={anadir} />
+      {soloLectura ? (
+        <div className="flex flex-col gap-3 rounded-xl bg-secondary p-4 text-secondary-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            Lista archivada: no se puede cambiar.
+            {list.caducaEl !== null && (
+              <>
+                {" "}
+                <strong className="font-semibold">
+                  Se borrará el {formatDiaYMes(list.caducaEl)}.
+                </strong>
+              </>
+            )}
+          </p>
+          <Button
+            onClick={() => recuperar()}
+            disabled={isPending}
+            className="h-11 px-4 font-semibold"
+          >
+            <ArchiveRestore aria-hidden="true" />
+            Recuperar
+          </Button>
+        </div>
+      ) : (
+        <AddItemForm onAdd={(values) => enviarAlta(values, newId())} />
+      )}
 
       {error !== null && (
         <p
@@ -106,6 +200,7 @@ export function ShoppingListScreen({ list }: Props) {
         onToggle={marcar}
         onCantidad={cambiarCantidad}
         onQuitar={quitar}
+        soloLectura={soloLectura}
       />
       <ItemList
         titulo="En el carro"
@@ -114,20 +209,39 @@ export function ShoppingListScreen({ list }: Props) {
         onToggle={marcar}
         onCantidad={cambiarCantidad}
         onQuitar={quitar}
+        soloLectura={soloLectura}
       />
 
-      {enElCarro.length > 0 && (
+      {!soloLectura && enElCarro.length > 0 && (
         <FinishShoppingButton pendientes={pendientes.length} onTerminar={terminar} />
       )}
 
-      <button
-        type="button"
-        onClick={irAlFormulario}
-        aria-label="Añadir producto"
-        className="fixed right-5 bottom-6 z-40 flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-90 sm:hidden"
-      >
-        <Plus className="size-8" aria-hidden="true" />
-      </button>
+      {!soloLectura && (
+        <button
+          type="button"
+          onClick={irAlFormulario}
+          aria-label="Añadir producto"
+          className="fixed right-5 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-40 flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-90 sm:hidden"
+        >
+          <Plus className="size-8" aria-hidden="true" />
+        </button>
+      )}
+
+      <DuplicadoDialog
+        estado={alta}
+        onUnir={(respuesta) => responderAlta({ duplicado: "unir", ...respuesta })}
+        onSeparar={() => responderAlta({ duplicado: "separar" })}
+        onCerrar={() => setAlta(null)}
+      />
+      <ElegirListaDialog
+        limite={limite}
+        motivo="desarchivar"
+        onElegir={(id) => {
+          setLimite(null);
+          recuperar(id);
+        }}
+        onCerrar={() => setLimite(null)}
+      />
     </section>
   );
 }

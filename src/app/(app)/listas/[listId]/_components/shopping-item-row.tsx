@@ -9,13 +9,20 @@ type Props = {
   onToggle: (comprado: boolean) => void;
   onCantidad: (cantidad: CantidadDto) => void;
   onQuitar: () => void;
+  soloLectura?: boolean;
 };
 
 // Hasta que el ítem se vincule a un Ingredient con categoría (vista 3),
 // el círculo del diseño muestra la inicial en lugar de un icono.
 const inicial = (nombre: string) => nombre.trim().charAt(0).toLocaleUpperCase("es-ES");
 
-export function ShoppingItemRow({ item, onToggle, onCantidad, onQuitar }: Props) {
+export function ShoppingItemRow({
+  item,
+  onToggle,
+  onCantidad,
+  onQuitar,
+  soloLectura = false,
+}: Props) {
   const comprado = item.compradoAt !== null;
   return (
     <li
@@ -34,15 +41,17 @@ export function ShoppingItemRow({ item, onToggle, onCantidad, onQuitar }: Props)
         >
           {inicial(item.nombre)}
         </span>
-        <Button
-          variant="ghost"
-          size="icon-lg"
-          onClick={onQuitar}
-          aria-label={`Quitar ${item.nombre}`}
-          className="-mt-1.5 -mr-1.5 size-11 rounded-full text-muted-foreground [&_svg:not([class*='size-'])]:size-5"
-        >
-          <X aria-hidden="true" />
-        </Button>
+        {!soloLectura && (
+          <Button
+            variant="ghost"
+            size="icon-lg"
+            onClick={onQuitar}
+            aria-label={`Quitar ${item.nombre}`}
+            className="-mt-1.5 -mr-1.5 size-11 rounded-full text-muted-foreground [&_svg:not([class*='size-'])]:size-5"
+          >
+            <X aria-hidden="true" />
+          </Button>
+        )}
       </div>
       <h3
         className={cn(
@@ -58,18 +67,20 @@ export function ShoppingItemRow({ item, onToggle, onCantidad, onQuitar }: Props)
           nombre={item.nombre}
           cantidad={item.cantidad}
           onChange={onCantidad}
-          disabled={comprado}
+          disabled={comprado || soloLectura}
         />
       </div>
-      <Button
-        variant={comprado ? "outline" : "default"}
-        onClick={() => onToggle(!comprado)}
-        className="mt-4 h-11 w-full font-semibold"
-      >
-        {comprado ? <Undo2 aria-hidden="true" /> : <Check aria-hidden="true" />}
-        {comprado ? "Devolver" : "Al carro"}
-        <span className="sr-only">: {item.nombre}</span>
-      </Button>
+      {!soloLectura && (
+        <Button
+          variant={comprado ? "outline" : "default"}
+          onClick={() => onToggle(!comprado)}
+          className="mt-4 h-11 w-full font-semibold"
+        >
+          {comprado ? <Undo2 aria-hidden="true" /> : <Check aria-hidden="true" />}
+          {comprado ? "Devolver" : "Al carro"}
+          <span className="sr-only">: {item.nombre}</span>
+        </Button>
+      )}
     </li>
   );
 }

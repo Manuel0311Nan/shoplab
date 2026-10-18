@@ -110,6 +110,33 @@ describe("apiRoute", () => {
     });
   });
 
+  it("apiRoute_ConQuery_LaValidaYLaPasaAlHandler", async () => {
+    const handler = vi.fn(async () => new Response(null, { status: 204 }));
+    const route = apiRoute(
+      { query: z.object({ estado: z.enum(["a", "b"]).default("a"), limite: z.coerce.number() }) },
+      handler,
+    );
+
+    await route(new Request("http://localhost/api/v1/test?limite=5"), params({}));
+
+    expect(handler).toHaveBeenCalledWith(
+      expect.objectContaining({ query: { estado: "a", limite: 5 } }),
+    );
+  });
+
+  it("apiRoute_ConQueryInvalida_Devuelve400ParametrosNoValidos", async () => {
+    const handler = vi.fn(async () => new Response());
+    const route = apiRoute({ query: z.object({ limite: z.coerce.number().max(50) }) }, handler);
+
+    const response = await route(new Request("http://localhost/x?limite=900"), params({}));
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({
+      error: { code: "PARAMETROS_NO_VALIDOS", details: { campos: { limite: expect.any(Array) } } },
+    });
+    expect(handler).not.toHaveBeenCalled();
+  });
+
   it("apiRoute_ConJsonMalFormado_Devuelve400JsonNoValido", async () => {
     const route = apiRoute({ body: z.object({}) }, async () => new Response());
 
