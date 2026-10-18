@@ -38,6 +38,15 @@ export class InMemoryShoppingListRepository implements ShoppingListRepository {
     return ShoppingList.rehydrate(guardada.lista, items);
   }
 
+  /** Como el repositorio de Prisma: sin archivadas, de la más antigua a la más reciente. */
+  async listarActivas(limite: number): Promise<ShoppingListSnapshot[]> {
+    return [...this.store.values()]
+      .map((guardada) => guardada.lista)
+      .filter((lista) => lista.archivadaAt === null)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      .slice(0, limite);
+  }
+
   /** Como el repositorio de Prisma: actualiza la lista y hace upsert de los ítems modificados. */
   async save(list: ShoppingList): Promise<void> {
     const guardada = this.store.get(list.id) ?? { lista: list.toSnapshot(), items: new Map() };
