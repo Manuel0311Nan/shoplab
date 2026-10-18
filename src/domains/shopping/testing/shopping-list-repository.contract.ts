@@ -38,6 +38,25 @@ export function shoppingListRepositoryContract(nombre: string, crear: CrearRepos
       expect(encontrada?.itemsActivos().map((i) => i.id)).toEqual([ITEM_ID]);
     });
 
+    it("listarActivas_VariasListas_SinArchivadasYPorFechaDeCreacion", async () => {
+      const crearLista = (id: string, nombre: string, fecha: Date) =>
+        ShoppingList.rehydrate(
+          { id, nombre, archivadaAt: null, createdAt: fecha, updatedAt: fecha },
+          [],
+        );
+      const archivada = lista([], { archivada: true });
+      const repo = await crear([
+        crearLista(OTRO_ID, "Fiesta", DESPUES),
+        crearLista(ITEM_ID, "Semana", AHORA),
+        archivada,
+      ]);
+
+      const activas = await repo.listarActivas(10);
+
+      expect(activas.map((l) => l.id)).toEqual([ITEM_ID, OTRO_ID]);
+      expect(await repo.listarActivas(1)).toHaveLength(1);
+    });
+
     it("save_ListaNueva_SeRecuperaVacia", async () => {
       const repo = await crear([]);
       const nueva = ShoppingList.create({ id: LISTA_ID, nombre: "Semana" }, AHORA);
