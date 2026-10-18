@@ -19,14 +19,80 @@ model Hogar {
 }
 
 model Usuario {
-  id        String   @id @default(uuid(7)) @db.Uuid
-  email     String   @unique
-  nombre    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid(7)) @db.Uuid
+  email         String   @unique
+  nombre        String
+  /// Lo exige Better Auth. Se usará con la verificación de email (vista 6).
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   hogares        MiembroHogar[]
   itemsComprados ShoppingItem[]
+  sesiones       Session[]
+  cuentas        Account[]
+}
+
+// ─── Identity (tablas de Better Auth) ──────────────────────────────────────
+// Sin hogarId: no van en TENANT_MODELS. Nombres en inglés porque son tablas
+// de la librería, no de nuestro dominio. Ids UUIDv7 generados con newId().
+
+/// Una fila por dispositivo con sesión abierta. Borrarla cierra esa sesión.
+model Session {
+  id        String   @id @db.Uuid
+  usuarioId String   @db.Uuid
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+}
+
+/// Forma de entrar de un usuario. Con email y contraseña, `password` guarda el hash (scrypt).
+model Account {
+  id                    String    @id @db.Uuid
+  usuarioId             String    @db.Uuid
+  accountId             String
+  providerId            String
+  password              String?
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+}
+
+/// Tokens de un solo uso: verificar email y restablecer contraseña (vista 6).
+model Verification {
+  id         String   @id @db.Uuid
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+/// Contadores del límite de peticiones, compartidos entre instancias de Vercel.
+model RateLimit {
+  id          String @id @db.Uuid
+  key         String @unique
+  count       Int
+  lastRequest BigInt
 }
 
 model MiembroHogar {
