@@ -29,8 +29,8 @@ API HTTP: todo lo que haga la web debe poder hacerse vía `/api/v1`.
 - **ORM / BD:** Prisma 7 (fijado; migrar a Prisma 8 es decisión aparte)
   con PostgreSQL en Neon vía `@prisma/adapter-neon`. Cliente generado en
   `src/generated/prisma` (no se versiona; `postinstall` lo genera)
-- **Autenticación:** Auth.js (NextAuth v5) para la web; tokens Bearer
-  para clientes de la API (ver Identity)
+- **Autenticación:** Better Auth (versión exacta fijada): cookie en la web
+  y `Authorization: Bearer` para la app (ver Identity)
 - **Estado:** lectura en Server Components; mutaciones con Server
   Actions + `useOptimistic` (React 19). TanStack Query solo para polling
   y revalidación sin acción del usuario. Zustand para estado UI local
@@ -64,12 +64,14 @@ src/
   shared/
     kernel/           → Result, errores, Unidad/Cantidad, auth-context,
                         prisma (singleton), tenant-prisma, tenant-models, TenantRepository
-    kernel/           → también Clock y newId() (UUIDv7, válido en cliente)
+    kernel/           → también Clock, newId() (UUIDv7, válido en cliente) y auth.ts (Better Auth)
     lib/              → utilidades de UI (cn)
     sync/             → motor de sincronización (ver Sync)
     ui/               → componentes UI agnósticos de dominio (shadcn)
   app/
     _lib/<contexto>/    → mappers dominio → DTO, compartidos por API, actions y páginas
+    _lib/auth/          → authClient (navegador), rutaSegura, mensajes de error de login
+    (auth)/             → /login, /registro, /bienvenida (sin cabecera de la app)
     api/_lib/           → apiRoute(), parse, Result → HTTP
     api/v1/.../route.ts → API pública (rutas en inglés: /api/v1/lists)
     actions/            → Server Actions (solo web), delgadas
@@ -101,10 +103,12 @@ Reglas aplicadas por ESLint:
   `domains/`, solo dentro del mismo contexto. Los tests pueden importar
   `testing/` y el kernel.
 
-Route Handlers: siempre con `apiRoute({ ids, body }, handler)`, que
+Route Handlers: siempre con `apiRoute({ ids, body, auth }, handler)`, que
 autentica, valida ids (UUID) y cuerpo, y convierte excepciones en 500
 con el contrato de error. El handler solo llama al use case y mapea con
-`mapResult`.
+`mapResult`. `auth: "identidad"` para rutas que no exigen hogar (crearlo).
+Única excepción: `/api/v1/auth/[...all]`, que son las rutas de Better Auth
+con su propio formato de error.
 
 ## UI: mobile first (decisión tomada)
 
@@ -150,7 +154,11 @@ hay en casa: cantidad, caducidad, ubicación).
 - **Suggestions** (core): motor de puntuación de recetas según despensa,
   caducidades próximas y preferencias. Detalle en
   `src/domains/suggestions/README.md`
-- **Households**: hogar, miembros, invitaciones (tenant)
+- **Households**: hogar, miembros, invitaciones (tenant). El hogar se crea
+  después del registro, en `/bienvenida` (`CreateHouseholdCommand`, id
+  generado en el cliente para que un doble envío no cree dos). La primera
+  lista se crea en `app/_lib/households/alta-hogar.ts`, llamando a Shopping:
+  excepción temporal hasta tener eventos de dominio (vista 4)
 - **Identity**: autenticación web y por token
 
 Conceptos compartidos entre contextos (Unidad, Cantidad) viven en
@@ -188,22 +196,29 @@ con hogar activo en el `AuthContext`>
 
 ## Identity
 
-- Registro crea Usuario + Hogar en una transacción
-  (`RegisterHouseholdCommand`). Otros miembros entran por invitación.
-- Web: Auth.js, `Credentials` + `jwt` en cookie.
-- Clientes de la API: <PENDING: mecanismo concreto — por defecto access
-  token JWT corto + refresh token rotativo persistido, emitidos por
-  `/api/v1/auth/token`>.
-- `getAuthContext(): Promise<Result<AuthContext>>`, sin parámetros: lee
-  cookie o Bearer con `next/headers` y devuelve el mismo
-  `AuthContext { userId, hogarId }`. Los handlers no distinguen.
-  <PENDING: envolverlo en `cache()` de React, como los loaders, antes de
-  la fase 5>. Hasta la
-  fase 5 devuelve una identidad de desarrollo
-  (`shared/kernel/dev-identity.ts`, creada por `prisma/seed.ts`),
-  bloqueada si `NODE_ENV === "production"`.
-- Email (invitaciones, reset) detrás del puerto `EmailSender`
-  <PENDING: proveedor>.
+**Decisión tomada:** Better Auth (no Auth.js, en mantenimiento desde 09/2025).
+
+- Instancia en `shared/kernel/auth.ts`: email y contraseña (8-128, scrypt),
+  `Usuario` hace de tabla `user` (`modelName: "usuario"`, `name` → `nombre`),
+  sesiones en BD de 30 días (tabla `Session`), hash en `Account.password`,
+  ids con `newId()`, límite de peticiones en Postgres (`RateLimit`).
+- Endpoints en `/api/v1/auth/*` (`basePath`). La web y la app usan los mismos.
+- Registro = solo el usuario (`autoSignIn`); el hogar se crea en `/bienvenida`.
+- App móvil: plugin `bearer`. Tras el login, la cabecera `set-auth-token` es
+  el token; se envía como `Authorization: Bearer`. Misma sesión, revocable.
+- `getIdentity()` → `{ userId, nombre, email }` o `NO_AUTENTICADO` (401).
+  `getAuthContext()` → `{ userId, hogarId }`, `NO_AUTENTICADO` o `SIN_HOGAR`
+  (403 → la web manda a `/bienvenida`). Ambas con `cache()`; leen cookie o
+  Bearer sin distinguir. Hogar activo: el más antiguo (`elegirHogarActivo`).
+- Protección en dos capas: `middleware.ts` solo mira si existe la cookie
+  (redirección rápida, runtime Node); la seguridad real es `getAuthContext()`
+  / `getIdentity()` en cada página, Server Action y endpoint.
+- Login y registro desde el navegador con `authClient` (acción de cliente en
+  `useActionState`): así pasan por el límite de peticiones.
+- Variables: `BETTER_AUTH_SECRET` (≥ 32 caracteres, una por entorno) y
+  `BETTER_AUTH_URL`. En Vercel, `VERCEL_URL` se añade a `trustedOrigins`.
+- Fuera de alcance hasta la vista 6: verificación de email, restablecer
+  contraseña (`EmailSender` <PENDING: proveedor>) e invitaciones.
 
 ## Sync
 
@@ -283,13 +298,20 @@ a otros hogares>
 - No añadir un modelo con `hogarId` sin ponerlo en `TENANT_MODELS` o en
   `TENANT_EXCLUDED`.
 - No usar `uuid` aleatorios ni `new Date()` en dominio: `newId()` y `Clock`.
+- No hacer login o registro con `auth.api.*` desde el servidor (Server
+  Action): esas llamadas no pasan por el límite de peticiones.
+- No confiar en `middleware.ts` para la seguridad: la cookie se puede
+  inventar. Cada página, acción y endpoint valida con `getAuthContext()`.
+- No redirigir a un `?next=` sin `rutaSegura()` (redirección abierta).
+- No importar `shared/kernel/auth.ts` desde un componente de cliente: el
+  navegador usa `app/_lib/auth/auth-client.ts`.
 
 ## Seguridad y configuración
 
 - Variables de entorno validadas con Zod en un único `env.ts`.
 - Secretos en `.env.local` (gitignored) y en Vercel por entorno.
-- Rate limiting en login, emisión de tokens y sync <PENDING: proveedor —
-  Upstash Ratelimit por defecto>.
+- Rate limiting: el de Better Auth en `/api/v1/auth/*` (solo en producción,
+  contadores en la tabla `RateLimit`). Sync <PENDING: cuando exista>.
 
 ## Infraestructura
 
@@ -312,9 +334,10 @@ app) y `DATABASE_URL_UNPOOLED` (directa, CLI de Prisma vía
 `AUTH_SECRET`, `AUTH_URL`, credenciales del proveedor de email, secretos
 de firma de tokens de la API.
 
-<PENDING: local trabaja contra la rama `main` de Neon. Antes del primer
-usuario real: `.env.local` pasa a la rama `development` y se borran de
-`main` las filas del seed>
+<PENDING, OBLIGATORIO ANTES DE DESPLEGAR: local trabaja contra la rama
+`main` de Neon y el seed crea `dev@shoplab.local` con contraseña conocida.
+`.env.local` pasa a la rama `development` y se borran de `main` las filas
+del seed>
 
 - Migraciones: `migrate dev` solo en local; producción con
   `migrate deploy` en el despliegue <PENDING: script en el build de Vercel>.
@@ -325,7 +348,10 @@ usuario real: `.env.local` pasa a la rama `development` y se borran de
 ## Estado de las vistas
 
 1. Lista de la compra (`/listas/[listId]`): hecha, pendiente de PR a `main`.
-2. Mis listas: siguiente (paginación por cursor, `<form action>`).
+2. Registro y login (adelantada): hecha en `feat/auth`; pendiente aplicar
+   la migración `auth`, probar en el navegador y PR.
+3. Mis listas: siguiente (paginación por cursor, `<form action>`). Ya
+   existen `CreateShoppingListCommand` y `ListShoppingListsQuery`.
 
 Plan completo y orden en la guía de vistas (`docs/shoplab-guia-vista.pdf`).
 Antes de empezar una vista nueva, preguntar a Manuel.
