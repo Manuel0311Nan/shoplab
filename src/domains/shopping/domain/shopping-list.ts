@@ -17,6 +17,12 @@ export interface CambiosItem {
   readonly comprado?: boolean;
 }
 
+/**
+ * Qué hacer con los ítems pendientes al terminar la compra: `vaciar` los quita
+ * también; `conservarPendientes` los deja en la lista para la próxima vez.
+ */
+export type ModoTerminarCompra = "vaciar" | "conservarPendientes";
+
 export const MAX_ITEMS_POR_LISTA = 200;
 export const MAX_NOMBRE_LISTA = 80;
 
@@ -96,6 +102,19 @@ export class ShoppingList {
 
   quitarItem(itemId: string, ahora: Date): Result<ShoppingItem> {
     return this.modificarItem(itemId, ahora, (item) => item.quitar(ahora));
+  }
+
+  /** Cierra la compra: quita los ítems comprados y, según el modo, también los pendientes. */
+  terminarCompra(modo: ModoTerminarCompra, ahora: Date): Result<void> {
+    if (this.estaArchivada) return err(ShoppingErrors.listaArchivada());
+
+    for (const item of this.itemsActivos()) {
+      if (modo === "vaciar" || item.estaComprado) {
+        item.quitar(ahora);
+        this.registrarCambio(item.id, ahora);
+      }
+    }
+    return ok(undefined);
   }
 
   toSnapshot(): ShoppingListSnapshot {

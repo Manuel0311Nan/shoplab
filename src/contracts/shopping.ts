@@ -40,9 +40,16 @@ export const updateItemRequestSchema = z
     message: "Indica comprado o cantidad",
   });
 
+export const modoTerminarCompraSchema = z.enum(["vaciar", "conservarPendientes"]);
+
+/** Terminar la compra: se quitan los comprados y, con `vaciar`, también los pendientes. */
+export const finishShoppingRequestSchema = z.object({ modo: modoTerminarCompraSchema });
+
 export type UnidadDto = z.infer<typeof unidadSchema>;
 export type CantidadDto = z.infer<typeof cantidadSchema>;
 export type ShoppingItemResponse = z.infer<typeof shoppingItemSchema>;
 export type ShoppingListResponse = z.infer<typeof shoppingListResponseSchema>;
 export type AddItemRequest = z.input<typeof addItemRequestSchema>;
 export type UpdateItemRequest = z.input<typeof updateItemRequestSchema>;
+export type ModoTerminarCompraDto = z.infer<typeof modoTerminarCompraSchema>;
+export type FinishShoppingRequest = z.input<typeof finishShoppingRequestSchema>;

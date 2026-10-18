@@ -1,9 +1,14 @@
-import type { CantidadDto, ShoppingItemResponse } from "@/contracts/shopping";
+import type {
+  CantidadDto,
+  ModoTerminarCompraDto,
+  ShoppingItemResponse,
+} from "@/contracts/shopping";
 export type AccionLista =
   | { readonly tipo: "anadir"; readonly item: ShoppingItemResponse }
   | { readonly tipo: "comprado"; readonly itemId: string; readonly comprado: boolean }
   | { readonly tipo: "cantidad"; readonly itemId: string; readonly cantidad: CantidadDto }
-  | { readonly tipo: "quitar"; readonly itemId: string };
+  | { readonly tipo: "quitar"; readonly itemId: string }
+  | { readonly tipo: "terminar"; readonly modo: ModoTerminarCompraDto };
 export function aplicarAccion(
   items: ShoppingItemResponse[],
   accion: AccionLista,
@@ -23,5 +28,7 @@ export function aplicarAccion(
       );
     case "quitar":
       return items.filter((item) => item.id !== accion.itemId);
+    case "terminar":
+      return accion.modo === "vaciar" ? [] : items.filter((item) => item.compradoAt === null);
   }
 }

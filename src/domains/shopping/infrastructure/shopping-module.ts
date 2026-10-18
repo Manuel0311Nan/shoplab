@@ -1,6 +1,7 @@
 import "server-only";
 import { AddItemCommand } from "@/domains/shopping/application/commands/add-item.command";
 import { CreateShoppingListCommand } from "@/domains/shopping/application/commands/create-shopping-list.command";
+import { FinishShoppingCommand } from "@/domains/shopping/application/commands/finish-shopping.command";
 import { RemoveItemCommand } from "@/domains/shopping/application/commands/remove-item.command";
 import { UpdateItemCommand } from "@/domains/shopping/application/commands/update-item.command";
 import { GetShoppingListQuery } from "@/domains/shopping/application/queries/get-shopping-list.query";
@@ -18,6 +19,7 @@ export function shoppingModule(auth: AuthContext) {
     addItem: new AddItemCommand(lists, systemClock),
     updateItem: new UpdateItemCommand(lists, systemClock),
     removeItem: new RemoveItemCommand(lists, systemClock),
+    finishShopping: new FinishShoppingCommand(lists, systemClock),
   };
 }
 
