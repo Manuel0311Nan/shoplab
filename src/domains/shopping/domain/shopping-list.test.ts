@@ -1,8 +1,39 @@
 import { describe, expect, it } from "vitest";
-import { AHORA, ITEM_ID, USUARIO_ID, cantidad, item, lista, listaVacia } from "../testing/builders";
-import { MAX_ITEMS_POR_LISTA } from "./shopping-list";
+import {
+  AHORA,
+  ITEM_ID,
+  LISTA_ID,
+  USUARIO_ID,
+  cantidad,
+  item,
+  lista,
+  listaVacia,
+} from "../testing/builders";
+import { MAX_ITEMS_POR_LISTA, MAX_NOMBRE_LISTA, ShoppingList } from "./shopping-list";
 
 describe("ShoppingList", () => {
+  it("create_ConNombreValido_CreaUnaListaVaciaConElNombreRecortado", () => {
+    const result = ShoppingList.create({ id: LISTA_ID, nombre: "  Semana  " }, AHORA);
+
+    expect(result.ok && result.value.toSnapshot()).toEqual({
+      id: LISTA_ID,
+      nombre: "Semana",
+      archivadaAt: null,
+      createdAt: AHORA,
+      updatedAt: AHORA,
+    });
+    expect(result.ok && result.value.itemsActivos()).toEqual([]);
+  });
+
+  it.each(["", "   ", "x".repeat(MAX_NOMBRE_LISTA + 1)])(
+    "create_ConNombreNoValido_DevuelveNombreNoValido (%#)",
+    (nombre) => {
+      const result = ShoppingList.create({ id: LISTA_ID, nombre }, AHORA);
+
+      expect(result).toMatchObject({ ok: false, error: { code: "NOMBRE_NO_VALIDO" } });
+    },
+  );
+
   it("agregarItem_ConDatosValidos_AñadeUnItemPendiente", () => {
     const lista = listaVacia();
     const result = lista.agregarItem(

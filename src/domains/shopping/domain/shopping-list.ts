@@ -18,6 +18,12 @@ export interface CambiosItem {
 }
 
 export const MAX_ITEMS_POR_LISTA = 200;
+export const MAX_NOMBRE_LISTA = 80;
+
+export interface NewShoppingList {
+  readonly id: string;
+  readonly nombre: string;
+}
 
 export class ShoppingList {
   private readonly modificados = new Set<string>();
@@ -26,6 +32,20 @@ export class ShoppingList {
     private state: ShoppingListSnapshot,
     private readonly items: Map<string, ShoppingItem>,
   ) {}
+
+  /** Lista nueva y vacía. El nombre se recorta y debe tener entre 1 y 80 caracteres. */
+  static create(input: NewShoppingList, ahora: Date): Result<ShoppingList> {
+    const nombre = input.nombre.trim();
+    if (nombre.length === 0 || nombre.length > MAX_NOMBRE_LISTA) {
+      return err(ShoppingErrors.nombreNoValido(MAX_NOMBRE_LISTA));
+    }
+    return ok(
+      new ShoppingList(
+        { id: input.id, nombre, archivadaAt: null, createdAt: ahora, updatedAt: ahora },
+        new Map(),
+      ),
+    );
+  }
 
   static rehydrate(snapshot: ShoppingListSnapshot, items: readonly ShoppingItem[]): ShoppingList {
     return new ShoppingList(snapshot, new Map(items.map((item) => [item.id, item])));
