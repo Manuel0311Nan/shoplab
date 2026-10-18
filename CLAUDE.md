@@ -99,16 +99,18 @@ Reglas aplicadas por ESLint:
   `shared/kernel` e `infrastructure/`.
 - `boundaries/dependencies`: `domain` → kernel; `application` → domain y
   kernel; `infrastructure` → application, domain, kernel, generated y env;
-  `kernel` → generated y env; `ui` → `shared/lib`. Entre capas de
+  `kernel` → generated y env; `ui` → `shared/lib`. `contracts` no importa
+  `domains/`: los tests de paridad contrato ↔ dominio viven en `app/_lib/`. Entre capas de
   `domains/`, solo dentro del mismo contexto. Los tests pueden importar
   `testing/` y el kernel.
 
-Route Handlers: siempre con `apiRoute({ ids, body, auth }, handler)`, que
-autentica, valida ids (UUID) y cuerpo, y convierte excepciones en 500
+Route Handlers: siempre con `apiRoute({ ids, query, body, auth }, handler)`, que
+autentica, valida ids (UUID), parámetros de la URL y cuerpo, y convierte excepciones en 500
 con el contrato de error. El handler solo llama al use case y mapea con
 `mapResult`. `auth: "identidad"` para rutas que no exigen hogar (crearlo).
-Única excepción: `/api/v1/auth/[...all]`, que son las rutas de Better Auth
-con su propio formato de error.
+Excepciones: `/api/v1/auth/[...all]` (Better Auth, con su propio formato
+de error) y `/api/cron/*` (fuera de v1: solo las llama Vercel Cron con
+`Authorization: Bearer CRON_SECRET`, comprobado con `esLlamadaDeCron`).
 
 ## UI: mobile first (decisión tomada)
 
@@ -134,7 +136,13 @@ El producto nace para el móvil, aunque hoy solo exista la web.
 - Versionado en la URL. Cambios incompatibles → `/api/v2`; v1 no se rompe.
 - Errores con forma única `{ error: { code, message, details? } }`;
   `code` es estable y se mapea desde el `Result` del use case.
-- Paginación por cursor, no por offset.
+- Paginación por cursor, no por offset: `{ items, nextCursor }`
+  (`contracts/pagination.ts`), cursor opaco de `shared/kernel/cursor.ts`.
+  Solo se pagina lo que tiene un orden estable: las listas activas (máx.
+  15, ordenadas por `updatedAt`, que cambia al editar) van en una página.
+- Errores que piden una decisión al usuario llevan los datos en `details`
+  (esquemas en contracts): `LIMITE_DE_LISTAS` (activas entre las que
+  elegir), `POSIBLE_DUPLICADO` y `UNIDADES_DISTINTAS` (el ítem existente).
 - Fechas ISO 8601 en UTC; cantidades con unidad explícita (VO `Cantidad`).
 - IDs UUIDv7 que puede generar el cliente (necesario para crear offline).
 - Nada de la capa `application` conoce cookies, `redirect()` ni headers:
@@ -148,7 +156,20 @@ hay en casa: cantidad, caducidad, ubicación).
 
 - **Catalog**: Ingredient y Product, sinónimos, unidades y conversiones
 - **Pantry** (core): InventoryItem, caducidades, consumo
+- **Catalog (hoy)**: solo `ProductoBase`, la lista base global para
+  autocompletar (328 productos en `lista-base.data.ts`, cargados por
+  `prisma db seed` con upsert por nombre normalizado e ids UUID v5). Se
+  descarga entera una vez y se filtra en el cliente. Ingredient/Product
+  llegarán en la vista 3 y podrán apoyarse en esta tabla
 - **Shopping**: listas, ítems, estado comprado, lista por tienda/pasillo.
+  Máximo 15 listas activas por hogar (`MAX_LISTAS_ACTIVAS`): crear o
+  desarchivar la 16.ª exige `archivarListaId` y el intercambio se guarda en
+  una transacción (`guardarVarias`). Las archivadas se borran a los 15 días:
+  las consultas las ocultan desde ese momento y el cron diario
+  `/api/cron/purgar-listas` las marca con `deletedAt`. Un producto parecido
+  (mismo `productoBaseId` o mismo `normalizarNombre`) no se añade sin que
+  el usuario elija `duplicado: "unir" | "separar"`; al unir, g↔kg y ml↔l
+  se convierten y entre familias distintas se pide `cantidadFinal`.
   Un ítem tiene `nombre` libre + `ingredientId` opcional (se vincula con
   Catalog cuando exista), cantidad obligatoria (la UI propone 1 ud.) y
   `compradoAt` en lugar de booleano. Comprado y cantidad se cambian con
@@ -314,6 +335,8 @@ a otros hogares>
 
 - Variables de entorno validadas con Zod en un único `env.ts`.
 - Secretos en `.env.local` (gitignored) y en Vercel por entorno.
+- `CRON_SECRET` (opcional en local; obligatoria en Vercel Production para
+  que corra el cron).
 - Rate limiting: el de Better Auth en `/api/v1/auth/*` (solo en producción,
   contadores en la tabla `RateLimit`). Sync <PENDING: cuando exista>.
 
@@ -351,11 +374,12 @@ del seed>
 
 ## Estado de las vistas
 
-1. Lista de la compra (`/listas/[listId]`): hecha, pendiente de PR a `main`.
-2. Registro y login (adelantada): hecha en `feat/auth`; pendiente aplicar
-   la migración `auth`, probar en el navegador y PR.
-3. Mis listas: siguiente (paginación por cursor, `<form action>`). Ya
-   existen `CreateShoppingListCommand` y `ListShoppingListsQuery`.
+1. Lista de la compra (`/listas/[listId]`): hecha.
+2. Registro y login (adelantada): hecha.
+3. Mis listas (`/listas`): hecha en `feat/mis-listas`; pendiente aplicar la
+   migración `mis_listas`, el seed (lista base), `CRON_SECRET` en Vercel,
+   probar en el móvil y PR. Plan y decisiones D1–D7 en
+   `docs/migas-plan-mis-listas.pdf`.
 
 Plan completo y orden en la guía de vistas (`docs/shoplab-guia-vista.pdf`).
 Antes de empezar una vista nueva, preguntar a Manuel.

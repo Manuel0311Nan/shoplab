@@ -17,8 +17,11 @@ consumirán otros clientes, como una futura app móvil (proyecto aparte).
 
 - **Hogares compartidos**: cada hogar tiene sus miembros, listas y
   despensa comunes. Nuevos miembros entran por invitación.
-- **Lista de la compra**: varias listas, ítems con cantidad y unidad,
-  marcar como comprado, orden por tienda/pasillo.
+- **Lista de la compra**: hasta 15 listas activas por hogar, ítems con
+  cantidad y unidad, marcar como comprado, autocompletado con una lista
+  base de 328 productos y aviso de productos repetidos (unir sumando
+  g↔kg y ml↔l, o añadir aparte). Las listas archivadas se borran solas
+  a los 15 días. Orden por tienda/pasillo (más adelante).
 - **Despensa**: qué hay en casa, cuánto, dónde y cuándo caduca. Lo
   comprado entra automáticamente en la despensa.
 - **Recetas**: recetario con ingredientes normalizados, importación desde
@@ -110,7 +113,7 @@ pnpm install
 cp .env.example .env.local   # rellenar valores (BETTER_AUTH_SECRET incluido)
 pnpm db:migrate              # aplica las migraciones (nunca aceptes un reset)
 pnpm db:generate             # Prisma 7 no genera el cliente al migrar
-pnpm prisma db seed          # usuario dev@migas.local / dev-migas-1234
+pnpm prisma db seed          # lista base + usuario dev@migas.local / dev-migas-1234
 pnpm dev
 ```
 
@@ -122,6 +125,7 @@ pnpm dev
 | `DATABASE_URL_UNPOOLED` | Conexión directa (CLI de Prisma)                |
 | `BETTER_AUTH_SECRET`    | Firma de sesiones (≥ 32 caracteres)             |
 | `BETTER_AUTH_URL`       | URL pública de la app (`http://localhost:3000`) |
+| `CRON_SECRET`           | Protege `/api/cron/*` (opcional en local)       |
 
 Se validan al arrancar en `src/env.ts`; si falta alguna, la app no
 inicia.
@@ -146,6 +150,10 @@ inicia.
 | `main`    | producción | Vercel         | main           |
 
 `main` está protegida: PR + lint, typecheck y tests en verde.
+
+Cron de Vercel (`vercel.json`): `/api/cron/purgar-listas` a las 04:00 UTC
+borra las listas archivadas hace 15 días. Necesita `CRON_SECRET` en el
+entorno Production de Vercel (16+ caracteres; Vercel la envía sola).
 
 ## Pendiente de decidir
 
