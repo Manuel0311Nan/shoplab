@@ -18,6 +18,7 @@ function itemToDomain(row: ShoppingItemRow): ShoppingItem {
     id: row.id,
     nombre: row.nombre,
     ingredientId: row.ingredientId,
+    productoBaseId: row.productoBaseId,
     cantidad: cantidadDesdeBd(row.cantidadValor, row.cantidadUnidad),
     nota: row.nota,
     compradoAt: row.compradoAt,
@@ -35,6 +36,7 @@ export function shoppingListToDomain(row: ShoppingListRow): ShoppingList {
       archivadaAt: row.archivadaAt,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
+      deletedAt: row.deletedAt,
     },
     row.items.map(itemToDomain),
   );

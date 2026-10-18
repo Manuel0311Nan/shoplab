@@ -126,26 +126,66 @@ model ShoppingList {
   items       ShoppingItem[]
 
   @@index([hogarId, updatedAt])
+  /// Mis listas: activas por updatedAt y archivadas por archivadaAt.
+  @@index([hogarId, archivadaAt, updatedAt])
 }
 
 model ShoppingItem {
-  id             String       @id @default(uuid(7)) @db.Uuid
-  hogarId        String       @db.Uuid
-  listaId        String       @db.Uuid
+  id             String        @id @default(uuid(7)) @db.Uuid
+  hogarId        String        @db.Uuid
+  listaId        String        @db.Uuid
   nombre         String
-  ingredientId   String?      @db.Uuid
-  cantidadValor  Decimal      @db.Decimal(10, 3)
+  ingredientId   String?       @db.Uuid
+  /// Producto de la lista base elegido al autocompletar (null si se escribió a mano).
+  productoBaseId String?       @db.Uuid
+  cantidadValor  Decimal       @db.Decimal(10, 3)
   cantidadUnidad Unidad
   nota           String?
   compradoAt     DateTime?
-  compradoPorId  String?      @db.Uuid
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  compradoPorId  String?       @db.Uuid
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   deletedAt      DateTime?
-  hogar          Hogar        @relation(fields: [hogarId], references: [id], onDelete: Cascade)
-  lista          ShoppingList @relation(fields: [listaId], references: [id], onDelete: Cascade)
-  compradoPor    Usuario?     @relation(fields: [compradoPorId], references: [id], onDelete: SetNull)
+  hogar          Hogar         @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+  lista          ShoppingList  @relation(fields: [listaId], references: [id], onDelete: Cascade)
+  compradoPor    Usuario?      @relation(fields: [compradoPorId], references: [id], onDelete: SetNull)
+  productoBase   ProductoBase? @relation(fields: [productoBaseId], references: [id], onDelete: SetNull)
 
   @@index([listaId, deletedAt])
   @@index([hogarId, updatedAt])
+}
+
+// ─── Catalog ────────────────────────────────────────────────────────────────
+// Lista base global (sin hogarId: no va en TENANT_MODELS). La rellena el seed.
+
+enum CategoriaProducto {
+  frutas
+  verduras
+  vacuno
+  pollo_pavo
+  cerdo_cordero
+  charcuteria
+  pescado
+  lacteos_huevos
+  panaderia
+  despensa
+  especias
+  bebidas
+  congelados
+  limpieza
+  higiene
+}
+
+/// Producto de la lista base para autocompletar.
+model ProductoBase {
+  id                String            @id @db.Uuid
+  nombre            String
+  /// normalizarNombre(nombre): sin tildes, minúsculas, espacios simples. Clave del seed.
+  nombreNormalizado String            @unique
+  categoria         CategoriaProducto
+  unidadPorDefecto  Unidad
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  items ShoppingItem[]
 }

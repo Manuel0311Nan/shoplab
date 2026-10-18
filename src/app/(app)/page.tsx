@@ -17,8 +17,8 @@ export default async function Home() {
     redirect(contexto.error.code === "SIN_HOGAR" ? "/bienvenida" : "/login");
   }
 
-  const listas = await shoppingModule(contexto.value).listLists.execute();
-  const primera = listas.ok ? listas.value.at(0) : undefined;
+  const listas = await shoppingModule(contexto.value).listLists.execute({ estado: "activas" });
+  const primera = listas.ok ? listas.value.items.at(0) : undefined;
   if (primera !== undefined) redirect(`/listas/${primera.id}`);
 
   // Solo si la primera lista no llegó a crearse con el hogar.

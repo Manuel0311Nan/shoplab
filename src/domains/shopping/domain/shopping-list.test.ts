@@ -23,6 +23,7 @@ describe("ShoppingList", () => {
       archivadaAt: null,
       createdAt: AHORA,
       updatedAt: AHORA,
+      deletedAt: null,
     });
     expect(result.ok && result.value.itemsActivos()).toEqual([]);
   });

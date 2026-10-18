@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { ShoppingList } from "@/domains/shopping/domain/shopping-list";
-import { item, lista, LISTA_ID } from "@/domains/shopping/testing/builders";
+import { item, lista, LISTA_ID, USUARIO_ID } from "@/domains/shopping/testing/builders";
 import { shoppingListRepositoryContract } from "@/domains/shopping/testing/shopping-list-repository.contract";
 import { prisma } from "@/shared/kernel/prisma";
 import { PrismaShoppingListRepository } from "./prisma-shopping-list-repository";
@@ -43,17 +43,24 @@ beforeAll(async () => {
     ],
     skipDuplicates: true,
   });
+  // Quien marca productos como comprados en la suite (compradoPorId tiene FK a Usuario).
+  await prisma.usuario.upsert({
+    where: { id: USUARIO_ID },
+    create: { id: USUARIO_ID, email: "contrato-shopping@migas.test", nombre: "Usuario de test" },
+    update: {},
+  });
 });
 
 afterAll(async () => {
   // onDelete: Cascade borra también sus listas e ítems.
   await prisma.hogar.deleteMany({ where: { id: { in: [HOGAR_ID, OTRO_HOGAR_ID] } } });
+  await prisma.usuario.deleteMany({ where: { id: USUARIO_ID } });
   await prisma.$disconnect();
 });
 
-shoppingListRepositoryContract("Prisma", async (listas) => {
+shoppingListRepositoryContract("Prisma", async (listas, clock) => {
   await sembrar(listas);
-  return new PrismaShoppingListRepository({ hogarId: HOGAR_ID });
+  return new PrismaShoppingListRepository({ hogarId: HOGAR_ID }, clock);
 });
 
 describe("PrismaShoppingListRepository: aislamiento entre hogares", () => {

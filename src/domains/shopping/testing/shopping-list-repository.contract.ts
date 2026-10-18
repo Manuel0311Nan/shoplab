@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ShoppingListRepository } from "@/domains/shopping/application/ports/shopping-list-repository";
 import { ShoppingList } from "@/domains/shopping/domain/shopping-list";
+import type { Clock } from "@/shared/kernel/clock";
 import {
   AHORA,
   DESPUES,
@@ -11,17 +12,32 @@ import {
   cantidad,
   item,
   lista,
+  listaCon,
+  listaId,
+  minutos,
 } from "./builders";
 
-/** Crea un repositorio que ya contiene las listas indicadas (y nada más). */
-export type CrearRepositorio = (listas: readonly ShoppingList[]) => Promise<ShoppingListRepository>;
+/** Crea un repositorio que ya contiene las listas indicadas (y nada más), con ese reloj. */
+export type CrearRepositorio = (
+  listas: readonly ShoppingList[],
+  clock: Clock,
+) => Promise<ShoppingListRepository>;
+
+const DIA = 24 * 60 * 60_000;
+const relojEn = (fecha: Date): Clock => ({ now: () => fecha });
 
 /**
  * Comportamiento que debe cumplir TODA implementación de `ShoppingListRepository`.
  * Se ejecuta contra el fake en memoria (tests unitarios) y contra Prisma (integración):
  * así el fake no puede desviarse del repositorio real sin que falle un test.
  */
-export function shoppingListRepositoryContract(nombre: string, crear: CrearRepositorio): void {
+export function shoppingListRepositoryContract(
+  nombre: string,
+  crearConReloj: CrearRepositorio,
+): void {
+  const crear = (listas: readonly ShoppingList[], ahora: Date = AHORA) =>
+    crearConReloj(listas, relojEn(ahora));
+
   describe(`ShoppingListRepository: ${nombre}`, () => {
     it("findById_ListaInexistente_DevuelveNull", async () => {
       const repo = await crear([]);
@@ -38,23 +54,111 @@ export function shoppingListRepositoryContract(nombre: string, crear: CrearRepos
       expect(encontrada?.itemsActivos().map((i) => i.id)).toEqual([ITEM_ID]);
     });
 
-    it("listarActivas_VariasListas_SinArchivadasYPorFechaDeCreacion", async () => {
-      const crearLista = (id: string, nombre: string, fecha: Date) =>
-        ShoppingList.rehydrate(
-          { id, nombre, archivadaAt: null, createdAt: fecha, updatedAt: fecha },
-          [],
-        );
-      const archivada = lista([], { archivada: true });
+    it("listarActivas_VariasListas_SinArchivadasNiBorradasYUltimaModificadaPrimero", async () => {
       const repo = await crear([
-        crearLista(OTRO_ID, "Fiesta", DESPUES),
-        crearLista(ITEM_ID, "Semana", AHORA),
-        archivada,
+        listaCon({ id: listaId(1), nombre: "Antigua", updatedAt: AHORA }),
+        listaCon({ id: listaId(2), nombre: "Reciente", updatedAt: minutos(10) }),
+        listaCon({ id: listaId(3), nombre: "Archivada", archivadaAt: AHORA }),
+        listaCon({ id: listaId(4), nombre: "Borrada", deletedAt: AHORA }),
       ]);
 
-      const activas = await repo.listarActivas(10);
+      const activas = await repo.listarActivas();
 
-      expect(activas.map((l) => l.id)).toEqual([ITEM_ID, OTRO_ID]);
-      expect(await repo.listarActivas(1)).toHaveLength(1);
+      expect(activas.map((l) => l.nombre)).toEqual(["Reciente", "Antigua"]);
+      expect(await repo.contarActivas()).toBe(2);
+    });
+
+    it("listarActivas_MismaFecha_DesempataPorIdDescendente", async () => {
+      const repo = await crear([listaCon({ id: listaId(1) }), listaCon({ id: listaId(2) })]);
+
+      const activas = await repo.listarActivas();
+
+      expect(activas.map((l) => l.id)).toEqual([listaId(2), listaId(1)]);
+    });
+
+    it("listarActivas_ConItems_CuentaPendientesYTotalSinQuitados", async () => {
+      const repo = await crear([
+        listaCon({}, [
+          item({ id: listaId(11), nombre: "Pan" }),
+          item({ id: listaId(12), nombre: "Leche", compradoAt: AHORA, compradoPorId: USUARIO_ID }),
+          item({ id: listaId(13), nombre: "Huevos" }),
+        ]),
+        listaCon({ id: OTRO_ID }),
+      ]);
+      const conQuitado = await repo.findById(LISTA_ID);
+      conQuitado?.quitarItem(listaId(13), DESPUES);
+      if (conQuitado) await repo.save(conQuitado);
+
+      const activas = await repo.listarActivas();
+
+      expect(activas.find((l) => l.id === LISTA_ID)).toMatchObject({ pendientes: 1, total: 2 });
+      expect(activas.find((l) => l.id === OTRO_ID)).toMatchObject({ pendientes: 0, total: 0 });
+    });
+
+    it("listarArchivadas_VariasPaginas_UltimaArchivadaPrimeroConCursor", async () => {
+      const repo = await crear(
+        [
+          listaCon({ id: listaId(1), nombre: "A", archivadaAt: minutos(1) }),
+          listaCon({ id: listaId(2), nombre: "B", archivadaAt: minutos(3) }),
+          listaCon({ id: listaId(3), nombre: "C", archivadaAt: minutos(3) }),
+          listaCon({ id: listaId(4), nombre: "Activa" }),
+        ],
+        minutos(60),
+      );
+
+      const primera = await repo.listarArchivadas({ limite: 2 });
+      const ultima = primera.at(-1);
+      const segunda = await repo.listarArchivadas({
+        limite: 2,
+        ...(ultima?.archivadaAt ? { despuesDe: { fecha: ultima.archivadaAt, id: ultima.id } } : {}),
+      });
+
+      expect(primera.map((l) => l.nombre)).toEqual(["C", "B"]);
+      expect(segunda.map((l) => l.nombre)).toEqual(["A"]);
+    });
+
+    it("listarArchivadas_ArchivadaHaceMasDe15Dias_NoAparece", async () => {
+      const ahora = new Date(AHORA.getTime() + 15 * DIA);
+      const repo = await crear(
+        [
+          listaCon({ id: listaId(1), nombre: "Caducada", archivadaAt: AHORA }),
+          listaCon({ id: listaId(2), nombre: "Vigente", archivadaAt: minutos(1) }),
+        ],
+        ahora,
+      );
+
+      expect((await repo.listarArchivadas({ limite: 10 })).map((l) => l.nombre)).toEqual([
+        "Vigente",
+      ]);
+      expect(await repo.findById(listaId(1))).toBeNull();
+      expect(await repo.findById(listaId(2))).not.toBeNull();
+    });
+
+    it("findById_ListaBorrada_DevuelveNull", async () => {
+      const repo = await crear([lista()]);
+      const original = await repo.findById(LISTA_ID);
+      original?.eliminar(DESPUES);
+
+      if (original) await repo.save(original);
+
+      expect(await repo.findById(LISTA_ID)).toBeNull();
+      expect(await repo.listarActivas()).toEqual([]);
+    });
+
+    it("guardarVarias_IntercambioArchivarYDesarchivar_GuardaAmbas", async () => {
+      const repo = await crear([
+        listaCon({ id: listaId(1) }),
+        listaCon({ id: listaId(2), archivadaAt: AHORA }),
+      ]);
+      const activa = await repo.findById(listaId(1));
+      const archivada = await repo.findById(listaId(2));
+      activa?.archivar(DESPUES);
+      archivada?.desarchivar(DESPUES);
+
+      if (activa && archivada) await repo.guardarVarias([activa, archivada]);
+
+      expect((await repo.listarActivas()).map((l) => l.id)).toEqual([listaId(2)]);
+      expect((await repo.listarArchivadas({ limite: 10 })).map((l) => l.id)).toEqual([listaId(1)]);
     });
 
     it("save_ListaNueva_SeRecuperaVacia", async () => {
@@ -70,6 +174,7 @@ export function shoppingListRepositoryContract(nombre: string, crear: CrearRepos
         archivadaAt: null,
         createdAt: AHORA,
         updatedAt: AHORA,
+        deletedAt: null,
       });
       expect(recargada?.itemsActivos()).toEqual([]);
     });
@@ -89,6 +194,7 @@ export function shoppingListRepositoryContract(nombre: string, crear: CrearRepos
         id: ITEM_ID,
         nombre: "Leche",
         ingredientId: null,
+        productoBaseId: null,
         cantidad: { valor: 1.5, unidad: "l" },
         nota: "Sin lactosa",
         compradoAt: null,
