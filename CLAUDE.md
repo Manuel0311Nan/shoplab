@@ -122,6 +122,9 @@ El producto nace para el móvil, aunque hoy solo exista la web.
   de línea).
 - Sistema visual del diseño de Stitch en `globals.css` (tokens de shadcn);
   los componentes nunca usan hex.
+- PWA instalable: `app/manifest.ts`, iconos en `public/icons/` y
+  `app/{icon,apple-icon}.png`, generados del logo. Sin service worker hasta
+  el modo sin conexión (Sync).
 
 ## API pública (decisión tomada)
 

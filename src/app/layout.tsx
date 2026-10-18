@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -20,7 +20,20 @@ const beVietnam = Be_Vietnam_Pro({
 
 export const metadata: Metadata = {
   title: "Migas",
+  applicationName: "Migas",
   description: "Lista de la compra, despensa y recetas del hogar",
+  // iOS no lee el manifiesto para esto: "Añadir a pantalla de inicio" en Safari.
+  appleWebApp: { capable: true, title: "Migas", statusBarStyle: "default" },
+  // Evita que iOS convierta cantidades en enlaces de teléfono.
+  formatDetection: { telephone: false },
+};
+
+// Color de la barra del sistema en el móvil: el fondo de la app en cada tema.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fff8f3" },
+    { media: "(prefers-color-scheme: dark)", color: "#1c140b" },
+  ],
 };
 
 export default function RootLayout({
