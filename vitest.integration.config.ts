@@ -32,6 +32,9 @@ export default defineConfig({
       NODE_ENV: "test",
       DATABASE_URL: testDatabaseUrl,
       DATABASE_URL_UNPOOLED: process.env.TEST_DATABASE_URL_UNPOOLED ?? testDatabaseUrl,
+      // env.ts las exige; los tests de integración no inician sesión.
+      BETTER_AUTH_SECRET: "test-secreto-falso-de-al-menos-32-caracteres",
+      BETTER_AUTH_URL: "http://localhost:3000",
     },
   },
 });
