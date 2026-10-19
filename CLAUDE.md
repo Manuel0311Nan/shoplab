@@ -155,12 +155,26 @@ Modelo de tres niveles: **Ingredient** (concepto canónico: "tomate") →
 hay en casa: cantidad, caducidad, ubicación).
 
 - **Catalog**: Ingredient y Product, sinónimos, unidades y conversiones
-- **Pantry** (core): InventoryItem, caducidades, consumo
-- **Catalog (hoy)**: solo `ProductoBase`, la lista base global para
-  autocompletar (328 productos en `lista-base.data.ts`, cargados por
-  `prisma db seed` con upsert por nombre normalizado e ids UUID v5). Se
-  descarga entera una vez y se filtra en el cliente. Ingredient/Product
-  llegarán en la vista 3 y podrán apoyarse en esta tabla
+- **Pantry** (core): `Ubicacion` (por hogar, máx. 12, con tipo frío,
+  congelado o ambiente para proponer dónde va cada categoría; el alta del
+  hogar crea Nevera, Congelador y Armario) e `InventoryItem`: una línea por
+  producto, ubicación y caducidad opcional (`Dia`, sin hora). Sin fechas,
+  el mismo producto en la misma ubicación es una sola línea que suma. Cada
+  cambio de cantidad devuelve un `MovimientoDespensa` (entrada, consumo,
+  desecho, ajuste, baja) que se guarda con la línea en una transacción.
+  Máx. 500 líneas vivas por hogar, sin paginar. Un solo
+  `PantryRepository` para ubicaciones, líneas y movimientos
+- **Catalog (hoy)**: `ProductoBase`, la lista base global (328 productos
+  y sus sinónimos en `lista-base.data.ts`, cargados por `prisma db seed`
+  sin transacción larga e ids UUID v5), y `ProductoRecordado`, la memoria
+  de cada hogar para el texto libre. Texto libre conectado (D1 de la vista
+  3): lista y despensa guardan el nombre escrito + `productoBaseId`
+  opcional; `ResolverProductoQuery` vincula (elegido, nombre o sinónimo de
+  la lista base) y decide la categoría (memoria del hogar, lista base u
+  «otros»). Se descarga entero y se filtra en el cliente
+- **Categorías**: las 15 de la lista base + «otros», en el kernel y en el
+  orden del súper (`compararCategorias`). Cada línea de lista y despensa
+  guarda la suya y se puede cambiar; cambiarla la recuerda el hogar
 - **Shopping**: listas, ítems, estado comprado, lista por tienda/pasillo.
   Máximo 15 listas activas por hogar (`MAX_LISTAS_ACTIVAS`): crear o
   desarchivar la 16.ª exige `archivarListaId` y el intercambio se guarda en
@@ -170,8 +184,8 @@ hay en casa: cantidad, caducidad, ubicación).
   (mismo `productoBaseId` o mismo `normalizarNombre`) no se añade sin que
   el usuario elija `duplicado: "unir" | "separar"`; al unir, g↔kg y ml↔l
   se convierten y entre familias distintas se pide `cantidadFinal`.
-  Un ítem tiene `nombre` libre + `ingredientId` opcional (se vincula con
-  Catalog cuando exista), cantidad obligatoria (la UI propone 1 ud.) y
+  Un ítem tiene `nombre` libre + `productoBaseId` y categoría (ver Catalog),
+  cantidad obligatoria (la UI propone 1 ud.) y
   `compradoAt` en lugar de booleano. Comprado y cantidad se cambian con
   un único `UpdateItemCommand` (PATCH atómico)
 - **Recipes**: recetas e ingredientes de receta (referencian Ingredient)
@@ -181,8 +195,15 @@ hay en casa: cantidad, caducidad, ubicación).
 - **Households**: hogar, miembros, invitaciones (tenant). El hogar se crea
   después del registro, en `/bienvenida` (`CreateHouseholdCommand`, id
   generado en el cliente para que un doble envío no cree dos). La primera
-  lista se crea en `app/_lib/households/alta-hogar.ts`, llamando a Shopping:
-  excepción temporal hasta tener eventos de dominio (vista 4)
+  lista y las ubicaciones se crean en `app/_lib/households/alta-hogar.ts`,
+  llamando a Shopping y Pantry: excepción temporal hasta tener eventos
+
+Entre contextos, sin eventos todavía: orquestadores en `app/_lib/<contexto>/`
+que llaman a los módulos de varios contextos y los usan igual la API y las
+Server Actions (`productos-con-catalogo.ts`, `despensa-con-catalogo.ts`,
+`alta-hogar.ts`). Guardar la compra en la despensa es uno: lo decide el
+usuario en la hoja «Guardar en la despensa», no el hecho de marcar.
+
 - **Identity**: autenticación web y por token
 
 Conceptos compartidos entre contextos (Unidad, Cantidad) viven en
@@ -304,8 +325,13 @@ a otros hogares>
 - No generar IDs solo en servidor para entidades creables offline.
 - No romper `/api/v1` (renombrar campos, cambiar tipos): se versiona.
 - No leer cookies/headers fuera de `app/` y `shared/kernel/auth-context`.
-- No guardar cantidades sin unidad ni texto libre donde va un Ingredient
-  (aplica a Pantry y Recipes; Shopping admite `nombre` libre).
+- No guardar cantidades sin unidad. El texto libre de lista y despensa va
+  siempre por el orquestador que lo vincula al catálogo (D1, vista 3);
+  Recipes sí exigirá Ingredient.
+- No guardar caducidades como instante: son `Dia` (`@db.Date`), y «hoy» se
+  calcula con `hoyEn(ZONA_HOGAR, clock)` en el servidor.
+- No cambiar la cantidad de una línea de despensa sin su movimiento.
+- No importar un repositorio de otro contexto: orquestador en `app/_lib`.
 - No llamar al microservicio Python directamente: siempre vía su puerto.
 - No importar `prisma` del kernel en repositorios de modelos de hogar:
   usar `this.db` de `TenantRepository`.
@@ -376,10 +402,12 @@ del seed>
 
 1. Lista de la compra (`/listas/[listId]`): hecha.
 2. Registro y login (adelantada): hecha.
-3. Mis listas (`/listas`): hecha en `feat/mis-listas`; pendiente aplicar la
-   migración `mis_listas`, el seed (lista base), `CRON_SECRET` en Vercel,
-   probar en el móvil y PR. Plan y decisiones D1–D7 en
-   `docs/migas-plan-mis-listas.pdf`.
+3. Mis listas (`/listas`): hecha.
+4. Despensa (`/despensa`) y categorías en la lista: hecha en
+   `feat/despensa`; pendiente aplicar las migraciones (`categoria_otros`,
+   `categorias`, `despensa`), volver a sembrar (sinónimos), probar en el
+   móvil y PR. Plan y decisiones D1–D9 en el documento «Migas · Plan de la
+   vista Despensa».
 
 Plan completo y orden en la guía de vistas (`docs/shoplab-guia-vista.pdf`).
 Antes de empezar una vista nueva, preguntar a Manuel.
