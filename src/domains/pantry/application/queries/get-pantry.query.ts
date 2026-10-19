@@ -6,7 +6,11 @@ import { type Dia, hoyEn, ZONA_HOGAR } from "@/shared/kernel/dia";
 import { ok, type Result } from "@/shared/kernel/result";
 import type { PantryRepository } from "../ports/pantry-repository";
 
-export type LineaDespensa = InventoryItemSnapshot & { readonly caducidad: Caducidad };
+export type LineaDespensa = InventoryItemSnapshot & {
+  readonly caducidad: Caducidad;
+  /** D8: queda 1 ud. o el 20 % (en g, kg, ml o l) de lo que entró. */
+  readonly quedaPoco: boolean;
+};
 
 export interface VistaDespensa {
   /** El día con el que se calculó la caducidad: la pantalla no vuelve a calcularlo. */
@@ -37,7 +41,7 @@ export class GetPantryQuery {
       ubicaciones: ubicaciones.map((u) => u.toSnapshot()),
       lineas: lineas.map((l) => {
         const s = l.toSnapshot();
-        return { ...s, caducidad: estadoCaducidad(s.caducaEl, hoy) };
+        return { ...s, caducidad: estadoCaducidad(s.caducaEl, hoy), quedaPoco: l.quedaPoco() };
       }),
     });
   }
