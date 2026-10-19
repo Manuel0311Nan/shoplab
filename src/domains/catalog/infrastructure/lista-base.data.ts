@@ -1,4 +1,4 @@
-import type { Categoria } from "@/domains/catalog/domain/producto-base";
+import type { Categoria } from "@/shared/kernel/categoria";
 import type { Unidad } from "@/shared/kernel/unidad";
 
 /**

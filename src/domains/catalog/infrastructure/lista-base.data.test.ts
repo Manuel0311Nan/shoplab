@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CATEGORIAS } from "@/domains/catalog/domain/producto-base";
+import { CATEGORIAS } from "@/shared/kernel/categoria";
 import { normalizarNombre } from "@/shared/kernel/texto";
 import { UNIDADES } from "@/shared/kernel/unidad";
 import { LISTA_BASE } from "./lista-base.data";
@@ -21,6 +21,7 @@ describe("LISTA_BASE", () => {
       expect(CATEGORIAS).toContain(categoria);
       expect(UNIDADES).toContain(unidad);
     }
-    expect(new Set(LISTA_BASE.map(([, c]) => c)).size).toBe(CATEGORIAS.length);
+    // Todas menos "otros", que es para lo que no se sabe clasificar.
+    expect(new Set(LISTA_BASE.map(([, c]) => c)).size).toBe(CATEGORIAS.length - 1);
   });
 });

@@ -17,6 +17,7 @@ export const categoriaProductoSchema = z.enum([
   "congelados",
   "limpieza",
   "higiene",
+  "otros",
 ]);
 
 export const productoBaseSchema = z.object({
