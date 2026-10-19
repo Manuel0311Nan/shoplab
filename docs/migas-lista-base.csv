@@ -1,0 +1,329 @@
+nombre,categoria,unidad
+Manzana Golden,Frutas,kg
+Manzana Fuji,Frutas,kg
+Manzana Reineta,Frutas,kg
+Manzana Granny Smith,Frutas,kg
+Manzana Royal Gala,Frutas,kg
+Pera Conferencia,Frutas,kg
+Pera Blanquilla,Frutas,kg
+Plátano de Canarias,Frutas,kg
+Banana,Frutas,kg
+Naranja de mesa,Frutas,kg
+Naranja de zumo,Frutas,kg
+Mandarina,Frutas,kg
+Limón,Frutas,kg
+Lima,Frutas,kg
+Pomelo,Frutas,kg
+Uva blanca,Frutas,kg
+Uva negra,Frutas,kg
+Fresas,Frutas,g
+Frambuesas,Frutas,g
+Arándanos,Frutas,g
+Moras,Frutas,g
+Cerezas,Frutas,kg
+Melocotón,Frutas,kg
+Nectarina,Frutas,kg
+Paraguayo,Frutas,kg
+Albaricoque,Frutas,kg
+Ciruela,Frutas,kg
+Kiwi,Frutas,kg
+Mango,Frutas,unidad
+Piña,Frutas,unidad
+Melón,Frutas,unidad
+Sandía,Frutas,unidad
+Papaya,Frutas,unidad
+Aguacate,Frutas,unidad
+Granada,Frutas,unidad
+Higos,Frutas,kg
+Caqui,Frutas,kg
+Chirimoya,Frutas,kg
+Coco,Frutas,unidad
+Maracuyá,Frutas,unidad
+Nísperos,Frutas,kg
+Tomate pera,Verduras y hortalizas,kg
+Tomate en rama,Verduras y hortalizas,kg
+Tomate cherry,Verduras y hortalizas,g
+Tomate para ensalada,Verduras y hortalizas,kg
+Lechuga romana,Verduras y hortalizas,unidad
+Lechuga iceberg,Verduras y hortalizas,unidad
+Cogollos,Verduras y hortalizas,unidad
+Canónigos,Verduras y hortalizas,g
+Rúcula,Verduras y hortalizas,g
+Espinacas,Verduras y hortalizas,g
+Cebolla,Verduras y hortalizas,kg
+Cebolla morada,Verduras y hortalizas,kg
+Cebolleta,Verduras y hortalizas,unidad
+Puerro,Verduras y hortalizas,unidad
+Ajos,Verduras y hortalizas,unidad
+Patatas,Verduras y hortalizas,kg
+Boniato,Verduras y hortalizas,kg
+Zanahoria,Verduras y hortalizas,kg
+Calabacín,Verduras y hortalizas,kg
+Berenjena,Verduras y hortalizas,kg
+Pimiento rojo,Verduras y hortalizas,kg
+Pimiento verde,Verduras y hortalizas,kg
+Pimiento italiano,Verduras y hortalizas,kg
+Pepino,Verduras y hortalizas,kg
+Brócoli,Verduras y hortalizas,unidad
+Coliflor,Verduras y hortalizas,unidad
+Repollo,Verduras y hortalizas,unidad
+Calabaza,Verduras y hortalizas,kg
+Champiñones,Verduras y hortalizas,g
+Setas variadas,Verduras y hortalizas,g
+Judías verdes,Verduras y hortalizas,kg
+Alcachofas,Verduras y hortalizas,kg
+Espárragos verdes,Verduras y hortalizas,unidad
+Apio,Verduras y hortalizas,unidad
+Remolacha cocida,Verduras y hortalizas,unidad
+Rábanos,Verduras y hortalizas,unidad
+Col lombarda,Verduras y hortalizas,unidad
+Acelgas,Verduras y hortalizas,unidad
+Solomillo de ternera,Carne de vacuno,kg
+Entrecot de ternera,Carne de vacuno,kg
+Chuletón de vaca,Carne de vacuno,kg
+Lomo alto de vaca,Carne de vacuno,kg
+Lomo bajo de ternera,Carne de vacuno,kg
+Cadera de ternera,Carne de vacuno,kg
+Babilla de ternera,Carne de vacuno,kg
+Redondo de ternera,Carne de vacuno,kg
+Aguja de ternera,Carne de vacuno,kg
+Falda de ternera,Carne de vacuno,kg
+Morcillo de ternera,Carne de vacuno,kg
+Ossobuco de ternera,Carne de vacuno,kg
+Carrillera de ternera,Carne de vacuno,kg
+Rabo de toro,Carne de vacuno,kg
+Costilla de vaca,Carne de vacuno,kg
+Filetes de ternera,Carne de vacuno,kg
+Carne picada de ternera,Carne de vacuno,kg
+Hamburguesas de vacuno,Carne de vacuno,unidad
+Picaña,Carne de vacuno,kg
+Tapa de ternera,Carne de vacuno,kg
+Pollo entero,Carne de pollo y pavo,unidad
+Pechuga de pollo,Carne de pollo y pavo,kg
+Filetes de pechuga de pollo,Carne de pollo y pavo,kg
+Solomillos de pollo,Carne de pollo y pavo,kg
+Muslos de pollo,Carne de pollo y pavo,kg
+Contramuslos de pollo,Carne de pollo y pavo,kg
+Contramuslos deshuesados,Carne de pollo y pavo,kg
+Jamoncitos de pollo,Carne de pollo y pavo,kg
+Alitas de pollo,Carne de pollo y pavo,kg
+Pollo troceado,Carne de pollo y pavo,kg
+Carcasas de pollo,Carne de pollo y pavo,unidad
+Hígados de pollo,Carne de pollo y pavo,g
+Carne picada de pollo,Carne de pollo y pavo,kg
+Pechuga de pavo,Carne de pollo y pavo,kg
+Muslo de pavo,Carne de pollo y pavo,kg
+Hamburguesas de pollo,Carne de pollo y pavo,unidad
+Lomo de cerdo,Carne de cerdo y cordero,kg
+Solomillo de cerdo,Carne de cerdo y cordero,kg
+Chuletas de cerdo,Carne de cerdo y cordero,kg
+Costillas de cerdo,Carne de cerdo y cordero,kg
+Panceta,Carne de cerdo y cordero,kg
+Secreto ibérico,Carne de cerdo y cordero,kg
+Presa ibérica,Carne de cerdo y cordero,kg
+Pluma ibérica,Carne de cerdo y cordero,kg
+Codillo de cerdo,Carne de cerdo y cordero,unidad
+Carne picada mixta,Carne de cerdo y cordero,kg
+Salchichas frescas,Carne de cerdo y cordero,unidad
+Chorizo fresco,Carne de cerdo y cordero,unidad
+Morcilla,Carne de cerdo y cordero,unidad
+Chuletas de cordero,Carne de cerdo y cordero,kg
+Paletilla de cordero,Carne de cerdo y cordero,kg
+Pierna de cordero,Carne de cerdo y cordero,kg
+Conejo troceado,Carne de cerdo y cordero,kg
+Jamón serrano,Charcutería,g
+Jamón ibérico,Charcutería,g
+Jamón cocido,Charcutería,g
+Pechuga de pavo en lonchas,Charcutería,g
+Chorizo,Charcutería,g
+Salchichón,Charcutería,g
+Lomo embuchado,Charcutería,g
+Bacon,Charcutería,g
+Fuet,Charcutería,unidad
+Mortadela,Charcutería,g
+Salchichas cocidas,Charcutería,unidad
+Merluza,Pescado y marisco,kg
+Salmón,Pescado y marisco,kg
+Bacalao fresco,Pescado y marisco,kg
+Bacalao desalado,Pescado y marisco,kg
+Dorada,Pescado y marisco,unidad
+Lubina,Pescado y marisco,unidad
+Sardinas,Pescado y marisco,kg
+Boquerones,Pescado y marisco,kg
+Atún fresco,Pescado y marisco,kg
+Emperador,Pescado y marisco,kg
+Rape,Pescado y marisco,kg
+Gallo,Pescado y marisco,kg
+Lenguado,Pescado y marisco,unidad
+Calamares,Pescado y marisco,kg
+Sepia,Pescado y marisco,kg
+Pulpo,Pescado y marisco,kg
+Gambas,Pescado y marisco,kg
+Langostinos,Pescado y marisco,kg
+Mejillones,Pescado y marisco,kg
+Almejas,Pescado y marisco,kg
+Atún en lata,Pescado y marisco,unidad
+Sardinas en lata,Pescado y marisco,unidad
+Berberechos en lata,Pescado y marisco,unidad
+Salmón ahumado,Pescado y marisco,g
+Huevos,Lácteos y huevos,unidad
+Leche entera,Lácteos y huevos,l
+Leche semidesnatada,Lácteos y huevos,l
+Leche desnatada,Lácteos y huevos,l
+Leche sin lactosa,Lácteos y huevos,l
+Bebida de avena,Lácteos y huevos,l
+Bebida de soja,Lácteos y huevos,l
+Bebida de almendras,Lácteos y huevos,l
+Yogur natural,Lácteos y huevos,unidad
+Yogur griego,Lácteos y huevos,unidad
+Yogur de sabores,Lácteos y huevos,unidad
+Kéfir,Lácteos y huevos,ml
+Mantequilla,Lácteos y huevos,g
+Nata para cocinar,Lácteos y huevos,ml
+Nata para montar,Lácteos y huevos,ml
+Queso fresco,Lácteos y huevos,g
+Queso de Burgos,Lácteos y huevos,g
+Queso curado,Lácteos y huevos,g
+Queso semicurado,Lácteos y huevos,g
+Queso tierno,Lácteos y huevos,g
+Queso rallado,Lácteos y huevos,g
+Mozzarella,Lácteos y huevos,g
+Queso de cabra,Lácteos y huevos,g
+Queso de untar,Lácteos y huevos,g
+Requesón,Lácteos y huevos,g
+Natillas,Lácteos y huevos,unidad
+Pan de barra,Panadería y cereales,unidad
+Pan de molde,Panadería y cereales,unidad
+Pan de molde integral,Panadería y cereales,unidad
+Pan integral,Panadería y cereales,unidad
+Picos,Panadería y cereales,g
+Tostadas,Panadería y cereales,unidad
+Pan rallado,Panadería y cereales,g
+Tortillas de trigo,Panadería y cereales,unidad
+Copos de avena,Panadería y cereales,g
+Cereales de desayuno,Panadería y cereales,g
+Galletas,Panadería y cereales,g
+Magdalenas,Panadería y cereales,unidad
+Bollería variada,Panadería y cereales,unidad
+Arroz redondo,Despensa,kg
+Arroz largo,Despensa,kg
+Arroz basmati,Despensa,kg
+Arroz integral,Despensa,kg
+Espaguetis,Despensa,g
+Macarrones,Despensa,g
+Tallarines,Despensa,g
+Fideos,Despensa,g
+Cuscús,Despensa,g
+Quinoa,Despensa,g
+Lentejas,Despensa,kg
+Garbanzos,Despensa,kg
+Alubias blancas,Despensa,kg
+Alubias rojas,Despensa,kg
+Garbanzos cocidos,Despensa,unidad
+Lentejas cocidas,Despensa,unidad
+Harina de trigo,Despensa,kg
+Harina de maíz,Despensa,kg
+Azúcar,Despensa,kg
+Azúcar moreno,Despensa,kg
+Sal,Despensa,kg
+Aceite de oliva virgen extra,Despensa,l
+Aceite de oliva suave,Despensa,l
+Aceite de girasol,Despensa,l
+Vinagre de vino,Despensa,ml
+Vinagre de Jerez,Despensa,ml
+Tomate triturado,Despensa,unidad
+Tomate frito,Despensa,unidad
+Caldo de pollo,Despensa,l
+Caldo de verduras,Despensa,l
+Levadura,Despensa,g
+Cacao en polvo,Despensa,g
+Chocolate,Despensa,g
+Café molido,Despensa,g
+Café en grano,Despensa,g
+Té,Despensa,unidad
+Infusiones,Despensa,unidad
+Miel,Despensa,g
+Mermelada,Despensa,g
+Almendras,Despensa,g
+Nueces,Despensa,g
+Avellanas,Despensa,g
+Pasas,Despensa,g
+Aceitunas,Despensa,g
+Mayonesa,Despensa,ml
+Ketchup,Despensa,ml
+Mostaza,Despensa,g
+Salsa de soja,Despensa,ml
+Pimienta negra molida,Especias y condimentos,g
+Pimienta negra en grano,Especias y condimentos,g
+Pimentón dulce,Especias y condimentos,g
+Pimentón picante,Especias y condimentos,g
+Pimentón de la Vera,Especias y condimentos,g
+Comino,Especias y condimentos,g
+Orégano,Especias y condimentos,g
+Tomillo,Especias y condimentos,g
+Romero,Especias y condimentos,g
+Laurel,Especias y condimentos,g
+Albahaca,Especias y condimentos,g
+Perejil fresco,Especias y condimentos,unidad
+Cilantro fresco,Especias y condimentos,unidad
+Hierbabuena,Especias y condimentos,unidad
+Canela en rama,Especias y condimentos,g
+Canela molida,Especias y condimentos,g
+Nuez moscada,Especias y condimentos,g
+Clavo,Especias y condimentos,g
+Azafrán,Especias y condimentos,g
+Cúrcuma,Especias y condimentos,g
+Curry,Especias y condimentos,g
+Jengibre fresco,Especias y condimentos,g
+Jengibre molido,Especias y condimentos,g
+Ajo en polvo,Especias y condimentos,g
+Cebolla en polvo,Especias y condimentos,g
+Guindilla,Especias y condimentos,g
+Eneldo,Especias y condimentos,g
+Hierbas provenzales,Especias y condimentos,g
+Sal en escamas,Especias y condimentos,g
+Vainilla,Especias y condimentos,unidad
+Colorante alimentario,Especias y condimentos,g
+Agua mineral,Bebidas,l
+Agua con gas,Bebidas,l
+Zumo de naranja,Bebidas,l
+Zumo de piña,Bebidas,l
+Refresco de cola,Bebidas,l
+Refresco de limón,Bebidas,l
+Cerveza,Bebidas,unidad
+Cerveza sin alcohol,Bebidas,unidad
+Vino tinto,Bebidas,unidad
+Vino blanco,Bebidas,unidad
+Guisantes congelados,Congelados,g
+Verduras para salteado,Congelados,g
+Espinacas congeladas,Congelados,g
+Patatas fritas congeladas,Congelados,g
+Pizza congelada,Congelados,unidad
+Helado,Congelados,unidad
+Gambas congeladas,Congelados,g
+Varitas de merluza,Congelados,unidad
+Detergente para lavadora,Limpieza,unidad
+Suavizante,Limpieza,unidad
+Lavavajillas a mano,Limpieza,unidad
+Pastillas para lavavajillas,Limpieza,unidad
+Lejía,Limpieza,l
+Limpiador multiusos,Limpieza,unidad
+Friegasuelos,Limpieza,unidad
+Bolsas de basura,Limpieza,unidad
+Papel de cocina,Limpieza,unidad
+Estropajos,Limpieza,unidad
+Bayetas,Limpieza,unidad
+Papel de aluminio,Limpieza,unidad
+Film transparente,Limpieza,unidad
+Papel higiénico,Higiene,unidad
+Gel de ducha,Higiene,unidad
+Champú,Higiene,unidad
+Acondicionador,Higiene,unidad
+Pasta de dientes,Higiene,unidad
+Cepillo de dientes,Higiene,unidad
+Desodorante,Higiene,unidad
+Jabón de manos,Higiene,unidad
+Pañuelos de papel,Higiene,unidad
+Compresas,Higiene,unidad
+Maquinillas de afeitar,Higiene,unidad
+Bastoncillos,Higiene,unidad
