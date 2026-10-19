@@ -213,6 +213,8 @@ describe("InventoryItem", () => {
   it.each([
     [cantidad(1, "unidad"), cantidad(6, "unidad"), true],
     [cantidad(2, "unidad"), cantidad(6, "unidad"), false],
+    // Recién comprado: 1 ud. de 1 ud. no "queda poco".
+    [cantidad(1, "unidad"), cantidad(1, "unidad"), false],
     [cantidad(200, "g"), cantidad(1, "kg"), true],
     [cantidad(300, "g"), cantidad(1, "kg"), false],
   ])("quedaPoco_%#", (actual, referencia, esperado) => {

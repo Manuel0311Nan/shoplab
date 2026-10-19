@@ -31,7 +31,7 @@ function Caducidad({ linea }: { linea: LineaDespensaResponse }) {
   return (
     <span
       className={cn(
-        "rounded-full px-2 py-0.5 text-xs font-semibold",
+        "self-start rounded-full px-2 py-0.5 text-xs font-semibold",
         COLOR[linea.caducidad.estado],
       )}
     >

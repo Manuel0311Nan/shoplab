@@ -238,15 +238,17 @@ export class InventoryItem {
   }
 
   /**
-   * D8: queda poco si queda 1 ud. (o menos) o, en g, kg, ml o l, el 20 % o menos de lo
-   * que entró por última vez.
+   * D8: queda poco cuando, tras gastar, queda 1 ud. o, en g, kg, ml o l, el 20 % o menos
+   * de lo que entró por última vez. Algo recién comprado nunca "queda poco", aunque sea
+   * 1 ud.: hay que haber gastado parte.
    */
   quedaPoco(): boolean {
     if (this.estaDeBaja) return false;
     const { cantidad, cantidadReferencia } = this.state;
-    if (cantidad.unidad === "unidad") return cantidad.valor <= 1;
     const referencia = convertirCantidad(cantidadReferencia, cantidad.unidad);
-    return referencia !== null && cantidad.valor <= referencia.valor * PORCENTAJE_QUEDA_POCO;
+    if (referencia === null || cantidad.valor >= referencia.valor) return false;
+    if (cantidad.unidad === "unidad") return cantidad.valor <= 1;
+    return cantidad.valor <= referencia.valor * PORCENTAJE_QUEDA_POCO;
   }
 
   toSnapshot(): InventoryItemSnapshot {

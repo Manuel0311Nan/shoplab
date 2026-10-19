@@ -55,7 +55,7 @@ function Formulario({
     <>
       <DialogTitle>{linea.nombre}</DialogTitle>
       <DialogDescription>
-        Quedan {formatCantidad(linea.cantidad)}. ¿Cuánto has usado o tirado?
+        Hay {formatCantidad(linea.cantidad)} ¿Cuánto has usado o tirado?
       </DialogDescription>
       <div className="flex items-center gap-2">
         <Input

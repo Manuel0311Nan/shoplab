@@ -1,5 +1,5 @@
 "use client";
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 import { NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
 import { cn } from "@/shared/lib/utils";
@@ -41,6 +41,24 @@ export function CampoProducto({
   const [abierto, setAbierto] = useState(false);
   const [activa, setActiva] = useState(-1);
   const sugerencias = abierto ? filtrarSugerencias(indice, texto) : [];
+  const contenedor = useRef<HTMLDivElement>(null);
+
+  // Al enviar el formulario (o resetearlo) la lista se cierra y se olvida lo escrito.
+  useEffect(() => {
+    const form = contenedor.current?.closest("form");
+    if (!form) return;
+    const cerrar = () => {
+      setAbierto(false);
+      setTexto("");
+      setActiva(-1);
+    };
+    form.addEventListener("submit", cerrar);
+    form.addEventListener("reset", cerrar);
+    return () => {
+      form.removeEventListener("submit", cerrar);
+      form.removeEventListener("reset", cerrar);
+    };
+  }, []);
   const mostrar = sugerencias.length > 0;
 
   function elegir(sugerencia: Sugerencia) {
@@ -68,7 +86,9 @@ export function CampoProducto({
   }
 
   return (
-    <div className="relative">
+    // Las sugerencias se despliegan dentro del formulario (no flotan encima): en el móvil,
+    // una lista flotante tapaba el botón "Añadir" y no se podía pulsar sin cerrarla.
+    <div ref={contenedor}>
       <Input
         id={id}
         placeholder={placeholder}
@@ -95,6 +115,10 @@ export function CampoProducto({
         }}
         onBlur={(e) => {
           void campo.onBlur(e);
+          // Si el foco pasa a otro campo o botón del mismo formulario, la lista sigue: al
+          // cerrarse movería el botón "Añadir" bajo el dedo y el toque se perdería.
+          const destino = e.relatedTarget;
+          if (destino instanceof Node && e.currentTarget.form?.contains(destino)) return;
           setAbierto(false);
         }}
       />
@@ -103,7 +127,7 @@ export function CampoProducto({
         role="listbox"
         aria-label="Sugerencias"
         hidden={!mostrar}
-        className="absolute inset-x-0 top-full z-30 mt-1 max-h-80 overflow-y-auto rounded-xl bg-popover p-1 text-popover-foreground shadow-lg"
+        className="mt-1 max-h-72 overflow-y-auto rounded-xl bg-popover p-1 text-popover-foreground shadow-lg"
       >
         {sugerencias.map((sugerencia, i) => (
           <li
