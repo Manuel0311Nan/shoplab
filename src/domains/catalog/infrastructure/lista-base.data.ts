@@ -340,3 +340,48 @@ export const LISTA_BASE: readonly (readonly [
   ["Maquinillas de afeitar", "higiene", "unidad"],
   ["Bastoncillos", "higiene", "unidad"],
 ];
+
+/**
+ * Otros nombres con los que se escribe un producto de la lista base. Si alguien escribe
+ * uno a mano, la línea se vincula a ese producto (D1 de la vista 3). Se normalizan al
+ * sembrar. Un sinónimo no puede coincidir con el nombre de otro producto.
+ */
+export const SINONIMOS: Readonly<Record<string, readonly string[]>> = {
+  "Plátano de Canarias": ["plátano", "plátanos"],
+  Banana: ["bananas"],
+  Patatas: ["patata", "papas"],
+  Huevos: ["huevo", "docena de huevos"],
+  "Leche semidesnatada": ["leche"],
+  "Pan de barra": ["pan", "barra de pan", "baguette"],
+  Cebolla: ["cebollas"],
+  Ajos: ["ajo", "cabeza de ajos"],
+  Zanahoria: ["zanahorias"],
+  "Tomate para ensalada": ["tomate", "tomates"],
+  Limón: ["limones"],
+  "Naranja de mesa": ["naranja", "naranjas"],
+  "Manzana Golden": ["manzana", "manzanas"],
+  "Pera Conferencia": ["pera", "peras"],
+  Fresas: ["fresa", "fresón", "fresones"],
+  "Pimiento rojo": ["pimiento", "pimientos"],
+  "Lechuga romana": ["lechuga"],
+  "Aceite de oliva virgen extra": ["aceite de oliva", "aceite", "aove"],
+  "Agua mineral": ["agua"],
+  "Yogur natural": ["yogur", "yogures", "yogures naturales"],
+  "Pechuga de pollo": ["pechugas de pollo"],
+  "Carne picada mixta": ["carne picada"],
+  "Atún en lata": ["atún", "latas de atún"],
+  "Queso semicurado": ["queso"],
+  "Café molido": ["café"],
+  "Papel higiénico": ["papel de váter", "papel wc"],
+  "Pasta de dientes": ["dentífrico"],
+  "Detergente para lavadora": ["detergente"],
+  "Lavavajillas a mano": ["lavavajillas"],
+  Espaguetis: ["espagueti", "spaghetti"],
+  Macarrones: ["pasta"],
+  Calabacín: ["calabacines"],
+  Pepino: ["pepinos"],
+  Aguacate: ["aguacates"],
+  Champiñones: ["champiñón"],
+  "Alubias blancas": ["alubias", "judías blancas"],
+  "Refresco de cola": ["cola"],
+};

@@ -6,9 +6,11 @@ import {
   addItemAction,
   removeItemAction,
   setItemPurchasedAction,
+  updateItemCategoryAction,
   updateItemQuantityAction,
 } from "@/app/actions/shopping-items";
 import { actualizarListaAction, finishShoppingAction } from "@/app/actions/shopping-lists";
+import type { CategoriaDto } from "@/contracts/categoria";
 import type {
   CantidadDto,
   LimiteDeListasDetails,
@@ -25,6 +27,7 @@ import { AddItemForm, NUEVO_PRODUCTO_ID, type NewItemValues } from "./add-item-f
 import { DuplicadoDialog, type EstadoDuplicado, type RespuestaUnir } from "./duplicado-dialog";
 import { FinishShoppingButton } from "./finish-shopping-button";
 import { ItemList } from "./item-list";
+import { SelectorOrden, useOrdenLista } from "./orden-lista";
 import { type AccionLista, aplicarAccion } from "./list-reducer";
 
 type Props = { list: ShoppingListResponse };
@@ -39,6 +42,7 @@ export function ShoppingListScreen({ list }: Props) {
   const [alta, setAlta] = useState<AltaPendiente | null>(null);
   const [limite, setLimite] = useState<LimiteDeListasDetails | null>(null);
   const soloLectura = list.archivada;
+  const [orden, setOrden] = useOrdenLista();
 
   function ejecutar(accion: AccionLista | null, llamada: () => Promise<Result<unknown>>) {
     setError(null);
@@ -70,6 +74,8 @@ export function ShoppingListScreen({ list }: Props) {
             nota: values.nota ?? null,
             ingredientId: null,
             productoBaseId: values.productoBaseId ?? null,
+            // La decide el servidor si no se eligió del autocompletado; mientras, Otros.
+            categoria: values.categoria ?? "otros",
             compradoAt: null,
             updatedAt: new Date().toISOString(),
           },
@@ -120,6 +126,10 @@ export function ShoppingListScreen({ list }: Props) {
   const cambiarCantidad = (itemId: string, cantidad: CantidadDto) =>
     ejecutar({ tipo: "cantidad", itemId, cantidad }, () =>
       updateItemQuantityAction(list.id, itemId, cantidad),
+    );
+  const cambiarCategoria = (itemId: string, categoria: CategoriaDto) =>
+    ejecutar({ tipo: "categoria", itemId, categoria }, () =>
+      updateItemCategoryAction(list.id, itemId, categoria),
     );
   const quitar = (itemId: string) =>
     ejecutar({ tipo: "quitar", itemId }, () => removeItemAction(list.id, itemId));
@@ -193,13 +203,17 @@ export function ShoppingListScreen({ list }: Props) {
         </p>
       )}
 
+      {pendientes.length > 1 && <SelectorOrden orden={orden} onCambiar={setOrden} />}
+
       <ItemList
         titulo="Por comprar"
         vacio="No queda nada por comprar."
         items={pendientes}
         onToggle={marcar}
         onCantidad={cambiarCantidad}
+        onCategoria={cambiarCategoria}
         onQuitar={quitar}
+        agrupar={orden === "categoria"}
         soloLectura={soloLectura}
       />
       <ItemList
@@ -208,6 +222,7 @@ export function ShoppingListScreen({ list }: Props) {
         items={enElCarro}
         onToggle={marcar}
         onCantidad={cambiarCantidad}
+        onCategoria={cambiarCategoria}
         onQuitar={quitar}
         soloLectura={soloLectura}
       />

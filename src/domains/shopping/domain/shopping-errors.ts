@@ -24,7 +24,9 @@ export const ShoppingErrors = {
     validationError("NOMBRE_NO_VALIDO", `El nombre debe tener entre 1 y ${max} caracteres`),
 
   sinCambios: () =>
-    validationError("SIN_CAMBIOS", "Indica al menos un cambio: cantidad o comprado"),
+    validationError("SIN_CAMBIOS", "Indica al menos un cambio: cantidad, comprado o categoría"),
+
+  categoriaNoValida: () => validationError("CATEGORIA_NO_VALIDA", "Esa categoría no existe"),
 
   sinCambiosLista: () =>
     validationError("SIN_CAMBIOS", "Indica al menos un cambio: nombre o archivada"),

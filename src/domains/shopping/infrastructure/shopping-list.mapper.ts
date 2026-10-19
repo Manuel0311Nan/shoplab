@@ -19,6 +19,7 @@ function itemToDomain(row: ShoppingItemRow): ShoppingItem {
     nombre: row.nombre,
     ingredientId: row.ingredientId,
     productoBaseId: row.productoBaseId,
+    categoria: row.categoria,
     cantidad: cantidadDesdeBd(row.cantidadValor, row.cantidadUnidad),
     nota: row.nota,
     compradoAt: row.compradoAt,

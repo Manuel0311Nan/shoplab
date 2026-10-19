@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import type { PrismaClient } from "../src/generated/prisma/client";
-import { LISTA_BASE } from "../src/domains/catalog/infrastructure/lista-base.data";
+import { LISTA_BASE, SINONIMOS } from "../src/domains/catalog/infrastructure/lista-base.data";
 import { normalizarNombre } from "../src/shared/kernel/texto";
 
 /** Espacio de nombres fijo para que cada producto tenga el mismo id en todas las BD. */
@@ -29,7 +29,13 @@ export async function sembrarListaBase(prisma: PrismaClient): Promise<number> {
   const existentes = new Map(
     (
       await prisma.productoBase.findMany({
-        select: { nombreNormalizado: true, nombre: true, categoria: true, unidadPorDefecto: true },
+        select: {
+          nombreNormalizado: true,
+          nombre: true,
+          categoria: true,
+          unidadPorDefecto: true,
+          sinonimos: true,
+        },
       })
     ).map((p) => [p.nombreNormalizado, p]),
   );
@@ -38,6 +44,7 @@ export async function sembrarListaBase(prisma: PrismaClient): Promise<number> {
   const cambiados = [];
   for (const [nombre, categoria, unidad] of LISTA_BASE) {
     const nombreNormalizado = normalizarNombre(nombre);
+    const sinonimos = (SINONIMOS[nombre] ?? []).map(normalizarNombre);
     const actual = existentes.get(nombreNormalizado);
     if (actual === undefined) {
       nuevos.push({
@@ -46,13 +53,15 @@ export async function sembrarListaBase(prisma: PrismaClient): Promise<number> {
         nombreNormalizado,
         categoria,
         unidadPorDefecto: unidad,
+        sinonimos,
       });
     } else if (
       actual.nombre !== nombre ||
       actual.categoria !== categoria ||
-      actual.unidadPorDefecto !== unidad
+      actual.unidadPorDefecto !== unidad ||
+      actual.sinonimos.join("|") !== sinonimos.join("|")
     ) {
-      cambiados.push({ nombreNormalizado, nombre, categoria, unidadPorDefecto: unidad });
+      cambiados.push({ nombreNormalizado, nombre, categoria, unidadPorDefecto: unidad, sinonimos });
     }
   }
 

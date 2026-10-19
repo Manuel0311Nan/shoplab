@@ -1,13 +1,16 @@
 import { Check, Undo2, X } from "lucide-react";
+import type { CategoriaDto } from "@/contracts/categoria";
 import type { CantidadDto, ShoppingItemResponse } from "@/contracts/shopping";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
+import { SelectorCategoria } from "../../../_components/selector-categoria";
 import { QuantityStepper } from "./quantity-stepper";
 
 type Props = {
   item: ShoppingItemResponse;
   onToggle: (comprado: boolean) => void;
   onCantidad: (cantidad: CantidadDto) => void;
+  onCategoria: (categoria: CategoriaDto) => void;
   onQuitar: () => void;
   soloLectura?: boolean;
 };
@@ -20,6 +23,7 @@ export function ShoppingItemRow({
   item,
   onToggle,
   onCantidad,
+  onCategoria,
   onQuitar,
   soloLectura = false,
 }: Props) {
@@ -61,7 +65,14 @@ export function ShoppingItemRow({
       >
         {item.nombre}
       </h3>
-      <p className="min-h-4 truncate text-xs text-muted-foreground">{item.nota}</p>
+      <SelectorCategoria
+        categoria={item.categoria}
+        producto={item.nombre}
+        onCambiar={onCategoria}
+        disabled={soloLectura}
+        className="self-start"
+      />
+      {item.nota && <p className="truncate text-xs text-muted-foreground">{item.nota}</p>}
       <div className="mt-3">
         <QuantityStepper
           nombre={item.nombre}

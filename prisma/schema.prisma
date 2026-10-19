@@ -13,9 +13,10 @@ model Hogar {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  miembros      MiembroHogar[]
-  listas        ShoppingList[] // ← nuevo
-  shoppingItems ShoppingItem[]
+  miembros            MiembroHogar[]
+  listas              ShoppingList[] // ← nuevo
+  shoppingItems       ShoppingItem[]
+  productosRecordados ProductoRecordado[]
 }
 
 model Usuario {
@@ -131,25 +132,27 @@ model ShoppingList {
 }
 
 model ShoppingItem {
-  id             String        @id @default(uuid(7)) @db.Uuid
-  hogarId        String        @db.Uuid
-  listaId        String        @db.Uuid
+  id             String            @id @default(uuid(7)) @db.Uuid
+  hogarId        String            @db.Uuid
+  listaId        String            @db.Uuid
   nombre         String
-  ingredientId   String?       @db.Uuid
+  ingredientId   String?           @db.Uuid
   /// Producto de la lista base elegido al autocompletar (null si se escribió a mano).
-  productoBaseId String?       @db.Uuid
-  cantidadValor  Decimal       @db.Decimal(10, 3)
+  productoBaseId String?           @db.Uuid
+  /// Para agrupar la lista por el recorrido del súper.
+  categoria      CategoriaProducto @default(otros)
+  cantidadValor  Decimal           @db.Decimal(10, 3)
   cantidadUnidad Unidad
   nota           String?
   compradoAt     DateTime?
-  compradoPorId  String?       @db.Uuid
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  compradoPorId  String?           @db.Uuid
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
   deletedAt      DateTime?
-  hogar          Hogar         @relation(fields: [hogarId], references: [id], onDelete: Cascade)
-  lista          ShoppingList  @relation(fields: [listaId], references: [id], onDelete: Cascade)
-  compradoPor    Usuario?      @relation(fields: [compradoPorId], references: [id], onDelete: SetNull)
-  productoBase   ProductoBase? @relation(fields: [productoBaseId], references: [id], onDelete: SetNull)
+  hogar          Hogar             @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+  lista          ShoppingList      @relation(fields: [listaId], references: [id], onDelete: Cascade)
+  compradoPor    Usuario?          @relation(fields: [compradoPorId], references: [id], onDelete: SetNull)
+  productoBase   ProductoBase?     @relation(fields: [productoBaseId], references: [id], onDelete: SetNull)
 
   @@index([listaId, deletedAt])
   @@index([hogarId, updatedAt])
@@ -174,6 +177,8 @@ enum CategoriaProducto {
   congelados
   limpieza
   higiene
+  /// Lo que no se sabe clasificar. La lista base no lo usa.
+  otros
 }
 
 /// Producto de la lista base para autocompletar.
@@ -184,8 +189,28 @@ model ProductoBase {
   nombreNormalizado String            @unique
   categoria         CategoriaProducto
   unidadPorDefecto  Unidad
+  /// Otros nombres ya normalizados (\"banana\" para Plátano): también vinculan.
+  sinonimos         String[]          @default([])
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
   items ShoppingItem[]
+}
+
+/// Memoria del hogar para el texto libre: lo que ya escribió alguna vez, con su
+/// categoría y unidad. Alimenta el autocompletado y clasifica sin preguntar.
+model ProductoRecordado {
+  hogarId           String            @db.Uuid
+  nombreNormalizado String
+  /// La última forma escrita, como se muestra en las sugerencias.
+  nombre            String
+  categoria         CategoriaProducto
+  unidad            Unidad
+  usos              Int               @default(1)
+  ultimoUso         DateTime
+  updatedAt         DateTime          @updatedAt
+
+  hogar Hogar @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+
+  @@id([hogarId, nombreNormalizado])
 }

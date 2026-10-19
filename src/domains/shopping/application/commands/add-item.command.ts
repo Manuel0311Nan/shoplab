@@ -2,6 +2,7 @@ import { ShoppingErrors } from "@/domains/shopping/domain/shopping-errors";
 import type { ShoppingItemSnapshot } from "@/domains/shopping/domain/shopping-item";
 import type { OpcionesDuplicado } from "@/domains/shopping/domain/shopping-list";
 import { Cantidad } from "@/shared/kernel/cantidad";
+import { esCategoria } from "@/shared/kernel/categoria";
 import type { Clock } from "@/shared/kernel/clock";
 import { newId } from "@/shared/kernel/ids";
 import { err, ok, type Result } from "@/shared/kernel/result";
@@ -20,6 +21,8 @@ export interface AddItemInput {
   readonly nota?: string | null;
   /** Producto de la lista base elegido al autocompletar. */
   readonly productoBaseId?: string | null;
+  /** La resuelve el orquestador (lista base, memoria del hogar u otros). */
+  readonly categoria?: string;
   /** Respuesta del usuario a POSIBLE_DUPLICADO. */
   readonly duplicado?: "unir" | "separar";
   /** Respuesta a UNIDADES_DISTINTAS: unidad en la que contar el total. */
@@ -45,6 +48,9 @@ export class AddItemCommand {
 
     const opciones = construirOpciones(input);
     if (!opciones.ok) return opciones;
+    if (input.categoria !== undefined && !esCategoria(input.categoria)) {
+      return err(ShoppingErrors.categoriaNoValida());
+    }
 
     const list = await this.lists.findById(input.listId);
     if (list === null) return err(ShoppingErrors.listaNoEncontrada());
@@ -56,6 +62,7 @@ export class AddItemCommand {
         cantidad: cantidad.value,
         nota: input.nota,
         productoBaseId: input.productoBaseId ?? null,
+        ...(input.categoria === undefined ? {} : { categoria: input.categoria }),
       },
       this.clock.now(),
       opciones.value,

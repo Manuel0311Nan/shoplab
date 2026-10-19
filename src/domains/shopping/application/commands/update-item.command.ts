@@ -2,6 +2,7 @@ import { ShoppingErrors } from "@/domains/shopping/domain/shopping-errors";
 import type { ShoppingItemSnapshot } from "@/domains/shopping/domain/shopping-item";
 import type { CambiosItem } from "@/domains/shopping/domain/shopping-list";
 import { Cantidad } from "@/shared/kernel/cantidad";
+import { esCategoria } from "@/shared/kernel/categoria";
 import type { Clock } from "@/shared/kernel/clock";
 import { err, ok, type Result } from "@/shared/kernel/result";
 import type { ShoppingListRepository } from "../ports/shopping-list-repository";
@@ -12,6 +13,7 @@ export interface UpdateItemInput {
   readonly usuarioId: string;
   readonly cantidad?: { readonly valor: number; readonly unidad: string };
   readonly comprado?: boolean;
+  readonly categoria?: string;
 }
 
 /**
@@ -46,15 +48,27 @@ export class UpdateItemCommand {
 
   /** Valida la entrada antes de tocar el repositorio. */
   private construirCambios(input: UpdateItemInput): Result<CambiosItem> {
-    if (input.cantidad === undefined && input.comprado === undefined) {
+    if (
+      input.cantidad === undefined &&
+      input.comprado === undefined &&
+      input.categoria === undefined
+    ) {
       return err(ShoppingErrors.sinCambios());
     }
 
-    if (input.cantidad === undefined) return ok({ comprado: input.comprado });
+    let cambios: CambiosItem = input.comprado === undefined ? {} : { comprado: input.comprado };
 
-    const cantidad = Cantidad.create(input.cantidad.valor, input.cantidad.unidad);
-    if (!cantidad.ok) return cantidad;
+    if (input.categoria !== undefined) {
+      if (!esCategoria(input.categoria)) return err(ShoppingErrors.categoriaNoValida());
+      cambios = { ...cambios, categoria: input.categoria };
+    }
 
-    return ok({ cantidad: cantidad.value, comprado: input.comprado });
+    if (input.cantidad !== undefined) {
+      const cantidad = Cantidad.create(input.cantidad.valor, input.cantidad.unidad);
+      if (!cantidad.ok) return cantidad;
+      cambios = { ...cambios, cantidad: cantidad.value };
+    }
+
+    return ok(cambios);
   }
 }

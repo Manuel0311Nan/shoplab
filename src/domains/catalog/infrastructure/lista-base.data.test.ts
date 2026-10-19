@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { CATEGORIAS } from "@/shared/kernel/categoria";
 import { normalizarNombre } from "@/shared/kernel/texto";
 import { UNIDADES } from "@/shared/kernel/unidad";
-import { LISTA_BASE } from "./lista-base.data";
+import { LISTA_BASE, SINONIMOS } from "./lista-base.data";
 
 describe("LISTA_BASE", () => {
   it("tieneAlMenos200Productos", () => {
@@ -23,5 +23,20 @@ describe("LISTA_BASE", () => {
     }
     // Todas menos "otros", que es para lo que no se sabe clasificar.
     expect(new Set(LISTA_BASE.map(([, c]) => c)).size).toBe(CATEGORIAS.length - 1);
+  });
+
+  it("sinonimos_DeProductosQueExisten_YSinChocarConOtrosNombres", () => {
+    const nombres = new Set(LISTA_BASE.map(([nombre]) => nombre));
+    const normalizados = new Set(LISTA_BASE.map(([nombre]) => normalizarNombre(nombre)));
+    const vistos = new Set<string>();
+    for (const [producto, sinonimos] of Object.entries(SINONIMOS)) {
+      expect(nombres).toContain(producto);
+      for (const sinonimo of sinonimos) {
+        const n = normalizarNombre(sinonimo);
+        expect(normalizados.has(n), sinonimo).toBe(false);
+        expect(vistos.has(n), sinonimo).toBe(false);
+        vistos.add(n);
+      }
+    }
   });
 });

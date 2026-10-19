@@ -1,5 +1,8 @@
 import { useId } from "react";
+import type { CategoriaDto } from "@/contracts/categoria";
 import type { CantidadDto, ShoppingItemResponse } from "@/contracts/shopping";
+import { NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
+import { agruparPorCategoria } from "./agrupar-por-categoria";
 import { ShoppingItemRow } from "./shopping-item-row";
 
 type Props = {
@@ -8,7 +11,10 @@ type Props = {
   items: readonly ShoppingItemResponse[];
   onToggle: (itemId: string, comprado: boolean) => void;
   onCantidad: (itemId: string, cantidad: CantidadDto) => void;
+  onCategoria: (itemId: string, categoria: CategoriaDto) => void;
   onQuitar: (itemId: string) => void;
+  /** Agrupar por categoría, en el orden del súper. */
+  agrupar?: boolean;
   /** Lista archivada: se ve, pero no se puede cambiar. */
   soloLectura?: boolean;
 };
@@ -19,10 +25,25 @@ export function ItemList({
   items,
   onToggle,
   onCantidad,
+  onCategoria,
   onQuitar,
+  agrupar = false,
   soloLectura = false,
 }: Props) {
   const tituloId = useId();
+  const fila = (item: ShoppingItemResponse) => (
+    <ShoppingItemRow
+      key={item.id}
+      item={item}
+      onToggle={(comprado) => onToggle(item.id, comprado)}
+      onCantidad={(cantidad) => onCantidad(item.id, cantidad)}
+      onCategoria={(categoria) => onCategoria(item.id, categoria)}
+      onQuitar={() => onQuitar(item.id)}
+      soloLectura={soloLectura}
+    />
+  );
+  const rejilla = "grid grid-cols-2 gap-4 sm:grid-cols-3";
+
   return (
     <section aria-labelledby={tituloId} className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
@@ -37,19 +58,17 @@ export function ItemList({
         <p className="rounded-xl border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
           {vacio}
         </p>
+      ) : agrupar ? (
+        agruparPorCategoria(items).map((grupo) => (
+          <div key={grupo.categoria} className="flex flex-col gap-2">
+            <h3 className="text-sm font-semibold text-muted-foreground">
+              {NOMBRE_CATEGORIA[grupo.categoria]}
+            </h3>
+            <ul className={rejilla}>{grupo.items.map(fila)}</ul>
+          </div>
+        ))
       ) : (
-        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {items.map((item) => (
-            <ShoppingItemRow
-              key={item.id}
-              item={item}
-              onToggle={(comprado) => onToggle(item.id, comprado)}
-              onCantidad={(cantidad) => onCantidad(item.id, cantidad)}
-              onQuitar={() => onQuitar(item.id)}
-              soloLectura={soloLectura}
-            />
-          ))}
-        </ul>
+        <ul className={rejilla}>{items.map(fila)}</ul>
       )}
     </section>
   );

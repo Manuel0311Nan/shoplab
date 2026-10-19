@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { categoriaSchema } from "./categoria";
 import { paginaSchema } from "./pagination";
 export const unidadSchema = z.enum(["unidad", "g", "kg", "ml", "l"]);
 
@@ -15,6 +16,7 @@ export const shoppingItemSchema = z.object({
   ingredientId: z.uuid().nullable(),
   /** Producto de la lista base del que salió (autocompletado), o null. */
   productoBaseId: z.uuid().nullable(),
+  categoria: categoriaSchema,
   compradoAt: z.iso.datetime().nullable(),
   updatedAt: z.iso.datetime(),
 });
@@ -98,6 +100,8 @@ export const addItemRequestSchema = z.object({
   cantidad: cantidadSchema,
   nota: z.string().trim().max(200).nullish(),
   productoBaseId: z.uuid().nullish(),
+  /** Si no llega, la decide el servidor: lista base, memoria del hogar u «otros». */
+  categoria: categoriaSchema.optional(),
   /** Respuesta a POSIBLE_DUPLICADO. */
   duplicado: z.enum(["unir", "separar"]).optional(),
   /** Respuesta a UNIDADES_DISTINTAS: unidad del total (si se pueden convertir). */
@@ -110,10 +114,14 @@ export const updateItemRequestSchema = z
   .object({
     comprado: z.boolean().optional(),
     cantidad: cantidadSchema.optional(),
+    /** Cambiarla también la guarda en la memoria del hogar. */
+    categoria: categoriaSchema.optional(),
   })
-  .refine((body) => body.comprado !== undefined || body.cantidad !== undefined, {
-    message: "Indica comprado o cantidad",
-  });
+  .refine(
+    (body) =>
+      body.comprado !== undefined || body.cantidad !== undefined || body.categoria !== undefined,
+    { message: "Indica comprado, cantidad o categoría" },
+  );
 
 export const modoTerminarCompraSchema = z.enum(["vaciar", "conservarPendientes"]);
 
