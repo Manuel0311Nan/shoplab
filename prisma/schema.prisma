@@ -17,6 +17,9 @@ model Hogar {
   listas              ShoppingList[] // ← nuevo
   shoppingItems       ShoppingItem[]
   productosRecordados ProductoRecordado[]
+  ubicaciones         Ubicacion[]
+  inventario          InventoryItem[]
+  movimientosDespensa MovimientoDespensa[]
 }
 
 model Usuario {
@@ -29,10 +32,11 @@ model Usuario {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  hogares        MiembroHogar[]
-  itemsComprados ShoppingItem[]
-  sesiones       Session[]
-  cuentas        Account[]
+  hogares             MiembroHogar[]
+  itemsComprados      ShoppingItem[]
+  sesiones            Session[]
+  cuentas             Account[]
+  movimientosDespensa MovimientoDespensa[]
 }
 
 // ─── Identity (tablas de Better Auth) ──────────────────────────────────────
@@ -194,7 +198,8 @@ model ProductoBase {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
-  items ShoppingItem[]
+  items      ShoppingItem[]
+  inventario InventoryItem[]
 }
 
 /// Memoria del hogar para el texto libre: lo que ya escribió alguna vez, con su
@@ -213,4 +218,94 @@ model ProductoRecordado {
   hogar Hogar @relation(fields: [hogarId], references: [id], onDelete: Cascade)
 
   @@id([hogarId, nombreNormalizado])
+}
+
+// ─── Pantry ─────────────────────────────────────────────────────────────────
+
+/// Qué conserva una ubicación: sirve para proponer dónde guardar cada categoría.
+enum TipoUbicacion {
+  frio
+  congelado
+  ambiente
+}
+
+/// Ver TipoMovimiento en domains/pantry/domain/inventory-item.ts.
+enum TipoMovimiento {
+  entrada
+  consumo
+  desecho
+  ajuste
+  baja
+}
+
+enum OrigenMovimiento {
+  manual
+  compra
+}
+
+/// Nevera, congelador, armario… configurables por hogar (D3, vista 3). Máximo 12.
+model Ubicacion {
+  id        String        @id @db.Uuid
+  hogarId   String        @db.Uuid
+  nombre    String
+  tipo      TipoUbicacion
+  /// Posición en la pantalla: 1, 2, 3…
+  orden     Int
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  deletedAt DateTime?
+
+  hogar      Hogar           @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+  inventario InventoryItem[]
+
+  @@index([hogarId, deletedAt, orden])
+}
+
+/// Una línea de la despensa: un producto en una ubicación con (o sin) caducidad.
+model InventoryItem {
+  id                 String            @id @db.Uuid
+  hogarId            String            @db.Uuid
+  nombre             String
+  nombreNormalizado  String
+  productoBaseId     String?           @db.Uuid
+  categoria          CategoriaProducto
+  ubicacionId        String            @db.Uuid
+  cantidadValor      Decimal           @db.Decimal(10, 3)
+  cantidadUnidad     Unidad
+  /// Tras la última entrada o ajuste, en la misma unidad: base de "queda poco".
+  cantidadReferencia Decimal           @db.Decimal(10, 3)
+  /// Un día, sin hora (D2: opcional).
+  caducaEl           DateTime?         @db.Date
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  deletedAt          DateTime?
+
+  hogar        Hogar                @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+  ubicacion    Ubicacion            @relation(fields: [ubicacionId], references: [id], onDelete: Restrict)
+  productoBase ProductoBase?        @relation(fields: [productoBaseId], references: [id], onDelete: SetNull)
+  movimientos  MovimientoDespensa[]
+
+  @@index([hogarId, deletedAt, ubicacionId])
+  @@index([hogarId, deletedAt, caducaEl])
+}
+
+/// Cada cambio de cantidad de una línea (D7). No se edita ni se borra.
+model MovimientoDespensa {
+  id              String           @id @db.Uuid
+  hogarId         String           @db.Uuid
+  inventoryItemId String           @db.Uuid
+  tipo            TipoMovimiento
+  cantidadValor   Decimal          @db.Decimal(10, 3)
+  cantidadUnidad  Unidad
+  origen          OrigenMovimiento
+  /// La lista de la que vino, si entró desde la compra. Sin FK: la lista puede borrarse.
+  listaId         String?          @db.Uuid
+  usuarioId       String?          @db.Uuid
+  createdAt       DateTime         @default(now())
+
+  hogar         Hogar         @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  usuario       Usuario?      @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@index([inventoryItemId, createdAt])
 }

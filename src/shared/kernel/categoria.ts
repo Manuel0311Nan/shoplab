@@ -57,6 +57,10 @@ export function compararCategorias(a: Categoria, b: Categoria): number {
 export const TIPOS_UBICACION = ["frio", "congelado", "ambiente"] as const;
 export type TipoUbicacion = (typeof TIPOS_UBICACION)[number];
 
+export function esTipoUbicacion(valor: string): valor is TipoUbicacion {
+  return (TIPOS_UBICACION as readonly string[]).includes(valor);
+}
+
 const FRIO: ReadonlySet<Categoria> = new Set([
   "vacuno",
   "pollo_pavo",
