@@ -1,0 +1,107 @@
+import { describe, expect, it } from "vitest";
+import type { LineaDespensaResponse, UbicacionResponse } from "@/contracts/pantry";
+import { agruparDespensa, agruparEnProductos, textoCaducidad } from "./vista-despensa";
+
+const NEVERA = "0199c000-0000-7000-8000-0000000000e1";
+const ARMARIO = "0199c000-0000-7000-8000-0000000000e3";
+const ubicaciones: UbicacionResponse[] = [
+  { id: ARMARIO, nombre: "Armario", tipo: "ambiente", orden: 2 },
+  { id: NEVERA, nombre: "Nevera", tipo: "frio", orden: 1 },
+];
+
+let n = 0;
+function linea(
+  nombre: string,
+  cambios: Partial<LineaDespensaResponse> & { dias?: number | null } = {},
+): LineaDespensaResponse {
+  const { dias = null, ...resto } = cambios;
+  n += 1;
+  return {
+    id: `0199c000-0000-7000-8000-${String(n).padStart(12, "0")}`,
+    nombre,
+    productoBaseId: null,
+    categoria: "despensa",
+    ubicacionId: ARMARIO,
+    cantidad: { valor: 1, unidad: "unidad" },
+    caducaEl: dias === null ? null : "2026-10-20",
+    caducidad: {
+      estado: dias === null ? "sin_fecha" : dias < 0 ? "caducado" : dias <= 7 ? "pronto" : "ok",
+      dias,
+    },
+    quedaPoco: false,
+    updatedAt: "2026-10-20T10:00:00.000Z",
+    ...resto,
+  };
+}
+
+describe("agruparEnProductos", () => {
+  it("juntaLotesDelMismoProductoYUbicacion_SumaYMandaElQueAntesCaduca", () => {
+    const productos = agruparEnProductos([
+      linea("Yogur", { dias: 10, cantidad: { valor: 4, unidad: "unidad" } }),
+      linea("yogur", { dias: 3, cantidad: { valor: 2, unidad: "unidad" } }),
+      linea("Yogur", { ubicacionId: NEVERA }),
+    ]);
+
+    expect(productos).toHaveLength(2);
+    const armario = productos.find((p) => p.ubicacionId === ARMARIO);
+    expect(armario?.total).toEqual({ valor: 6, unidad: "unidad" });
+    expect(armario?.principal.caducidad.dias).toBe(3);
+  });
+
+  it("unidadesQueNoSeSuman_SinTotal", () => {
+    const [p] = agruparEnProductos([
+      linea("Leche", { cantidad: { valor: 1, unidad: "l" }, dias: 2 }),
+      linea("Leche", { cantidad: { valor: 2, unidad: "unidad" }, dias: 5 }),
+    ]);
+    expect(p?.total).toBeNull();
+  });
+});
+
+describe("agruparDespensa", () => {
+  const lineas = [
+    linea("Lejía", { categoria: "limpieza" }),
+    linea("Leche", { categoria: "lacteos_huevos", ubicacionId: NEVERA, dias: 2 }),
+    linea("Arroz", { categoria: "despensa", dias: 30 }),
+    linea("Pasta", { categoria: "despensa" }),
+  ];
+
+  it("porUbicacion_OrdenDelHogarYCategoriasDentro", () => {
+    const grupos = agruparDespensa(ubicaciones, lineas, "ubicacion");
+
+    expect(grupos.map((g) => g.titulo)).toEqual(["Nevera", "Armario"]);
+    expect(grupos[1]?.subgrupos.map((s) => [s.titulo, s.productos.map((p) => p.nombre)])).toEqual([
+      ["Despensa", ["Arroz", "Pasta"]],
+      ["Limpieza", ["Lejía"]],
+    ]);
+  });
+
+  it("porCategoria_OrdenDelSuper", () => {
+    const grupos = agruparDespensa(ubicaciones, lineas, "categoria");
+    expect(grupos.map((g) => g.titulo)).toEqual(["Lácteos y huevos", "Despensa", "Limpieza"]);
+  });
+
+  it("filtros_UbicacionYUrgentes", () => {
+    expect(
+      agruparDespensa(ubicaciones, lineas, "ubicacion", { ubicacionId: NEVERA }).map(
+        (g) => g.titulo,
+      ),
+    ).toEqual(["Nevera"]);
+    const urgentes = agruparDespensa(ubicaciones, lineas, "categoria", { urgentes: true });
+    expect(
+      urgentes.flatMap((g) => g.subgrupos.flatMap((s) => s.productos.map((p) => p.nombre))),
+    ).toEqual(["Leche"]);
+  });
+});
+
+describe("textoCaducidad", () => {
+  it.each([
+    [null, null],
+    [-3, "Caducó hace 3 días"],
+    [-1, "Caducó ayer"],
+    [0, "Caduca hoy"],
+    [1, "Caduca mañana"],
+    [6, "Caduca en 6 días"],
+  ])("%s → %s", (dias, texto) => {
+    expect(textoCaducidad({ estado: "ok", dias })).toBe(texto);
+  });
+});

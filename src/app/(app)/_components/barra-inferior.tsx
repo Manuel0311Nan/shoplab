@@ -4,18 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/shared/lib/utils";
 
-const PRONTO = [
-  { nombre: "Despensa", icono: Package },
-  { nombre: "Recetas", icono: BookOpen },
-] as const;
+const PRONTO = [{ nombre: "Recetas", icono: BookOpen }] as const;
 
 /**
- * Navegación principal en móvil (D6). Despensa y Recetas llegan en las vistas 3 y 4:
- * se ven, pero desactivadas con "Pronto". Respeta la zona segura del iPhone.
+ * Navegación principal en móvil. Recetas llega en la vista 4: se ve, pero desactivada
+ * con "Pronto". Respeta la zona segura del iPhone.
  */
 export function BarraInferior() {
   const ruta = usePathname();
   const enListas = ruta === "/" || ruta.startsWith("/listas");
+  const enDespensa = ruta.startsWith("/despensa");
 
   return (
     <nav
@@ -34,6 +32,19 @@ export function BarraInferior() {
           >
             <ListChecks className="size-6" aria-hidden="true" />
             Listas
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/despensa"
+            aria-current={enDespensa ? "page" : undefined}
+            className={cn(
+              "flex h-full flex-col items-center justify-center gap-0.5 text-xs font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              enDespensa ? "text-primary" : "text-muted-foreground",
+            )}
+          >
+            <Package className="size-6" aria-hidden="true" />
+            Despensa
           </Link>
         </li>
         {PRONTO.map(({ nombre, icono: Icono }) => (

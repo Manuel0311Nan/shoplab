@@ -15,6 +15,7 @@ import type {
   CantidadDto,
   LimiteDeListasDetails,
   ModoTerminarCompraDto,
+  ShoppingItemResponse,
   ShoppingListResponse,
 } from "@/contracts/shopping";
 import { newId } from "@/shared/kernel/ids";
@@ -26,6 +27,7 @@ import { formatDiaYMes } from "../../../_components/fechas";
 import { AddItemForm, NUEVO_PRODUCTO_ID, type NewItemValues } from "./add-item-form";
 import { DuplicadoDialog, type EstadoDuplicado, type RespuestaUnir } from "./duplicado-dialog";
 import { FinishShoppingButton } from "./finish-shopping-button";
+import { GuardarEnDespensaSheet } from "./guardar-en-despensa-sheet";
 import { ItemList } from "./item-list";
 import { SelectorOrden, useOrdenLista } from "./orden-lista";
 import { type AccionLista, aplicarAccion } from "./list-reducer";
@@ -43,6 +45,8 @@ export function ShoppingListScreen({ list }: Props) {
   const [limite, setLimite] = useState<LimiteDeListasDetails | null>(null);
   const soloLectura = list.archivada;
   const [orden, setOrden] = useOrdenLista();
+  const [paraDespensa, setParaDespensa] = useState<ShoppingItemResponse[] | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
 
   function ejecutar(accion: AccionLista | null, llamada: () => Promise<Result<unknown>>) {
     setError(null);
@@ -133,8 +137,18 @@ export function ShoppingListScreen({ list }: Props) {
     );
   const quitar = (itemId: string) =>
     ejecutar({ tipo: "quitar", itemId }, () => removeItemAction(list.id, itemId));
-  const terminar = (modo: ModoTerminarCompraDto) =>
-    ejecutar({ tipo: "terminar", modo }, () => finishShoppingAction(list.id, modo));
+  /** D6: al terminar, lo que estaba en el carro se ofrece para guardarlo en la despensa. */
+  function terminar(modo: ModoTerminarCompraDto) {
+    const comprados = items.filter((item) => item.compradoAt !== null);
+    setError(null);
+    setAviso(null);
+    startTransition(async () => {
+      aplicarOptimista({ tipo: "terminar", modo });
+      const result = await finishShoppingAction(list.id, modo);
+      if (!result.ok) setError(result.error.message);
+      else if (comprados.length > 0) setParaDespensa(comprados);
+    });
+  }
 
   // El FAB del diseño lleva al formulario: en móvil suele quedar fuera de vista.
   function irAlFormulario() {
@@ -194,6 +208,15 @@ export function ShoppingListScreen({ list }: Props) {
         <AddItemForm onAdd={(values) => enviarAlta(values, newId())} />
       )}
 
+      {aviso !== null && (
+        <p
+          role="status"
+          className="rounded-lg bg-secondary px-4 py-3 text-sm font-medium text-secondary-foreground"
+        >
+          {aviso}
+        </p>
+      )}
+
       {error !== null && (
         <p
           role="alert"
@@ -242,6 +265,14 @@ export function ShoppingListScreen({ list }: Props) {
         </button>
       )}
 
+      <GuardarEnDespensaSheet
+        listaId={list.id}
+        productos={paraDespensa}
+        onCerrar={(mensaje) => {
+          setParaDespensa(null);
+          if (mensaje) setAviso(mensaje);
+        }}
+      />
       <DuplicadoDialog
         estado={alta}
         onUnir={(respuesta) => responderAlta({ duplicado: "unir", ...respuesta })}
