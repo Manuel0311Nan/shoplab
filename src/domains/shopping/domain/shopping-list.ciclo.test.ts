@@ -219,3 +219,22 @@ describe("ShoppingList: productos repetidos", () => {
     expect(l.agregarItem(nuevo("Pan"), DESPUES).ok).toBe(true);
   });
 });
+
+describe("ShoppingList: categoría", () => {
+  it("actualizarItem_ConCategoria_LaCambiaYActualizaFechas", () => {
+    const l = lista([item()]);
+
+    const result = l.actualizarItem(ITEM_ID, { categoria: "panaderia" }, USUARIO_ID, DESPUES);
+
+    expect(result.ok && result.value.categoria).toBe("panaderia");
+    expect(l.itemsModificados()[0]).toMatchObject({ categoria: "panaderia", updatedAt: DESPUES });
+  });
+
+  it("agregarItem_SinCategoria_VaAOtros", () => {
+    const l = lista();
+
+    l.agregarItem({ id: OTRO_ID, nombre: "Tarta", cantidad: cantidad(1, "unidad") }, DESPUES);
+
+    expect(l.itemsActivos()[0]?.categoria).toBe("otros");
+  });
+});

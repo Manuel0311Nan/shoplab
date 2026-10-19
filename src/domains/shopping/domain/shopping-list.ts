@@ -1,3 +1,4 @@
+import type { Categoria } from "@/shared/kernel/categoria";
 import { type Cantidad, sonConvertibles, sumarCantidades } from "@/shared/kernel/cantidad";
 import { err, ok, type Result } from "@/shared/kernel/result";
 import { normalizarNombre } from "@/shared/kernel/texto";
@@ -18,6 +19,7 @@ export interface ShoppingListSnapshot {
 export interface CambiosItem {
   readonly cantidad?: Cantidad;
   readonly comprado?: boolean;
+  readonly categoria?: Categoria;
 }
 
 /**
@@ -194,6 +196,7 @@ export class ShoppingList {
       if (cambios.cantidad !== undefined) item.cambiarCantidad(cambios.cantidad, ahora);
       if (cambios.comprado === true) item.marcarComprado(usuarioId, ahora);
       if (cambios.comprado === false) item.desmarcarComprado(ahora);
+      if (cambios.categoria !== undefined) item.cambiarCategoria(cambios.categoria, ahora);
     });
   }
 

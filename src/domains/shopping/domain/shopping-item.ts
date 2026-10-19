@@ -1,4 +1,5 @@
 import type { Cantidad } from "@/shared/kernel/cantidad";
+import { CATEGORIA_POR_DEFECTO, type Categoria } from "@/shared/kernel/categoria";
 import { err, ok, type Result } from "@/shared/kernel/result";
 import { ShoppingErrors } from "./shopping-errors";
 
@@ -8,6 +9,8 @@ export interface ShoppingItemSnapshot {
   readonly ingredientId: string | null;
   /** Producto de la lista base (Catalog) del que salió, si se eligió al autocompletar. */
   readonly productoBaseId: string | null;
+  /** Para agrupar la lista por el recorrido del súper. */
+  readonly categoria: Categoria;
   readonly cantidad: Cantidad;
   readonly nota: string | null;
   readonly compradoAt: Date | null;
@@ -23,6 +26,7 @@ export interface NewShoppingItem {
   readonly nota?: string | null;
   readonly ingredientId?: string | null;
   readonly productoBaseId?: string | null;
+  readonly categoria?: Categoria;
 }
 const NOMBRE_MAX = 80;
 const NOTA_MAX = 200;
@@ -49,6 +53,7 @@ export class ShoppingItem {
         nombre,
         ingredientId: input.ingredientId ?? null,
         productoBaseId: input.productoBaseId ?? null,
+        categoria: input.categoria ?? CATEGORIA_POR_DEFECTO,
         cantidad: input.cantidad,
         nota,
         compradoAt: null,
@@ -78,6 +83,9 @@ export class ShoppingItem {
   get productoBaseId(): string | null {
     return this.state.productoBaseId;
   }
+  get categoria(): Categoria {
+    return this.state.categoria;
+  }
   get estaQuitado(): boolean {
     return this.state.deletedAt !== null;
   }
@@ -91,6 +99,10 @@ export class ShoppingItem {
   }
   cambiarCantidad(cantidad: Cantidad, ahora: Date): void {
     this.state = { ...this.state, cantidad, updatedAt: ahora };
+  }
+  cambiarCategoria(categoria: Categoria, ahora: Date): void {
+    if (categoria === this.state.categoria) return;
+    this.state = { ...this.state, categoria, updatedAt: ahora };
   }
   quitar(ahora: Date): void {
     this.state = { ...this.state, deletedAt: ahora, updatedAt: ahora };

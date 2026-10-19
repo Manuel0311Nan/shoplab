@@ -140,3 +140,32 @@ describe("UpdateItemCommand", () => {
     expect(repo.saveCount).toBe(0);
   });
 });
+
+describe("UpdateItemCommand: categoría", () => {
+  it("execute_CategoriaValida_LaGuarda", async () => {
+    const repo = new InMemoryShoppingListRepository([lista([item()])]);
+
+    const result = await new UpdateItemCommand(repo, { now: () => AHORA }).execute({
+      listId: LISTA_ID,
+      itemId: ITEM_ID,
+      usuarioId: USUARIO_ID,
+      categoria: "frutas",
+    });
+
+    expect(result).toMatchObject({ ok: true, value: { categoria: "frutas" } });
+  });
+
+  it("execute_CategoriaDesconocida_DevuelveCategoriaNoValida", async () => {
+    const repo = new InMemoryShoppingListRepository([lista([item()])]);
+
+    const result = await new UpdateItemCommand(repo, { now: () => AHORA }).execute({
+      listId: LISTA_ID,
+      itemId: ITEM_ID,
+      usuarioId: USUARIO_ID,
+      categoria: "juguetes",
+    });
+
+    expect(result).toMatchObject({ ok: false, error: { code: "CATEGORIA_NO_VALIDA" } });
+    expect(repo.saveCount).toBe(0);
+  });
+});

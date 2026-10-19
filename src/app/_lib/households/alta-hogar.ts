@@ -1,6 +1,7 @@
 import "server-only";
 import type { CreateHouseholdRequest, HouseholdResponse } from "@/contracts/households";
 import { householdsModule } from "@/domains/households/infrastructure/households-module";
+import { pantryModule } from "@/domains/pantry/infrastructure/pantry-module";
 import { shoppingModule } from "@/domains/shopping/infrastructure/shopping-module";
 import type { Identity } from "@/shared/kernel/auth-context";
 import { ok, type Result } from "@/shared/kernel/result";
@@ -13,7 +14,8 @@ const NOMBRE_PRIMERA_LISTA = "Lista de la compra";
  *
  * Excepción temporal a "un use case por operación": la primera lista es de otro contexto
  * (Shopping) y aún no hay eventos de dominio (llegan en la vista 4, y entonces Shopping
- * reaccionará a `HogarCreado`). Si la lista falla, el hogar queda creado igualmente.
+ * reaccionará a `HogarCreado`). Lo mismo con las ubicaciones de la despensa (Pantry).
+ * Si algo de eso falla, el hogar queda creado igualmente.
  */
 export async function darDeAltaHogar(
   identity: Identity,
@@ -35,6 +37,12 @@ export async function darDeAltaHogar(
     if (lista.ok) primeraListaId = lista.value.id;
   } catch (error) {
     console.error("[alta-hogar] No se pudo crear la primera lista", error);
+  }
+
+  try {
+    await pantryModule({ hogarId: hogar.value.id }).crearUbicacionesPorDefecto.execute();
+  } catch (error) {
+    console.error("[alta-hogar] No se pudieron crear las ubicaciones de la despensa", error);
   }
 
   return ok({

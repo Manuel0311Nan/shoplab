@@ -22,6 +22,7 @@ export function item(cambios: Partial<ShoppingItemSnapshot> = {}): ShoppingItem 
     nombre: "Pan",
     ingredientId: null,
     productoBaseId: null,
+    categoria: "otros",
     cantidad: cantidad(1, "unidad"),
     nota: null,
     compradoAt: null,

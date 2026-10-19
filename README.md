@@ -22,8 +22,13 @@ consumirán otros clientes, como una futura app móvil (proyecto aparte).
   base de 328 productos y aviso de productos repetidos (unir sumando
   g↔kg y ml↔l, o añadir aparte). Las listas archivadas se borran solas
   a los 15 días. Orden por tienda/pasillo (más adelante).
-- **Despensa**: qué hay en casa, cuánto, dónde y cuándo caduca. Lo
-  comprado entra automáticamente en la despensa.
+- **Despensa**: qué hay en casa, cuánto, en qué ubicación (configurables
+  por hogar) y, si se quiere, cuándo caduca, con aviso de lo que caduca esta
+  semana. Al terminar la compra se ofrece guardarla en la despensa, y lo
+  que se acaba vuelve a la lista con un toque.
+- **Categorías**: cada producto tiene la suya; la lista se agrupa en el
+  orden del súper y la despensa por ubicación o por categoría. El hogar
+  recuerda cómo clasifica lo que escribe a mano.
 - **Recetas**: recetario con ingredientes normalizados, importación desde
   EPUB de recetarios.
 - **Sugerencias**: motor que puntúa recetas según la despensa, las

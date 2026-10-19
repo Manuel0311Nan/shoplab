@@ -136,6 +136,7 @@ export class PrismaShoppingListRepository
           nombre: item.nombre,
           ingredientId: item.ingredientId,
           productoBaseId: item.productoBaseId,
+          categoria: item.categoria,
           cantidadValor: item.cantidad.valor,
           cantidadUnidad: item.cantidad.unidad,
           nota: item.nota,

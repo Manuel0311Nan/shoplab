@@ -184,3 +184,77 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {}
+
+# ─── Despensa (vista 3) ──────────────────────────────────────
+# Pega aquí un id de línea y de ubicación de "Ver la despensa"
+@linea = PEGA-AQUI-EL-ID
+@ubicacion = PEGA-AQUI-EL-ID
+
+### Ver la despensa: ubicaciones, líneas y caducidad calculada (hoy en Madrid)
+GET {{base}}/pantry
+Authorization: Bearer {{token}}
+
+### Añadir a mano: sin categoría ni ubicación, las decide el servidor
+POST {{base}}/pantry/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "id": "0199c000-0000-7000-8000-00000000a001", "nombre": "banana", "cantidad": { "valor": 1, "unidad": "kg" }, "caducaEl": "2026-11-03" }
+
+### Mismo id otra vez: 204, no suma dos veces
+POST {{base}}/pantry/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "id": "0199c000-0000-7000-8000-00000000a001", "nombre": "banana", "cantidad": { "valor": 1, "unidad": "kg" } }
+
+### Guardar la compra (todo en una transacción)
+POST {{base}}/pantry/items/batch
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "listaId": "{{lista}}", "productos": [ { "id": "0199c000-0000-7000-8000-00000000a002", "nombre": "Leche", "cantidad": { "valor": 2, "unidad": "l" } } ] }
+
+### Gastar 200 g (sin cantidad, todo). avisarLista propone añadirlo a la lista
+POST {{base}}/pantry/items/{{linea}}/consume
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "cantidad": { "valor": 200, "unidad": "g" }, "motivo": "gastado" }
+
+### Mover, cambiar la fecha o la categoría (null quita la fecha)
+PATCH {{base}}/pantry/items/{{linea}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "ubicacionId": "{{ubicacion}}", "caducaEl": null }
+
+### Quitar (añadido por error): 204
+DELETE {{base}}/pantry/items/{{linea}}
+Authorization: Bearer {{token}}
+
+### Ubicaciones
+GET {{base}}/pantry/locations
+Authorization: Bearer {{token}}
+
+### Nueva ubicación
+POST {{base}}/pantry/locations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nombre": "Bodega", "tipo": "ambiente" }
+
+### Subirla a la primera posición
+PATCH {{base}}/pantry/locations/{{ubicacion}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "posicion": 1 }
+
+### Borrarla moviendo lo que tenga (sin destinoId y con productos: 409)
+DELETE {{base}}/pantry/locations/{{ubicacion}}?destinoId=PEGA-AQUI-OTRA-UBICACION
+Authorization: Bearer {{token}}
+
+### Memoria del hogar para el autocompletado
+GET {{base}}/catalog/household-products
+Authorization: Bearer {{token}}

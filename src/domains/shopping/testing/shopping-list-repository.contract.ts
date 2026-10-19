@@ -195,6 +195,7 @@ export function shoppingListRepositoryContract(
         nombre: "Leche",
         ingredientId: null,
         productoBaseId: null,
+        categoria: "otros",
         cantidad: { valor: 1.5, unidad: "l" },
         nota: "Sin lactosa",
         compradoAt: null,

@@ -10,6 +10,10 @@ import type { Prisma } from "@/generated/prisma/client";
 export const TENANT_MODELS: ReadonlySet<Prisma.ModelName> = new Set<Prisma.ModelName>([
   "ShoppingList",
   "ShoppingItem",
+  "ProductoRecordado",
+  "Ubicacion",
+  "InventoryItem",
+  "MovimientoDespensa",
 ]);
 
 /** Modelos con `hogarId` que NO se filtran automáticamente, y por qué. */

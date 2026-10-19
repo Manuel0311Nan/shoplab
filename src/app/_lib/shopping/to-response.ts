@@ -19,6 +19,7 @@ export function toShoppingItemResponse(item: ShoppingItemSnapshot): ShoppingItem
     nota: item.nota,
     ingredientId: item.ingredientId,
     productoBaseId: item.productoBaseId,
+    categoria: item.categoria,
     compradoAt: item.compradoAt?.toISOString() ?? null,
     updatedAt: item.updatedAt.toISOString(),
   };

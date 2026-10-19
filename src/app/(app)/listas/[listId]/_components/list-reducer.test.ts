@@ -8,6 +8,7 @@ const leche: ShoppingItemResponse = {
   nota: null,
   ingredientId: null,
   productoBaseId: null,
+  categoria: "lacteos_huevos",
   compradoAt: null,
   updatedAt: "2026-10-10T10:00:00.000Z",
 };
@@ -32,5 +33,14 @@ describe("aplicarAccion", () => {
   it("aplicarAccion_TerminarVaciando_DejaLaListaVacia", () => {
     const result = aplicarAccion([leche], { tipo: "terminar", modo: "vaciar" });
     expect(result).toEqual([]);
+  });
+  it("aplicarAccion_Categoria_CambiaSoloEsaLinea", () => {
+    const result = aplicarAccion([leche], {
+      tipo: "categoria",
+      itemId: leche.id,
+      categoria: "bebidas",
+    });
+    expect(result[0]?.categoria).toBe("bebidas");
+    expect(leche.categoria).toBe("lacteos_huevos");
   });
 });

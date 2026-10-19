@@ -1,3 +1,4 @@
+import type { CategoriaDto } from "@/contracts/categoria";
 import type {
   CantidadDto,
   ModoTerminarCompraDto,
@@ -7,6 +8,7 @@ export type AccionLista =
   | { readonly tipo: "anadir"; readonly item: ShoppingItemResponse }
   | { readonly tipo: "comprado"; readonly itemId: string; readonly comprado: boolean }
   | { readonly tipo: "cantidad"; readonly itemId: string; readonly cantidad: CantidadDto }
+  | { readonly tipo: "categoria"; readonly itemId: string; readonly categoria: CategoriaDto }
   | { readonly tipo: "quitar"; readonly itemId: string }
   | { readonly tipo: "terminar"; readonly modo: ModoTerminarCompraDto };
 export function aplicarAccion(
@@ -25,6 +27,10 @@ export function aplicarAccion(
     case "cantidad":
       return items.map((item) =>
         item.id === accion.itemId ? { ...item, cantidad: accion.cantidad } : item,
+      );
+    case "categoria":
+      return items.map((item) =>
+        item.id === accion.itemId ? { ...item, categoria: accion.categoria } : item,
       );
     case "quitar":
       return items.filter((item) => item.id !== accion.itemId);
