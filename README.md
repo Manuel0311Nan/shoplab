@@ -29,8 +29,10 @@ consumirán otros clientes, como una futura app móvil (proyecto aparte).
 - **Categorías**: cada producto tiene la suya; la lista se agrupa en el
   orden del súper y la despensa por ubicación o por categoría. El hogar
   recuerda cómo clasifica lo que escribe a mano.
-- **Recetas**: recetario con ingredientes normalizados, importación desde
-  EPUB de recetarios.
+- **Recetas**: biblioteca propia de recetas caseras con los ingredientes
+  vinculados al catálogo. Primero salen las que puedes hacer con lo que
+  hay, con las raciones ajustadas a la despensa; si quieres más raciones,
+  lo que falta va a la lista con un toque.
 - **Sugerencias**: motor que puntúa recetas según la despensa, las
   caducidades próximas y las preferencias del hogar.
 - **Sync**: API preparada para clientes offline-first (cola de
@@ -57,15 +59,15 @@ Actions delgadas que llaman a use cases).
 
 **Bounded contexts**
 
-| Contexto           | Responsabilidad                              |
-| ------------------ | -------------------------------------------- |
-| Catalog            | Ingredientes, productos, sinónimos, unidades |
-| Pantry (core)      | Existencias, caducidades, consumo            |
-| Shopping           | Listas de la compra e ítems                  |
-| Recipes            | Recetas e importación de recetarios          |
-| Suggestions (core) | Puntuación y sugerencia de recetas           |
-| Households         | Hogares, miembros, invitaciones              |
-| Identity           | Autenticación web (cookie) y API (Bearer)    |
+| Contexto           | Responsabilidad                               |
+| ------------------ | --------------------------------------------- |
+| Catalog            | Ingredientes, productos, sinónimos, unidades  |
+| Pantry (core)      | Existencias, caducidades, consumo             |
+| Shopping           | Listas de la compra e ítems                   |
+| Recipes            | Biblioteca de recetas y cruce con la despensa |
+| Suggestions (core) | Puntuación y sugerencia de recetas            |
+| Households         | Hogares, miembros, invitaciones               |
+| Identity           | Autenticación web (cookie) y API (Bearer)     |
 
 **Flujos entre contextos** (por eventos de dominio):
 
@@ -165,7 +167,6 @@ entorno Production de Vercel (16+ caracteres; Vercel la envía sola).
 - Resolución de conflictos en sync (propuesta: last-write-wins por campo)
 - Pertenencia de un usuario a varios hogares
 - Proveedor de email (verificación y restablecer contraseña)
-- Origen y licencia del catálogo de recetas
 - Alojamiento del futuro microservicio Python (canonicalización/NLP)
 
 ## Convenciones

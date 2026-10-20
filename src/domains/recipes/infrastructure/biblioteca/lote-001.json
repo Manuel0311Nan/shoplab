@@ -1,0 +1,4095 @@
+{
+  "version": 1,
+  "recetas": [
+    {
+      "slug": "tortilla-de-patatas",
+      "nombre": "Tortilla de patatas",
+      "descripcion": "La de siempre: patata pochada despacio y huevo jugoso. Con o sin cebolla, eso lo decides tú.",
+      "raciones": 4,
+      "minutos": 45,
+      "etiquetas": ["huevos", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 6,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "nota": "1 mediana",
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "200 ml para pochar"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Pela las patatas y córtalas en láminas finas. Pica la cebolla si la usas.",
+        "Pocha patata y cebolla en abundante aceite a fuego medio-bajo unos 20 minutos, sin que se doren.",
+        "Escúrrelas bien y mézclalas con los huevos batidos y sal. Deja reposar 5 minutos.",
+        "Cuaja en una sartén con una cucharada de aceite, dale la vuelta con un plato y termina por el otro lado."
+      ]
+    },
+    {
+      "slug": "arroz-con-pollo",
+      "nombre": "Arroz con pollo",
+      "descripcion": "Arroz meloso de domingo con pollo dorado, pimiento y un sofrito de tomate.",
+      "raciones": 4,
+      "minutos": 50,
+      "etiquetas": ["arroz", "pollo"],
+      "ingredientes": [
+        {
+          "nombre": "Arroz",
+          "productos": ["Arroz redondo", "Arroz largo", "Arroz integral"],
+          "cantidad": {
+            "valor": 320,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pollo troceado",
+          "productos": [
+            "Pollo troceado",
+            "Muslos de pollo",
+            "Contramuslos de pollo",
+            "Jamoncitos de pollo",
+            "Pollo entero",
+            "Pechuga de pollo",
+            "Filetes de pechuga de pollo",
+            "Solomillos de pollo",
+            "Contramuslos deshuesados"
+          ],
+          "cantidad": {
+            "valor": 800,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento rojo",
+          "productos": ["Pimiento rojo"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "nota": "1"
+        },
+        {
+          "nombre": "Tomate triturado",
+          "productos": ["Tomate triturado", "Tomate frito"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "1 lata"
+        },
+        {
+          "nombre": "Caldo de pollo",
+          "productos": ["Caldo de pollo", "Caldo de verduras"],
+          "cantidad": {
+            "valor": 1000,
+            "unidad": "ml"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Pimentón dulce",
+          "basico": true,
+          "nota": "1 cucharadita"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Salpimienta el pollo y dóralo bien en una cazuela con aceite. Resérvalo.",
+        "En el mismo aceite sofríe el ajo y el pimiento picados. Añade el tomate y deja que se reduzca.",
+        "Incorpora el pimentón, el arroz y el pollo, y remueve un minuto.",
+        "Cubre con el caldo caliente (o agua) y cuece unos 18 minutos. Reposa 5 minutos antes de servir."
+      ]
+    },
+    {
+      "slug": "lentejas-estofadas",
+      "nombre": "Lentejas estofadas",
+      "descripcion": "Lentejas de cuchara con verduras y, si hay, un poco de chorizo.",
+      "raciones": 4,
+      "minutos": 60,
+      "etiquetas": ["legumbres"],
+      "ingredientes": [
+        {
+          "nombre": "Lentejas",
+          "productos": ["Lentejas", "Lentejas cocidas"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Zanahoria",
+          "productos": ["Zanahoria"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "nota": "2"
+        },
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "nota": "1"
+        },
+        {
+          "nombre": "Chorizo",
+          "productos": ["Chorizo", "Chorizo fresco"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Pimentón dulce",
+          "basico": true,
+          "nota": "1 cucharadita"
+        },
+        {
+          "nombre": "Laurel",
+          "basico": true,
+          "nota": "1 hoja"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Pica la cebolla, el ajo y la zanahoria y sofríelos en una olla con aceite.",
+        "Añade el pimentón, remueve unos segundos y echa las lentejas lavadas, el laurel y el chorizo en rodajas.",
+        "Cubre con agua fría y cuece a fuego suave unos 30 minutos.",
+        "Añade la patata cascada y cuece 15 minutos más. Ajusta de sal."
+      ]
+    },
+    {
+      "slug": "garbanzos-con-espinacas",
+      "nombre": "Garbanzos con espinacas",
+      "descripcion": "Tapa sevillana rápida con garbanzos de bote, espinacas y comino.",
+      "raciones": 4,
+      "minutos": 25,
+      "etiquetas": ["legumbres", "verduras", "rápida", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Garbanzos cocidos",
+          "productos": ["Garbanzos cocidos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "2 botes"
+        },
+        {
+          "nombre": "Espinacas",
+          "productos": ["Espinacas", "Espinacas congeladas"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pan",
+          "productos": ["Pan de barra", "Pan integral", "Pan de molde"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "una rebanada",
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "3 dientes"
+        },
+        {
+          "nombre": "Comino",
+          "basico": true,
+          "nota": "1 cucharadita"
+        },
+        {
+          "nombre": "Pimentón dulce",
+          "basico": true,
+          "nota": "1 cucharadita"
+        },
+        {
+          "nombre": "Vinagre",
+          "basico": true,
+          "nota": "un chorrito"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Fríe el ajo laminado y la rebanada de pan en aceite. Sácalos y májalos con el comino, el pimentón y el vinagre.",
+        "En el mismo aceite rehoga las espinacas hasta que pierdan volumen.",
+        "Añade los garbanzos escurridos y el majado con un poco de agua, y cuece 10 minutos."
+      ]
+    },
+    {
+      "slug": "macarrones-con-tomate-y-chorizo",
+      "nombre": "Macarrones con tomate y chorizo",
+      "descripcion": "Los macarrones de casa, gratinados si te apetece.",
+      "raciones": 4,
+      "minutos": 30,
+      "etiquetas": ["pasta", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Macarrones",
+          "productos": ["Macarrones"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Tomate frito",
+          "productos": ["Tomate frito", "Tomate triturado"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "1 bote"
+        },
+        {
+          "nombre": "Chorizo",
+          "productos": ["Chorizo", "Chorizo fresco"],
+          "cantidad": {
+            "valor": 120,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Queso rallado",
+          "productos": ["Queso rallado", "Queso curado", "Queso semicurado", "Mozzarella"],
+          "cantidad": {
+            "valor": 60,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un chorrito"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Cuece los macarrones en agua con sal y escúrrelos.",
+        "Sofríe la cebolla picada y el chorizo en dados con un poco de aceite.",
+        "Añade el tomate, calienta y mezcla con la pasta.",
+        "Si quieres, cubre con queso y gratina unos minutos."
+      ]
+    },
+    {
+      "slug": "espaguetis-carbonara",
+      "nombre": "Espaguetis a la carbonara",
+      "descripcion": "Sin nata: huevo, queso y panceta crujiente.",
+      "raciones": 4,
+      "minutos": 20,
+      "etiquetas": ["pasta", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Espaguetis",
+          "productos": ["Espaguetis", "Tallarines"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Panceta o bacon",
+          "productos": ["Bacon", "Panceta"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 4,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Queso rallado",
+          "productos": ["Queso rallado", "Queso curado", "Queso semicurado"],
+          "cantidad": {
+            "valor": 80,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimienta negra",
+          "basico": true,
+          "nota": "al gusto"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Cuece la pasta en agua con sal. Mientras, dora la panceta en dados en una sartén sin aceite.",
+        "Bate los huevos con el queso y mucha pimienta.",
+        "Escurre la pasta reservando un vaso del agua de cocción y mézclala con la panceta fuera del fuego.",
+        "Añade el huevo y remueve rápido, aflojando con el agua de cocción hasta que quede cremosa."
+      ]
+    },
+    {
+      "slug": "pollo-al-ajillo",
+      "nombre": "Pollo al ajillo",
+      "descripcion": "Pollo troceado dorado con mucho ajo y un toque de vino blanco.",
+      "raciones": 4,
+      "minutos": 40,
+      "etiquetas": ["pollo"],
+      "ingredientes": [
+        {
+          "nombre": "Pollo troceado",
+          "productos": [
+            "Pollo troceado",
+            "Muslos de pollo",
+            "Contramuslos de pollo",
+            "Jamoncitos de pollo",
+            "Pollo entero"
+          ],
+          "cantidad": {
+            "valor": 1000,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Vino blanco",
+          "productos": ["Vino blanco"],
+          "nota": "un vaso",
+          "opcional": true
+        },
+        {
+          "nombre": "Perejil",
+          "productos": ["Perejil fresco"],
+          "nota": "un puñado",
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "1 cabeza"
+        },
+        {
+          "nombre": "Laurel",
+          "basico": true,
+          "nota": "1 hoja"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Salpimienta el pollo y dóralo a fuego medio en aceite, por tandas.",
+        "Añade los ajos enteros chafados y el laurel, y sigue friendo hasta que el pollo esté hecho.",
+        "Riega con el vino, deja evaporar el alcohol y termina con perejil picado."
+      ]
+    },
+    {
+      "slug": "merluza-en-salsa-verde",
+      "nombre": "Merluza en salsa verde",
+      "descripcion": "Merluza en cazuela con una salsa ligada de ajo, harina y perejil.",
+      "raciones": 4,
+      "minutos": 25,
+      "etiquetas": ["pescado"],
+      "ingredientes": [
+        {
+          "nombre": "Merluza",
+          "productos": ["Merluza", "Bacalao fresco", "Gallo"],
+          "cantidad": {
+            "valor": 800,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Perejil",
+          "productos": ["Perejil fresco"],
+          "nota": "un manojo"
+        },
+        {
+          "nombre": "Harina",
+          "productos": ["Harina de trigo"],
+          "cantidad": {
+            "valor": 20,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Almejas",
+          "productos": ["Almejas"],
+          "cantidad": {
+            "valor": 250,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Vino blanco",
+          "productos": ["Vino blanco"],
+          "nota": "medio vaso",
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "3 dientes"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Sofríe el ajo picado en una cazuela con aceite sin que se dore.",
+        "Añade la harina, remueve y vierte el vino y un vaso de agua poco a poco hasta tener una salsa ligera.",
+        "Coloca la merluza salada, las almejas y el perejil picado. Mueve la cazuela en vaivén 5 minutos para ligar.",
+        "Dale la vuelta al pescado y cocina 3 minutos más."
+      ]
+    },
+    {
+      "slug": "salmon-al-horno-con-patatas",
+      "nombre": "Salmón al horno con patatas",
+      "descripcion": "Bandeja única: patatas panaderas y salmón con limón.",
+      "raciones": 4,
+      "minutos": 45,
+      "etiquetas": ["pescado", "horno"],
+      "ingredientes": [
+        {
+          "nombre": "Salmón",
+          "productos": ["Salmón"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Limón",
+          "productos": ["Limón", "Lima"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "nota": "1",
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        },
+        {
+          "nombre": "Pimienta negra",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Precalienta el horno a 200 °C. Corta las patatas y la cebolla en láminas finas.",
+        "Hornea patata y cebolla con aceite y sal 25 minutos.",
+        "Coloca encima el salmón salpimentado y unas rodajas de limón, y hornea 12 minutos más."
+      ]
+    },
+    {
+      "slug": "ensalada-mixta",
+      "nombre": "Ensalada mixta",
+      "descripcion": "Lechuga, tomate y atún: la ensalada de diario que acompaña a todo.",
+      "raciones": 4,
+      "minutos": 10,
+      "etiquetas": ["ensaladas", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Lechuga",
+          "productos": ["Lechuga romana", "Lechuga iceberg", "Cogollos"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Tomate",
+          "productos": ["Tomate pera", "Tomate en rama", "Tomate para ensalada", "Tomate cherry"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Atún en lata",
+          "productos": ["Atún en lata"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "2 latas"
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla morada", "Cebolla", "Cebolleta"],
+          "cantidad": {
+            "valor": 75,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "cocidos",
+          "opcional": true
+        },
+        {
+          "nombre": "Aceitunas",
+          "productos": ["Aceitunas"],
+          "cantidad": {
+            "valor": 50,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Vinagre",
+          "basico": true,
+          "nota": "un chorrito"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Lava y trocea la lechuga y el tomate. Corta la cebolla en juliana fina.",
+        "Si usas huevo, cuécelo 10 minutos y córtalo en cuartos.",
+        "Monta la ensalada con el atún y las aceitunas y aliña al momento."
+      ]
+    },
+    {
+      "slug": "gazpacho",
+      "nombre": "Gazpacho andaluz",
+      "descripcion": "Sopa fría de tomate maduro para los días de calor.",
+      "raciones": 4,
+      "minutos": 15,
+      "etiquetas": ["sopas", "verduras", "rápida", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Tomate maduro",
+          "productos": ["Tomate pera", "Tomate en rama", "Tomate para ensalada"],
+          "cantidad": {
+            "valor": 1000,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento verde",
+          "productos": ["Pimiento verde", "Pimiento italiano"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pepino",
+          "productos": ["Pepino"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pan duro",
+          "productos": ["Pan de barra", "Pan integral"],
+          "nota": "un trozo",
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "1 diente"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "100 ml"
+        },
+        {
+          "nombre": "Vinagre",
+          "basico": true,
+          "nota": "2 cucharadas"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Trocea el tomate, el pimiento, el pepino pelado y el ajo.",
+        "Tritura todo con el pan, el vinagre y la sal hasta que quede fino.",
+        "Añade el aceite en hilo sin dejar de batir. Cuela si lo quieres muy fino y enfría en la nevera."
+      ]
+    },
+    {
+      "slug": "salmorejo",
+      "nombre": "Salmorejo cordobés",
+      "descripcion": "Crema fría y espesa de tomate y pan, con huevo y jamón por encima.",
+      "raciones": 4,
+      "minutos": 15,
+      "etiquetas": ["sopas", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Tomate maduro",
+          "productos": ["Tomate pera", "Tomate en rama", "Tomate para ensalada"],
+          "cantidad": {
+            "valor": 1000,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pan de barra",
+          "productos": ["Pan de barra", "Pan integral"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "del día anterior"
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "cocidos",
+          "opcional": true
+        },
+        {
+          "nombre": "Jamón serrano",
+          "productos": ["Jamón serrano", "Jamón ibérico"],
+          "cantidad": {
+            "valor": 50,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "1 diente"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "150 ml"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Tritura el tomate con el ajo y la sal. Añade el pan troceado y deja que se empape 5 minutos.",
+        "Vuelve a triturar añadiendo el aceite poco a poco hasta que espese.",
+        "Sirve frío con huevo duro picado y jamón en tiras."
+      ]
+    },
+    {
+      "slug": "huevos-rotos-con-jamon",
+      "nombre": "Huevos rotos con jamón",
+      "descripcion": "Patatas fritas, huevos fritos rotos por encima y jamón.",
+      "raciones": 4,
+      "minutos": 30,
+      "etiquetas": ["huevos"],
+      "ingredientes": [
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 4,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Jamón serrano",
+          "productos": ["Jamón serrano", "Jamón ibérico"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "para freír"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Corta las patatas en bastones finos y fríelas en aceite hasta que estén doradas. Sálalas.",
+        "Fríe los huevos dejando la yema líquida.",
+        "Sirve las patatas con los huevos encima, rómpelos y reparte el jamón."
+      ]
+    },
+    {
+      "slug": "pisto-manchego",
+      "nombre": "Pisto manchego",
+      "descripcion": "Verduras de huerta pochadas con tomate. Con huevo frito, es un plato completo.",
+      "raciones": 4,
+      "minutos": 60,
+      "etiquetas": ["verduras", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Calabacín",
+          "productos": ["Calabacín"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Berenjena",
+          "productos": ["Berenjena"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento rojo",
+          "productos": ["Pimiento rojo"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento verde",
+          "productos": ["Pimiento verde", "Pimiento italiano"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Tomate triturado",
+          "productos": ["Tomate triturado"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "1 lata"
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 4,
+            "unidad": "unidad"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Azúcar",
+          "basico": true,
+          "nota": "una pizca"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Pica todas las verduras en dados pequeños.",
+        "Pocha la cebolla y el ajo, añade los pimientos y después la berenjena y el calabacín, a fuego suave.",
+        "Incorpora el tomate con la pizca de azúcar y cocina 20 minutos hasta que espese.",
+        "Sirve con un huevo frito por encima si te apetece."
+      ]
+    },
+    {
+      "slug": "crema-de-calabacin",
+      "nombre": "Crema de calabacín",
+      "descripcion": "Crema suave y ligera que sale con muy pocos ingredientes.",
+      "raciones": 4,
+      "minutos": 30,
+      "etiquetas": ["sopas", "verduras", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Calabacín",
+          "productos": ["Calabacín"],
+          "cantidad": {
+            "valor": 800,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada", "Puerro"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Quesito o queso de untar",
+          "productos": ["Queso de untar", "Queso tierno"],
+          "cantidad": {
+            "valor": 60,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Caldo de verduras",
+          "productos": ["Caldo de pollo", "Caldo de verduras"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "ml"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Rehoga la cebolla picada en una olla con aceite.",
+        "Añade el calabacín y la patata troceados, cubre con caldo o agua y cuece 20 minutos.",
+        "Tritura con el queso hasta que quede fina y ajusta de sal."
+      ]
+    },
+    {
+      "slug": "crema-de-calabaza",
+      "nombre": "Crema de calabaza y zanahoria",
+      "descripcion": "Crema naranja, dulce y reconfortante para el otoño.",
+      "raciones": 4,
+      "minutos": 35,
+      "etiquetas": ["sopas", "verduras", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Calabaza",
+          "productos": ["Calabaza", "Boniato"],
+          "cantidad": {
+            "valor": 800,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Zanahoria",
+          "productos": ["Zanahoria"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada", "Puerro"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Nata para cocinar",
+          "productos": ["Nata para cocinar"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "ml"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        },
+        {
+          "nombre": "Nuez moscada",
+          "basico": true,
+          "nota": "una pizca"
+        }
+      ],
+      "pasos": [
+        "Sofríe la cebolla picada con aceite.",
+        "Añade la calabaza y la zanahoria troceadas, cubre con agua y cuece 25 minutos.",
+        "Tritura, añade la nata y la nuez moscada y ajusta de sal."
+      ]
+    },
+    {
+      "slug": "sopa-de-fideos",
+      "nombre": "Sopa de fideos",
+      "descripcion": "Caldo calentito con fideos finos, huevo y jamón.",
+      "raciones": 4,
+      "minutos": 15,
+      "etiquetas": ["sopas", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Caldo de pollo",
+          "productos": ["Caldo de pollo", "Caldo de verduras"],
+          "cantidad": {
+            "valor": 1500,
+            "unidad": "ml"
+          }
+        },
+        {
+          "nombre": "Fideos",
+          "productos": ["Fideos"],
+          "cantidad": {
+            "valor": 120,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "cocidos",
+          "opcional": true
+        },
+        {
+          "nombre": "Jamón serrano",
+          "productos": ["Jamón serrano", "Jamón ibérico"],
+          "cantidad": {
+            "valor": 50,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Lleva el caldo a ebullición.",
+        "Echa los fideos y cuece el tiempo que indique el paquete.",
+        "Sirve con huevo duro y jamón picados."
+      ]
+    },
+    {
+      "slug": "albondigas-en-salsa",
+      "nombre": "Albóndigas en salsa",
+      "descripcion": "Albóndigas tiernas en salsa de tomate y cebolla, para mojar pan.",
+      "raciones": 4,
+      "minutos": 60,
+      "etiquetas": ["carne"],
+      "ingredientes": [
+        {
+          "nombre": "Carne picada",
+          "productos": ["Carne picada mixta", "Carne picada de ternera", "Carne picada de pollo"],
+          "cantidad": {
+            "valor": 500,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Pan rallado",
+          "productos": ["Pan rallado"],
+          "cantidad": {
+            "valor": 40,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Tomate triturado",
+          "productos": ["Tomate triturado", "Tomate frito"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "1 lata"
+        },
+        {
+          "nombre": "Harina",
+          "productos": ["Harina de trigo"],
+          "cantidad": {
+            "valor": 30,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Vino blanco",
+          "productos": ["Vino blanco"],
+          "nota": "medio vaso",
+          "opcional": true
+        },
+        {
+          "nombre": "Perejil",
+          "productos": ["Perejil fresco"],
+          "nota": "un puñado",
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Mezcla la carne con el huevo, el pan rallado, ajo y perejil picados y sal. Forma bolas.",
+        "Pásalas por harina y dóralas en aceite. Resérvalas.",
+        "En ese aceite pocha la cebolla, añade el vino y el tomate, y cuece 10 minutos.",
+        "Vuelve a meter las albóndigas y cocina 15 minutos más a fuego suave."
+      ]
+    },
+    {
+      "slug": "pollo-empanado",
+      "nombre": "Filetes de pollo empanados",
+      "descripcion": "Filetes finos rebozados en huevo y pan rallado. Gustan a todo el mundo.",
+      "raciones": 4,
+      "minutos": 25,
+      "etiquetas": ["pollo", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Filetes de pollo",
+          "productos": ["Filetes de pechuga de pollo", "Pechuga de pollo", "Pechuga de pavo"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Pan rallado",
+          "productos": ["Pan rallado"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Limón",
+          "productos": ["Limón"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "nota": "1",
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "para freír"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Sala los filetes. Si son gruesos, ábrelos o aplánalos.",
+        "Pásalos por huevo batido y después por pan rallado, apretando bien.",
+        "Fríelos en aceite caliente 2 o 3 minutos por cada lado y escúrrelos en papel."
+      ]
+    },
+    {
+      "slug": "lomo-con-pimientos",
+      "nombre": "Lomo con pimientos",
+      "descripcion": "Filetes de lomo a la plancha con pimientos verdes fritos.",
+      "raciones": 4,
+      "minutos": 25,
+      "etiquetas": ["carne", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Lomo de cerdo",
+          "productos": ["Lomo de cerdo", "Chuletas de cerdo", "Solomillo de cerdo"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento verde",
+          "productos": ["Pimiento verde", "Pimiento italiano"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 500,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Fríe los pimientos enteros a fuego medio hasta que se arruguen. Sálalos.",
+        "Si pones patatas, fríelas en bastones.",
+        "Haz el lomo a la plancha con ajo y sal, poco tiempo para que no se seque."
+      ]
+    },
+    {
+      "slug": "judias-verdes-con-patatas",
+      "nombre": "Judías verdes con patatas",
+      "descripcion": "Verdura de diario rehogada con ajo y pimentón.",
+      "raciones": 4,
+      "minutos": 30,
+      "etiquetas": ["verduras"],
+      "ingredientes": [
+        {
+          "nombre": "Judías verdes",
+          "productos": ["Judías verdes"],
+          "cantidad": {
+            "valor": 500,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Jamón serrano",
+          "productos": ["Jamón serrano", "Jamón ibérico"],
+          "cantidad": {
+            "valor": 60,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Pimentón dulce",
+          "basico": true,
+          "nota": "1 cucharadita"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Cuece las judías troceadas y las patatas en dados en agua con sal unos 20 minutos. Escurre.",
+        "Dora el ajo laminado y el jamón en aceite, retira del fuego y añade el pimentón.",
+        "Saltea las verduras en ese aceite un par de minutos."
+      ]
+    },
+    {
+      "slug": "coliflor-gratinada",
+      "nombre": "Coliflor gratinada",
+      "descripcion": "Coliflor con bechamel y queso gratinado al horno.",
+      "raciones": 4,
+      "minutos": 40,
+      "etiquetas": ["verduras", "horno", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Coliflor",
+          "productos": ["Coliflor", "Brócoli"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Leche",
+          "productos": [
+            "Leche entera",
+            "Leche semidesnatada",
+            "Leche desnatada",
+            "Leche sin lactosa"
+          ],
+          "cantidad": {
+            "valor": 500,
+            "unidad": "ml"
+          }
+        },
+        {
+          "nombre": "Harina",
+          "productos": ["Harina de trigo"],
+          "cantidad": {
+            "valor": 40,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Mantequilla",
+          "productos": ["Mantequilla"],
+          "cantidad": {
+            "valor": 40,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Queso rallado",
+          "productos": ["Queso rallado", "Queso curado", "Queso semicurado", "Mozzarella"],
+          "cantidad": {
+            "valor": 80,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Nuez moscada",
+          "basico": true,
+          "nota": "una pizca"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Cuece la coliflor en ramilletes 8 minutos y escúrrela bien.",
+        "Para la bechamel, derrite la mantequilla, tuesta la harina y añade la leche poco a poco sin dejar de remover. Sazona con sal y nuez moscada.",
+        "Pon la coliflor en una fuente, cúbrela con la bechamel y el queso, y gratina 10 minutos a 220 °C."
+      ]
+    },
+    {
+      "slug": "espaguetis-con-tomate-y-atun",
+      "nombre": "Espaguetis con tomate y atún",
+      "descripcion": "Pasta de despensa: se hace con lo que casi siempre hay.",
+      "raciones": 4,
+      "minutos": 20,
+      "etiquetas": ["pasta", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Espaguetis",
+          "productos": ["Espaguetis", "Tallarines", "Macarrones"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Tomate frito",
+          "productos": ["Tomate frito", "Tomate triturado"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "1 bote"
+        },
+        {
+          "nombre": "Atún en lata",
+          "productos": ["Atún en lata"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "2 latas"
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Orégano",
+          "basico": true,
+          "nota": "una pizca"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Cuece la pasta en agua con sal.",
+        "Sofríe la cebolla picada, añade el tomate, el atún escurrido y el orégano.",
+        "Mezcla con la pasta escurrida."
+      ]
+    },
+    {
+      "slug": "arroz-a-la-cubana",
+      "nombre": "Arroz a la cubana",
+      "descripcion": "Arroz blanco, tomate frito, huevo frito y plátano: comida rápida de casa.",
+      "raciones": 4,
+      "minutos": 25,
+      "etiquetas": ["arroz", "huevos", "rápida", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Arroz",
+          "productos": ["Arroz largo", "Arroz basmati", "Arroz redondo"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 4,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Tomate frito",
+          "productos": ["Tomate frito"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "1 bote"
+        },
+        {
+          "nombre": "Plátano",
+          "productos": ["Plátano de Canarias", "Banana"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          },
+          "nota": "2",
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "1 diente"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Sofríe el ajo en un poco de aceite, añade el arroz y cúbrelo con el doble de agua con sal. Cuece 15 minutos.",
+        "Calienta el tomate frito.",
+        "Fríe los huevos y, si quieres, el plátano en rodajas a lo largo. Sirve todo junto."
+      ]
+    },
+    {
+      "slug": "arroz-tres-delicias",
+      "nombre": "Arroz tres delicias",
+      "descripcion": "Arroz salteado con tortilla, jamón york y guisantes.",
+      "raciones": 4,
+      "minutos": 30,
+      "etiquetas": ["arroz", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Arroz",
+          "productos": ["Arroz largo", "Arroz basmati", "Arroz redondo"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Jamón cocido",
+          "productos": ["Jamón cocido", "Pechuga de pavo en lonchas"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Guisantes",
+          "productos": ["Guisantes congelados", "Verduras para salteado"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Zanahoria",
+          "productos": ["Zanahoria"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Gambas",
+          "productos": ["Gambas", "Langostinos", "Gambas congeladas"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Salsa de soja",
+          "productos": ["Salsa de soja"],
+          "cantidad": {
+            "valor": 30,
+            "unidad": "ml"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Cuece el arroz, escúrrelo y déjalo enfriar (mejor si es del día anterior).",
+        "Haz una tortilla fina, enróllala y córtala en tiras.",
+        "Saltea en una sartén muy caliente la zanahoria, los guisantes, el jamón y las gambas.",
+        "Añade el arroz y la tortilla, saltea 3 minutos y aliña con soja."
+      ]
+    },
+    {
+      "slug": "patatas-a-la-riojana",
+      "nombre": "Patatas a la riojana",
+      "descripcion": "Guiso de patatas cascadas con chorizo y pimentón.",
+      "raciones": 4,
+      "minutos": 50,
+      "etiquetas": ["carne"],
+      "ingredientes": [
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 1000,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Chorizo",
+          "productos": ["Chorizo", "Chorizo fresco"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento verde",
+          "productos": ["Pimiento verde", "Pimiento italiano"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Pimentón",
+          "basico": true,
+          "nota": "1 cucharada"
+        },
+        {
+          "nombre": "Laurel",
+          "basico": true,
+          "nota": "1 hoja"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Sofríe la cebolla, el pimiento y el ajo picados.",
+        "Añade el chorizo en rodajas y, después, el pimentón.",
+        "Incorpora las patatas cascadas, el laurel y agua hasta cubrir. Cuece 30 minutos a fuego medio."
+      ]
+    },
+    {
+      "slug": "pollo-al-curry",
+      "nombre": "Pollo al curry",
+      "descripcion": "Pollo en salsa cremosa de curry con arroz blanco.",
+      "raciones": 4,
+      "minutos": 35,
+      "etiquetas": ["pollo"],
+      "ingredientes": [
+        {
+          "nombre": "Pollo",
+          "productos": [
+            "Pechuga de pollo",
+            "Filetes de pechuga de pollo",
+            "Solomillos de pollo",
+            "Contramuslos deshuesados"
+          ],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Nata para cocinar",
+          "productos": ["Nata para cocinar", "Yogur natural"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "ml"
+          }
+        },
+        {
+          "nombre": "Curry",
+          "productos": ["Curry"],
+          "nota": "2 cucharaditas"
+        },
+        {
+          "nombre": "Arroz",
+          "productos": ["Arroz basmati", "Arroz largo"],
+          "cantidad": {
+            "valor": 250,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Corta el pollo en dados y dóralo en aceite. Resérvalo.",
+        "Pocha la cebolla picada, añade el curry y remueve un minuto.",
+        "Vuelve a poner el pollo, añade la nata y cuece 10 minutos.",
+        "Sirve con arroz blanco cocido aparte."
+      ]
+    },
+    {
+      "slug": "pollo-asado-con-patatas",
+      "nombre": "Pollo asado con patatas",
+      "descripcion": "Muslos al horno con patatas, cebolla y hierbas: se hace prácticamente solo.",
+      "raciones": 4,
+      "minutos": 70,
+      "etiquetas": ["pollo", "horno"],
+      "ingredientes": [
+        {
+          "nombre": "Muslos de pollo",
+          "productos": [
+            "Muslos de pollo",
+            "Contramuslos de pollo",
+            "Jamoncitos de pollo",
+            "Pollo troceado"
+          ],
+          "cantidad": {
+            "valor": 1200,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 800,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Limón",
+          "productos": ["Limón"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "nota": "1",
+          "opcional": true
+        },
+        {
+          "nombre": "Vino blanco",
+          "productos": ["Vino blanco"],
+          "nota": "un vaso",
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "4 dientes"
+        },
+        {
+          "nombre": "Romero o tomillo",
+          "basico": true,
+          "nota": "una pizca"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Precalienta el horno a 200 °C. Corta las patatas y la cebolla en rodajas y ponlas en la bandeja.",
+        "Coloca encima el pollo salpimentado con ajo, hierbas, limón y aceite.",
+        "Hornea 1 hora, regando con el vino a mitad de cocción y dando la vuelta al pollo."
+      ]
+    },
+    {
+      "slug": "alubias-con-chorizo",
+      "nombre": "Alubias con chorizo",
+      "descripcion": "Potaje de alubias con chorizo y verduras, para el frío.",
+      "raciones": 4,
+      "minutos": 90,
+      "etiquetas": ["legumbres", "carne"],
+      "ingredientes": [
+        {
+          "nombre": "Alubias",
+          "productos": ["Alubias blancas", "Alubias rojas"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          },
+          "nota": "en remojo desde la noche anterior"
+        },
+        {
+          "nombre": "Chorizo",
+          "productos": ["Chorizo", "Chorizo fresco"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Zanahoria",
+          "productos": ["Zanahoria"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Morcilla",
+          "productos": ["Morcilla"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Pimentón dulce",
+          "basico": true,
+          "nota": "1 cucharadita"
+        },
+        {
+          "nombre": "Laurel",
+          "basico": true,
+          "nota": "1 hoja"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Pon las alubias remojadas en una olla con agua fría, la cebolla, la zanahoria, el ajo y el laurel.",
+        "Cuando hierva, baja el fuego y añade un chorrito de agua fría para «asustarlas». Cuece 1 hora.",
+        "Añade el chorizo y la morcilla y el pimentón, y cuece 20 minutos más hasta que estén tiernas."
+      ]
+    },
+    {
+      "slug": "calamares-encebollados",
+      "nombre": "Calamares encebollados",
+      "descripcion": "Calamar tierno con mucha cebolla pochada.",
+      "raciones": 4,
+      "minutos": 45,
+      "etiquetas": ["pescado"],
+      "ingredientes": [
+        {
+          "nombre": "Calamares",
+          "productos": ["Calamares", "Sepia"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Vino blanco",
+          "productos": ["Vino blanco"],
+          "nota": "medio vaso",
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Limpia los calamares y córtalos en anillas.",
+        "Pocha la cebolla en juliana a fuego suave 20 minutos.",
+        "Sube el fuego, añade los calamares y el ajo, y saltea. Riega con el vino y cuece 10 minutos."
+      ]
+    },
+    {
+      "slug": "gambas-al-ajillo",
+      "nombre": "Gambas al ajillo",
+      "descripcion": "En cazuelita de barro, con ajo y guindilla, y pan para mojar.",
+      "raciones": 4,
+      "minutos": 15,
+      "etiquetas": ["pescado", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Gambas",
+          "productos": ["Gambas", "Langostinos", "Gambas congeladas"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          },
+          "nota": "peladas"
+        },
+        {
+          "nombre": "Guindilla",
+          "productos": ["Guindilla"],
+          "nota": "1",
+          "opcional": true
+        },
+        {
+          "nombre": "Pan",
+          "productos": ["Pan de barra", "Pan integral"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "para mojar",
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "6 dientes"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "150 ml"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Calienta el aceite con los ajos laminados y la guindilla sin que se quemen.",
+        "Añade las gambas saladas y cocina solo 1 o 2 minutos, hasta que cambien de color.",
+        "Sirve en la misma cazuela, chisporroteando."
+      ]
+    },
+    {
+      "slug": "mejillones-al-vapor",
+      "nombre": "Mejillones al vapor",
+      "descripcion": "Listos en diez minutos, con limón y laurel.",
+      "raciones": 4,
+      "minutos": 15,
+      "etiquetas": ["pescado", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Mejillones",
+          "productos": ["Mejillones"],
+          "cantidad": {
+            "valor": 1000,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Limón",
+          "productos": ["Limón"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "nota": "1",
+          "opcional": true
+        },
+        {
+          "nombre": "Vino blanco",
+          "productos": ["Vino blanco"],
+          "nota": "medio vaso",
+          "opcional": true
+        },
+        {
+          "nombre": "Laurel",
+          "basico": true,
+          "nota": "1 hoja"
+        }
+      ],
+      "pasos": [
+        "Limpia los mejillones quitando las barbas.",
+        "Ponlos en una olla con el laurel, el vino y un poco de agua, y tapa.",
+        "En cuanto se abran (4 o 5 minutos) están listos. Descarta los que sigan cerrados y sirve con limón."
+      ]
+    },
+    {
+      "slug": "revuelto-de-champinones",
+      "nombre": "Revuelto de champiñones",
+      "descripcion": "Cena rápida: setas salteadas con huevo cuajado a fuego suave.",
+      "raciones": 2,
+      "minutos": 15,
+      "etiquetas": ["huevos", "verduras", "rápida", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Champiñones",
+          "productos": ["Champiñones", "Setas variadas"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 4,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Jamón serrano",
+          "productos": ["Jamón serrano", "Jamón ibérico"],
+          "cantidad": {
+            "valor": 60,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Saltea los champiñones laminados con el ajo hasta que suelten el agua y se doren.",
+        "Añade el jamón si lo usas.",
+        "Baja el fuego, echa los huevos batidos con sal y remueve hasta que cuajen jugosos."
+      ]
+    },
+    {
+      "slug": "espinacas-a-la-crema",
+      "nombre": "Espinacas a la crema",
+      "descripcion": "Espinacas con una bechamel ligera, como guarnición o plato único.",
+      "raciones": 4,
+      "minutos": 25,
+      "etiquetas": ["verduras", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Espinacas",
+          "productos": ["Espinacas", "Espinacas congeladas"],
+          "cantidad": {
+            "valor": 500,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Leche",
+          "productos": [
+            "Leche entera",
+            "Leche semidesnatada",
+            "Leche desnatada",
+            "Leche sin lactosa"
+          ],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "ml"
+          }
+        },
+        {
+          "nombre": "Harina",
+          "productos": ["Harina de trigo"],
+          "cantidad": {
+            "valor": 30,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Mantequilla",
+          "productos": ["Mantequilla"],
+          "cantidad": {
+            "valor": 30,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Queso rallado",
+          "productos": ["Queso rallado", "Queso curado", "Queso semicurado"],
+          "cantidad": {
+            "valor": 50,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Nuez moscada",
+          "basico": true,
+          "nota": "una pizca"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Rehoga las espinacas hasta que pierdan el agua y escúrrelas.",
+        "Haz una bechamel con la mantequilla, la harina y la leche, y sazónala.",
+        "Mezcla con las espinacas y, si quieres, gratina con queso."
+      ]
+    },
+    {
+      "slug": "porrusalda",
+      "nombre": "Porrusalda",
+      "descripcion": "Sopa vasca de puerros y patata, sencilla y muy sabrosa.",
+      "raciones": 4,
+      "minutos": 40,
+      "etiquetas": ["sopas", "verduras"],
+      "ingredientes": [
+        {
+          "nombre": "Puerro",
+          "productos": ["Puerro"],
+          "cantidad": {
+            "valor": 3,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Zanahoria",
+          "productos": ["Zanahoria"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Bacalao desalado",
+          "productos": ["Bacalao desalado"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Rehoga el ajo y el puerro en rodajas en aceite.",
+        "Añade la patata cascada y la zanahoria, cubre con agua y cuece 25 minutos.",
+        "Si usas bacalao, añádelo desmigado los últimos 5 minutos."
+      ]
+    },
+    {
+      "slug": "bacalao-con-tomate",
+      "nombre": "Bacalao con tomate",
+      "descripcion": "Bacalao rebozado y luego cocinado en un sofrito de tomate.",
+      "raciones": 4,
+      "minutos": 40,
+      "etiquetas": ["pescado"],
+      "ingredientes": [
+        {
+          "nombre": "Bacalao",
+          "productos": ["Bacalao desalado", "Bacalao fresco", "Merluza"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Tomate triturado",
+          "productos": ["Tomate triturado"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "2 latas"
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento verde",
+          "productos": ["Pimiento verde", "Pimiento italiano"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Harina",
+          "productos": ["Harina de trigo"],
+          "cantidad": {
+            "valor": 30,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Azúcar",
+          "basico": true,
+          "nota": "una pizca"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Enharina el bacalao y fríelo por tandas. Resérvalo.",
+        "En una cazuela pocha la cebolla, el ajo y el pimiento.",
+        "Añade el tomate y el azúcar y cuece 20 minutos.",
+        "Mete el bacalao en la salsa y deja 5 minutos a fuego suave."
+      ]
+    },
+    {
+      "slug": "ensalada-de-garbanzos",
+      "nombre": "Ensalada de garbanzos",
+      "descripcion": "Ensalada fresca de legumbre con verduras picadas y atún.",
+      "raciones": 4,
+      "minutos": 10,
+      "etiquetas": ["ensaladas", "legumbres", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Garbanzos cocidos",
+          "productos": ["Garbanzos cocidos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "2 botes"
+        },
+        {
+          "nombre": "Tomate",
+          "productos": ["Tomate pera", "Tomate en rama", "Tomate para ensalada", "Tomate cherry"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento",
+          "productos": ["Pimiento rojo", "Pimiento verde", "Pimiento italiano"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla morada", "Cebolla", "Cebolleta"],
+          "cantidad": {
+            "valor": 75,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Atún en lata",
+          "productos": ["Atún en lata"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "cocidos",
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Vinagre",
+          "basico": true,
+          "nota": "un chorrito"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Escurre y enjuaga los garbanzos.",
+        "Pica el tomate, el pimiento y la cebolla en dados pequeños.",
+        "Mezcla todo con el atún y el huevo, y aliña."
+      ]
+    },
+    {
+      "slug": "ensalada-de-pasta",
+      "nombre": "Ensalada de pasta",
+      "descripcion": "Pasta fría con tomate y atún, ideal para llevar en táper.",
+      "raciones": 4,
+      "minutos": 20,
+      "etiquetas": ["ensaladas", "pasta", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Pasta corta",
+          "productos": ["Macarrones", "Espaguetis"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Tomate",
+          "productos": ["Tomate cherry", "Tomate pera", "Tomate en rama", "Tomate para ensalada"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Atún en lata",
+          "productos": ["Atún en lata"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "2 latas"
+        },
+        {
+          "nombre": "Aceitunas",
+          "productos": ["Aceitunas"],
+          "cantidad": {
+            "valor": 50,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "cocidos",
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Cuece la pasta, escúrrela y enfríala con agua fría.",
+        "Trocea el tomate y el huevo.",
+        "Mezcla con el atún y las aceitunas y aliña."
+      ]
+    },
+    {
+      "slug": "ensaladilla-rusa",
+      "nombre": "Ensaladilla rusa",
+      "descripcion": "La tapa de bar por excelencia, con mucha mayonesa.",
+      "raciones": 6,
+      "minutos": 40,
+      "etiquetas": ["ensaladas"],
+      "ingredientes": [
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 800,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Zanahoria",
+          "productos": ["Zanahoria"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 3,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Atún en lata",
+          "productos": ["Atún en lata"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "2 latas"
+        },
+        {
+          "nombre": "Mayonesa",
+          "productos": ["Mayonesa"],
+          "cantidad": {
+            "valor": 250,
+            "unidad": "ml"
+          }
+        },
+        {
+          "nombre": "Guisantes",
+          "productos": ["Guisantes congelados"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceitunas",
+          "productos": ["Aceitunas"],
+          "cantidad": {
+            "valor": 50,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Cuece las patatas y las zanahorias peladas en dados, y los huevos 10 minutos. Añade los guisantes al final.",
+        "Deja enfriar y pica el huevo.",
+        "Mezcla todo con el atún y la mayonesa, y guarda en la nevera al menos una hora."
+      ]
+    },
+    {
+      "slug": "hamburguesas-caseras",
+      "nombre": "Hamburguesas caseras",
+      "descripcion": "Hamburguesas de carne picada hechas en casa, con lo que tengas para acompañar.",
+      "raciones": 4,
+      "minutos": 25,
+      "etiquetas": ["carne", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Carne picada",
+          "productos": ["Carne picada de ternera", "Carne picada mixta"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Pan rallado",
+          "productos": ["Pan rallado"],
+          "cantidad": {
+            "valor": 30,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 75,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Queso",
+          "productos": ["Queso tierno", "Queso semicurado", "Mozzarella"],
+          "cantidad": {
+            "valor": 80,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Lechuga",
+          "productos": ["Lechuga iceberg", "Lechuga romana", "Cogollos"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        },
+        {
+          "nombre": "Pimienta negra",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Mezcla la carne con el huevo, el pan rallado, la cebolla muy picada, sal y pimienta.",
+        "Forma 4 hamburguesas y deja que reposen 10 minutos en la nevera.",
+        "Hazlas a la plancha 3 o 4 minutos por lado; pon el queso encima al final."
+      ]
+    },
+    {
+      "slug": "salteado-de-pollo-y-verduras",
+      "nombre": "Salteado de pollo y verduras",
+      "descripcion": "Pollo en tiras con verduras al wok y salsa de soja.",
+      "raciones": 4,
+      "minutos": 20,
+      "etiquetas": ["pollo", "verduras", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Pollo",
+          "productos": [
+            "Pechuga de pollo",
+            "Filetes de pechuga de pollo",
+            "Solomillos de pollo",
+            "Contramuslos deshuesados"
+          ],
+          "cantidad": {
+            "valor": 500,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Verduras",
+          "productos": ["Verduras para salteado", "Calabacín", "Pimiento rojo", "Brócoli"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Salsa de soja",
+          "productos": ["Salsa de soja"],
+          "cantidad": {
+            "valor": 40,
+            "unidad": "ml"
+          }
+        },
+        {
+          "nombre": "Arroz",
+          "productos": ["Arroz basmati", "Arroz largo"],
+          "cantidad": {
+            "valor": 250,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        }
+      ],
+      "pasos": [
+        "Corta el pollo en tiras y saltéalo en una sartén muy caliente con aceite. Resérvalo.",
+        "Saltea las verduras con el ajo a fuego fuerte, que queden crujientes.",
+        "Junta todo, añade la soja y saltea un minuto. Sirve con arroz si quieres."
+      ]
+    },
+    {
+      "slug": "solomillo-a-la-mostaza",
+      "nombre": "Solomillo de cerdo a la mostaza",
+      "descripcion": "Solomillo en medallones con una salsa de nata y mostaza.",
+      "raciones": 4,
+      "minutos": 25,
+      "etiquetas": ["carne"],
+      "ingredientes": [
+        {
+          "nombre": "Solomillo de cerdo",
+          "productos": ["Solomillo de cerdo", "Lomo de cerdo"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Nata para cocinar",
+          "productos": ["Nata para cocinar"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "ml"
+          }
+        },
+        {
+          "nombre": "Mostaza",
+          "productos": ["Mostaza"],
+          "cantidad": {
+            "valor": 30,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 75,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        },
+        {
+          "nombre": "Pimienta negra",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Corta el solomillo en medallones, salpimiéntalos y dóralos. Resérvalos.",
+        "En la misma sartén pocha la cebolla, añade la nata y la mostaza y deja reducir 5 minutos.",
+        "Vuelve a poner la carne en la salsa y cocina 3 minutos."
+      ]
+    },
+    {
+      "slug": "tortilla-de-calabacin",
+      "nombre": "Tortilla de calabacín",
+      "descripcion": "Como la de patatas, pero más ligera y rápida.",
+      "raciones": 4,
+      "minutos": 30,
+      "etiquetas": ["huevos", "verduras", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Calabacín",
+          "productos": ["Calabacín"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 5,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Corta el calabacín en dados y pocha con la cebolla hasta que esté tierno.",
+        "Mézclalo con los huevos batidos y sal.",
+        "Cuaja la tortilla por los dos lados."
+      ]
+    },
+    {
+      "slug": "berenjenas-rellenas",
+      "nombre": "Berenjenas rellenas de carne",
+      "descripcion": "Berenjenas al horno rellenas de carne con tomate y gratinadas.",
+      "raciones": 4,
+      "minutos": 60,
+      "etiquetas": ["carne", "verduras", "horno"],
+      "ingredientes": [
+        {
+          "nombre": "Berenjena",
+          "productos": ["Berenjena"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          },
+          "nota": "2 grandes"
+        },
+        {
+          "nombre": "Carne picada",
+          "productos": ["Carne picada mixta", "Carne picada de ternera", "Carne picada de pollo"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Tomate frito",
+          "productos": ["Tomate frito", "Tomate triturado"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "1 bote"
+        },
+        {
+          "nombre": "Queso para gratinar",
+          "productos": ["Queso rallado", "Mozzarella"],
+          "cantidad": {
+            "valor": 80,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Parte las berenjenas por la mitad, hazles cortes y hornéalas 25 minutos a 200 °C.",
+        "Vacía la pulpa. Sofríe la cebolla, la carne y la pulpa picada, y añade el tomate.",
+        "Rellena las berenjenas, cubre con queso y gratina 10 minutos."
+      ]
+    },
+    {
+      "slug": "sopa-de-ajo",
+      "nombre": "Sopa de ajo castellana",
+      "descripcion": "Sopa humilde de pan, ajo, pimentón y huevo.",
+      "raciones": 4,
+      "minutos": 25,
+      "etiquetas": ["sopas", "huevos"],
+      "ingredientes": [
+        {
+          "nombre": "Ajos",
+          "productos": ["Ajos"],
+          "nota": "1 cabeza"
+        },
+        {
+          "nombre": "Pan duro",
+          "productos": ["Pan de barra", "Pan integral"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 4,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Jamón serrano",
+          "productos": ["Jamón serrano", "Jamón ibérico"],
+          "cantidad": {
+            "valor": 80,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Caldo",
+          "productos": ["Caldo de pollo", "Caldo de verduras"],
+          "cantidad": {
+            "valor": 1000,
+            "unidad": "ml"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Pimentón",
+          "basico": true,
+          "nota": "1 cucharada"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Dora los ajos laminados y el jamón en aceite, y añade el pan en rebanadas finas.",
+        "Fuera del fuego echa el pimentón y enseguida el caldo o agua caliente.",
+        "Cuece 10 minutos, casca los huevos encima y deja que cuajen 3 minutos."
+      ]
+    },
+    {
+      "slug": "migas-extremenas",
+      "nombre": "Migas extremeñas",
+      "descripcion": "Las que dan nombre a la app: pan del día anterior, ajo y chorizo. Que no se tire ni una miga.",
+      "raciones": 4,
+      "minutos": 40,
+      "etiquetas": ["carne"],
+      "ingredientes": [
+        {
+          "nombre": "Pan duro",
+          "productos": ["Pan de barra", "Pan integral"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "de un par de días"
+        },
+        {
+          "nombre": "Chorizo",
+          "productos": ["Chorizo", "Chorizo fresco"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Panceta",
+          "productos": ["Panceta", "Bacon"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento verde",
+          "productos": ["Pimiento verde", "Pimiento italiano"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Uvas",
+          "productos": ["Uva blanca", "Uva negra"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "6 dientes"
+        },
+        {
+          "nombre": "Pimentón",
+          "basico": true,
+          "nota": "1 cucharadita"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "La noche antes, corta el pan en trozos pequeños, rocíalo con agua con sal y tápalo con un paño.",
+        "Fríe los ajos enteros, el chorizo, la panceta y el pimiento. Sácalos y resérvalos.",
+        "En ese aceite echa el pan y el pimentón y remueve sin parar 20 minutos, hasta que las migas estén sueltas y doradas.",
+        "Vuelve a juntar todo y sirve con uvas."
+      ]
+    },
+    {
+      "slug": "pollo-a-la-cerveza",
+      "nombre": "Pollo a la cerveza",
+      "descripcion": "Guiso de pollo con cebolla y cerveza, de los que se hacen solos.",
+      "raciones": 4,
+      "minutos": 50,
+      "etiquetas": ["pollo"],
+      "ingredientes": [
+        {
+          "nombre": "Pollo troceado",
+          "productos": [
+            "Pollo troceado",
+            "Muslos de pollo",
+            "Contramuslos de pollo",
+            "Jamoncitos de pollo",
+            "Pollo entero"
+          ],
+          "cantidad": {
+            "valor": 1000,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cerveza",
+          "productos": ["Cerveza", "Cerveza sin alcohol"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "1 lata o botellín"
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Zanahoria",
+          "productos": ["Zanahoria"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Laurel",
+          "basico": true,
+          "nota": "1 hoja"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Dora el pollo salpimentado en una cazuela y resérvalo.",
+        "Pocha la cebolla, el ajo y la zanahoria.",
+        "Vuelve a poner el pollo, añade el laurel y la cerveza y cuece tapado 30 minutos."
+      ]
+    },
+    {
+      "slug": "crema-de-champinones",
+      "nombre": "Crema de champiñones",
+      "descripcion": "Crema sedosa de champiñones para una cena ligera.",
+      "raciones": 4,
+      "minutos": 30,
+      "etiquetas": ["sopas", "verduras", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Champiñones",
+          "productos": ["Champiñones", "Setas variadas"],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada", "Puerro"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Nata para cocinar",
+          "productos": ["Nata para cocinar"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "ml"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Pocha la cebolla, añade los champiñones laminados y saltea hasta que se doren.",
+        "Añade la patata en dados, cubre con agua y cuece 15 minutos.",
+        "Tritura con la nata y ajusta de sal."
+      ]
+    },
+    {
+      "slug": "arroz-con-leche",
+      "nombre": "Arroz con leche",
+      "descripcion": "Postre de la abuela con canela y piel de limón.",
+      "raciones": 6,
+      "minutos": 60,
+      "etiquetas": ["postre", "arroz"],
+      "ingredientes": [
+        {
+          "nombre": "Arroz",
+          "productos": ["Arroz redondo"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Leche",
+          "productos": ["Leche entera", "Leche semidesnatada", "Leche sin lactosa"],
+          "cantidad": {
+            "valor": 1000,
+            "unidad": "ml"
+          }
+        },
+        {
+          "nombre": "Azúcar",
+          "productos": ["Azúcar"],
+          "cantidad": {
+            "valor": 120,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Canela en rama",
+          "productos": ["Canela en rama"],
+          "nota": "1 rama",
+          "opcional": true
+        },
+        {
+          "nombre": "Limón",
+          "productos": ["Limón"],
+          "nota": "la piel",
+          "opcional": true
+        }
+      ],
+      "pasos": [
+        "Calienta la leche con la canela y la piel de limón.",
+        "Añade el arroz y cuece a fuego muy suave 45 minutos, removiendo a menudo.",
+        "Añade el azúcar, cuece 5 minutos más y deja enfriar. Espolvorea canela molida si tienes."
+      ]
+    },
+    {
+      "slug": "torrijas",
+      "nombre": "Torrijas",
+      "descripcion": "Pan del día anterior empapado en leche y frito. Dulce de Semana Santa (y de cualquier día).",
+      "raciones": 4,
+      "minutos": 30,
+      "etiquetas": ["postre"],
+      "ingredientes": [
+        {
+          "nombre": "Pan de barra",
+          "productos": ["Pan de barra", "Pan integral"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "nota": "del día anterior"
+        },
+        {
+          "nombre": "Leche",
+          "productos": [
+            "Leche entera",
+            "Leche semidesnatada",
+            "Leche desnatada",
+            "Leche sin lactosa"
+          ],
+          "cantidad": {
+            "valor": 500,
+            "unidad": "ml"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Azúcar",
+          "productos": ["Azúcar"],
+          "cantidad": {
+            "valor": 80,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Canela",
+          "productos": ["Canela molida", "Canela en rama"],
+          "nota": "al gusto",
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "para freír"
+        }
+      ],
+      "pasos": [
+        "Calienta la leche con la mitad del azúcar y la canela.",
+        "Corta el pan en rebanadas gruesas y empápalas en la leche templada.",
+        "Pásalas por huevo batido y fríelas hasta que estén doradas.",
+        "Rebózalas en el resto del azúcar con canela."
+      ]
+    },
+    {
+      "slug": "bizcocho-de-yogur",
+      "nombre": "Bizcocho de yogur",
+      "descripcion": "El bizcocho fácil que se mide con el vasito del yogur.",
+      "raciones": 8,
+      "minutos": 50,
+      "etiquetas": ["postre", "horno", "desayuno"],
+      "ingredientes": [
+        {
+          "nombre": "Yogur",
+          "productos": ["Yogur natural", "Yogur griego", "Yogur de sabores"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 3,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Harina",
+          "productos": ["Harina de trigo"],
+          "cantidad": {
+            "valor": 250,
+            "unidad": "g"
+          },
+          "nota": "3 vasitos"
+        },
+        {
+          "nombre": "Azúcar",
+          "productos": ["Azúcar"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          },
+          "nota": "2 vasitos"
+        },
+        {
+          "nombre": "Levadura",
+          "productos": ["Levadura"],
+          "cantidad": {
+            "valor": 16,
+            "unidad": "g"
+          },
+          "nota": "1 sobre"
+        },
+        {
+          "nombre": "Limón",
+          "productos": ["Limón"],
+          "nota": "la ralladura",
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de girasol",
+          "basico": true,
+          "nota": "1 vasito"
+        }
+      ],
+      "pasos": [
+        "Precalienta el horno a 180 °C.",
+        "Bate los huevos con el azúcar, añade el yogur, el aceite y la ralladura.",
+        "Incorpora la harina tamizada con la levadura sin batir en exceso.",
+        "Vierte en un molde engrasado y hornea 35 o 40 minutos, hasta que un palillo salga limpio."
+      ]
+    },
+    {
+      "slug": "pan-con-tomate",
+      "nombre": "Pan con tomate",
+      "descripcion": "Desayuno mediterráneo: tostada, tomate rallado y aceite.",
+      "raciones": 2,
+      "minutos": 10,
+      "etiquetas": ["desayuno", "rápida", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Pan",
+          "productos": ["Pan de barra", "Pan integral", "Pan de molde", "Pan de molde integral"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Tomate",
+          "productos": ["Tomate pera", "Tomate en rama", "Tomate para ensalada"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Jamón serrano",
+          "productos": ["Jamón serrano", "Jamón ibérico"],
+          "cantidad": {
+            "valor": 50,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Tuesta el pan.",
+        "Ralla el tomate y sálalo.",
+        "Unta el tomate en el pan, riega con aceite y, si quieres, añade jamón."
+      ]
+    },
+    {
+      "slug": "gachas-de-avena",
+      "nombre": "Gachas de avena con plátano",
+      "descripcion": "Porridge cremoso para empezar el día.",
+      "raciones": 2,
+      "minutos": 10,
+      "etiquetas": ["desayuno", "rápida", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Copos de avena",
+          "productos": ["Copos de avena"],
+          "cantidad": {
+            "valor": 80,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Leche o bebida vegetal",
+          "productos": [
+            "Leche entera",
+            "Leche semidesnatada",
+            "Leche desnatada",
+            "Leche sin lactosa",
+            "Bebida de avena",
+            "Bebida de soja",
+            "Bebida de almendras"
+          ],
+          "cantidad": {
+            "valor": 400,
+            "unidad": "ml"
+          }
+        },
+        {
+          "nombre": "Plátano",
+          "productos": ["Plátano de Canarias", "Banana"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          },
+          "nota": "1",
+          "opcional": true
+        },
+        {
+          "nombre": "Miel",
+          "productos": ["Miel"],
+          "nota": "al gusto",
+          "opcional": true
+        },
+        {
+          "nombre": "Canela",
+          "productos": ["Canela molida"],
+          "nota": "una pizca",
+          "opcional": true
+        }
+      ],
+      "pasos": [
+        "Calienta la leche con la avena a fuego medio, removiendo, unos 5 minutos hasta que espese.",
+        "Sirve con el plátano en rodajas, la miel y la canela."
+      ]
+    },
+    {
+      "slug": "pasta-con-brocoli",
+      "nombre": "Pasta con brócoli y ajo",
+      "descripcion": "Pasta con brócoli salteado, ajo y un toque picante.",
+      "raciones": 4,
+      "minutos": 20,
+      "etiquetas": ["pasta", "verduras", "rápida", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Pasta",
+          "productos": ["Macarrones", "Espaguetis", "Tallarines"],
+          "cantidad": {
+            "valor": 350,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Brócoli",
+          "productos": ["Brócoli"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Queso rallado",
+          "productos": ["Queso rallado", "Queso curado", "Queso semicurado"],
+          "cantidad": {
+            "valor": 50,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Guindilla",
+          "productos": ["Guindilla"],
+          "nota": "una pizca",
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "3 dientes"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Cuece la pasta y, los últimos 4 minutos, añade el brócoli en ramilletes. Escurre.",
+        "Dora el ajo laminado con la guindilla en aceite.",
+        "Saltea la pasta y el brócoli en ese aceite y sirve con queso."
+      ]
+    },
+    {
+      "slug": "fajitas-de-pollo",
+      "nombre": "Fajitas de pollo",
+      "descripcion": "Tiras de pollo con pimientos y cebolla en tortillas de trigo.",
+      "raciones": 4,
+      "minutos": 25,
+      "etiquetas": ["pollo", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Tortillas de trigo",
+          "productos": ["Tortillas de trigo"],
+          "cantidad": {
+            "valor": 8,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Pollo",
+          "productos": [
+            "Pechuga de pollo",
+            "Filetes de pechuga de pollo",
+            "Solomillos de pollo",
+            "Contramuslos deshuesados"
+          ],
+          "cantidad": {
+            "valor": 500,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento rojo",
+          "productos": ["Pimiento rojo"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento verde",
+          "productos": ["Pimiento verde", "Pimiento italiano"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Queso rallado",
+          "productos": ["Queso rallado", "Mozzarella"],
+          "cantidad": {
+            "valor": 60,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Comino y pimentón",
+          "basico": true,
+          "nota": "1 cucharadita"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Corta el pollo, los pimientos y la cebolla en tiras.",
+        "Saltea el pollo con las especias a fuego fuerte, añade las verduras y cocina 5 minutos.",
+        "Calienta las tortillas y rellénalas."
+      ]
+    },
+    {
+      "slug": "dorada-al-horno",
+      "nombre": "Dorada al horno",
+      "descripcion": "Dorada entera sobre cama de patatas y cebolla.",
+      "raciones": 2,
+      "minutos": 40,
+      "etiquetas": ["pescado", "horno"],
+      "ingredientes": [
+        {
+          "nombre": "Dorada",
+          "productos": ["Dorada", "Lubina"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 500,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Limón",
+          "productos": ["Limón"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          },
+          "nota": "1",
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Hornea las patatas y la cebolla en láminas con aceite y sal 20 minutos a 200 °C.",
+        "Pon encima las doradas limpias, con unas rodajas de limón en el interior.",
+        "Hornea 15 o 20 minutos más y riega con un refrito de ajo y aceite al servir."
+      ]
+    },
+    {
+      "slug": "crema-de-verduras",
+      "nombre": "Crema de verduras de la nevera",
+      "descripcion": "Para aprovechar lo que queda: cualquier verdura, patata y caldo, triturado.",
+      "raciones": 4,
+      "minutos": 30,
+      "etiquetas": ["sopas", "verduras", "vegetariana"],
+      "ingredientes": [
+        {
+          "nombre": "Verduras variadas",
+          "productos": [
+            "Calabacín",
+            "Zanahoria",
+            "Puerro",
+            "Brócoli",
+            "Calabaza",
+            "Judías verdes",
+            "Espinacas",
+            "Acelgas"
+          ],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla", "Cebolla morada"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Caldo",
+          "productos": ["Caldo de pollo", "Caldo de verduras"],
+          "cantidad": {
+            "valor": 800,
+            "unidad": "ml"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Pocha la cebolla en aceite.",
+        "Añade las verduras y la patata troceadas, cubre con caldo o agua y cuece 20 minutos.",
+        "Tritura y ajusta de sal. Si queda espesa, añade un poco de agua."
+      ]
+    },
+    {
+      "slug": "tortilla-de-atun",
+      "nombre": "Tortilla francesa de atún",
+      "descripcion": "Cena de dos minutos con lo que siempre hay en el armario.",
+      "raciones": 2,
+      "minutos": 10,
+      "etiquetas": ["huevos", "pescado", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 4,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Atún en lata",
+          "productos": ["Atún en lata"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Tomate frito",
+          "productos": ["Tomate frito"],
+          "nota": "para acompañar",
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un poco"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Bate los huevos con sal y el atún escurrido.",
+        "Cuaja en una sartén con un poco de aceite y dóblala.",
+        "Sirve con tomate frito si te apetece."
+      ]
+    },
+    {
+      "slug": "ensalada-de-patata",
+      "nombre": "Ensalada campera",
+      "descripcion": "Patata cocida con tomate, pimiento, cebolla, huevo y atún.",
+      "raciones": 4,
+      "minutos": 30,
+      "etiquetas": ["ensaladas"],
+      "ingredientes": [
+        {
+          "nombre": "Patatas",
+          "productos": ["Patatas"],
+          "cantidad": {
+            "valor": 600,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Tomate",
+          "productos": ["Tomate pera", "Tomate en rama", "Tomate para ensalada"],
+          "cantidad": {
+            "valor": 200,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Pimiento",
+          "productos": ["Pimiento verde", "Pimiento rojo", "Pimiento italiano"],
+          "cantidad": {
+            "valor": 100,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Cebolla",
+          "productos": ["Cebolla morada", "Cebolla", "Cebolleta"],
+          "cantidad": {
+            "valor": 75,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Huevos",
+          "productos": ["Huevos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Atún en lata",
+          "productos": ["Atún en lata"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceitunas",
+          "productos": ["Aceitunas"],
+          "cantidad": {
+            "valor": 50,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Vinagre",
+          "basico": true,
+          "nota": "un chorrito"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Cuece las patatas con piel y los huevos. Enfría y trocea.",
+        "Pica el tomate, el pimiento y la cebolla.",
+        "Mezcla todo con el atún y las aceitunas y aliña."
+      ]
+    },
+    {
+      "slug": "garbanzos-salteados-con-chorizo",
+      "nombre": "Garbanzos salteados con chorizo",
+      "descripcion": "Garbanzos de bote dorados en la sartén con chorizo y pimentón.",
+      "raciones": 4,
+      "minutos": 15,
+      "etiquetas": ["legumbres", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Garbanzos cocidos",
+          "productos": ["Garbanzos cocidos"],
+          "cantidad": {
+            "valor": 2,
+            "unidad": "unidad"
+          },
+          "nota": "2 botes"
+        },
+        {
+          "nombre": "Chorizo",
+          "productos": ["Chorizo", "Chorizo fresco"],
+          "cantidad": {
+            "valor": 120,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Espinacas",
+          "productos": ["Espinacas", "Espinacas congeladas"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Ajo",
+          "basico": true,
+          "nota": "2 dientes"
+        },
+        {
+          "nombre": "Pimentón",
+          "basico": true,
+          "nota": "1 cucharadita"
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        }
+      ],
+      "pasos": [
+        "Dora el chorizo en dados y el ajo en una sartén.",
+        "Añade los garbanzos escurridos y saltea a fuego fuerte hasta que se tuesten.",
+        "Añade las espinacas y el pimentón y saltea un minuto."
+      ]
+    },
+    {
+      "slug": "pechuga-a-la-plancha-con-ensalada",
+      "nombre": "Pechuga a la plancha con ensalada",
+      "descripcion": "Lo más sencillo cuando no apetece cocinar.",
+      "raciones": 2,
+      "minutos": 15,
+      "etiquetas": ["pollo", "rápida"],
+      "ingredientes": [
+        {
+          "nombre": "Pechuga de pollo",
+          "productos": [
+            "Pechuga de pollo",
+            "Filetes de pechuga de pollo",
+            "Solomillos de pollo",
+            "Contramuslos deshuesados",
+            "Pechuga de pavo"
+          ],
+          "cantidad": {
+            "valor": 300,
+            "unidad": "g"
+          }
+        },
+        {
+          "nombre": "Lechuga",
+          "productos": ["Lechuga romana", "Lechuga iceberg", "Cogollos", "Canónigos", "Rúcula"],
+          "cantidad": {
+            "valor": 1,
+            "unidad": "unidad"
+          }
+        },
+        {
+          "nombre": "Tomate",
+          "productos": ["Tomate pera", "Tomate en rama", "Tomate para ensalada", "Tomate cherry"],
+          "cantidad": {
+            "valor": 150,
+            "unidad": "g"
+          },
+          "opcional": true
+        },
+        {
+          "nombre": "Limón",
+          "productos": ["Limón"],
+          "nota": "unas gotas",
+          "opcional": true
+        },
+        {
+          "nombre": "Aceite de oliva",
+          "basico": true,
+          "nota": "un buen chorro"
+        },
+        {
+          "nombre": "Sal",
+          "basico": true,
+          "nota": "al gusto"
+        }
+      ],
+      "pasos": [
+        "Filetea la pechuga, sálala y hazla a la plancha bien caliente 3 minutos por lado.",
+        "Prepara la ensalada y aliña.",
+        "Sirve el pollo con unas gotas de limón."
+      ]
+    }
+  ]
+}

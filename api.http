@@ -258,3 +258,26 @@ Authorization: Bearer {{token}}
 ### Memoria del hogar para el autocompletado
 GET {{base}}/catalog/household-products
 Authorization: Bearer {{token}}
+
+# ─── Recetas (vista 4) ───────────────────────────────────────
+# Pega aquí un id de receta de "Sugerencias"
+@receta = PEGA-AQUI-EL-ID
+
+### Sugerencias según la despensa: puedes (raciones ajustadas), casi (faltan 1-2) y masCompra
+GET {{base}}/recipes
+Authorization: Bearer {{token}}
+
+### Una receta cruzada con la despensa
+GET {{base}}/recipes/{{receta}}
+Authorization: Bearer {{token}}
+
+### Con más raciones: lo que no llega sale como "poco" con lo que falta
+GET {{base}}/recipes/{{receta}}?raciones=6
+Authorization: Bearer {{token}}
+
+### Lo que falta para 6 raciones, a la lista activa más reciente (lo calcula el servidor)
+POST {{base}}/recipes/{{receta}}/missing-to-list
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "raciones": 6 }

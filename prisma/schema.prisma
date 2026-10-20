@@ -309,3 +309,40 @@ model MovimientoDespensa {
 
   @@index([inventoryItemId, createdAt])
 }
+
+/// Biblioteca de recetas (vista 4). Global: igual para todos los hogares. La siembra
+/// `prisma/seed-recetas.ts` desde los lotes JSON de `domains/recipes/infrastructure/biblioteca`.
+model Receta {
+  id          String   @id @db.Uuid
+  slug        String   @unique
+  nombre      String
+  descripcion String
+  raciones    Int
+  minutos     Int
+  etiquetas   String[] @default([])
+  pasos       String[]
+  /// Huella del contenido del lote: si cambia, el seed reescribe la receta.
+  huella      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ingredientes RecetaIngrediente[]
+}
+
+model RecetaIngrediente {
+  id               String   @id @db.Uuid
+  recetaId         String   @db.Uuid
+  orden            Int
+  nombre           String
+  /// Productos de la lista base que lo cubren, en orden de preferencia. Sin FK (array).
+  productosBaseIds String[] @db.Uuid
+  cantidadValor    Decimal? @db.Decimal(10, 3)
+  cantidadUnidad   Unidad?
+  nota             String?
+  basico           Boolean  @default(false)
+  opcional         Boolean  @default(false)
+
+  receta Receta @relation(fields: [recetaId], references: [id], onDelete: Cascade)
+
+  @@unique([recetaId, orden])
+}
