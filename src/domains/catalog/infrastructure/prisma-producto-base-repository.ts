@@ -1,6 +1,7 @@
 import "server-only";
 import type { ProductoBaseRepository } from "@/domains/catalog/application/ports/producto-base-repository";
 import { compararProductos, type ProductoBase } from "@/domains/catalog/domain/producto-base";
+import type { AvisoAbierto } from "@/shared/kernel/abierto";
 import { prisma } from "@/shared/kernel/prisma";
 
 const SELECT = { id: true, nombre: true, categoria: true, unidadPorDefecto: true } as const;
@@ -26,5 +27,14 @@ export class PrismaProductoBaseRepository implements ProductoBaseRepository {
         select: SELECT,
       }))
     );
+  }
+
+  async avisoAbierto(id: string): Promise<AvisoAbierto | null> {
+    const p = await prisma.productoBase.findUnique({
+      where: { id },
+      select: { diasAvisoAmarillo: true, diasAvisoRojo: true },
+    });
+    if (p?.diasAvisoAmarillo == null || p.diasAvisoRojo == null) return null;
+    return { amarillo: p.diasAvisoAmarillo, rojo: p.diasAvisoRojo };
   }
 }

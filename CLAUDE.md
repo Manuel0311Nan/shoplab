@@ -164,7 +164,16 @@ hay en casa: cantidad, caducidad, ubicación).
   cambio de cantidad devuelve un `MovimientoDespensa` (entrada, consumo,
   desecho, ajuste, baja) que se guarda con la línea en una transacción.
   Máx. 500 líneas vivas por hogar, sin paginar. Un solo
-  `PantryRepository` para ubicaciones, líneas y movimientos
+  `PantryRepository` para ubicaciones, líneas y movimientos.
+  Paquetes abiertos: «Lo he abierto» guarda `abiertoEl` y fija en la línea
+  los días de aviso (`avisoAbierto`: amarillo, rojo). No cambia la
+  caducidad: avisa en verde, amarillo («revísalo») o rojo («mira si sigue
+  bueno») según los días que lleva abierto (`estadoAbierto`, kernel). Los
+  días salen de la excepción del producto en la lista base
+  (`AVISO_ABIERTO`) o de su categoría (`AVISO_ABIERTO_POR_CATEGORIA`);
+  fruta, verdura, limpieza e higiene no se abren. Con varias unidades se
+  abre una: se separa en su línea (ajustes, no compra ni consumo). Abierta
+  y cerrada son líneas distintas: la compra nunca suma en una abierta
 - **Catalog (hoy)**: `ProductoBase`, la lista base global (328 productos
   y sus sinónimos en `lista-base.data.ts`, cargados por `prisma db seed`
   sin transacción larga e ids UUID v5), y `ProductoRecordado`, la memoria
@@ -352,6 +361,8 @@ Recetas escritas para Migas: no copiar textos de webs ni de libros.
 - No guardar caducidades como instante: son `Dia` (`@db.Date`), y «hoy» se
   calcula con `hoyEn(ZONA_HOGAR, clock)` en el servidor.
 - No cambiar la cantidad de una línea de despensa sin su movimiento.
+- No tratar «abierto» como caducidad ni decir «tíralo»: es un aviso para
+  revisar. Los días se cambian en la lista base o en el kernel, no en la UI.
 - No importar un repositorio de otro contexto: orquestador en `app/_lib`.
 - No llamar al microservicio Python directamente: siempre vía su puerto.
 - No importar `prisma` del kernel en repositorios de modelos de hogar:

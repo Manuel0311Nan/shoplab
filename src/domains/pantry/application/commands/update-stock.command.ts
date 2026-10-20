@@ -17,6 +17,8 @@ export interface UpdateStockInput {
   readonly categoria?: string;
   /** Corrección del total (ajuste). */
   readonly cantidad?: { readonly valor: number; readonly unidad: string };
+  /** Solo en una línea abierta: otro día de apertura, o null para cerrarla. */
+  readonly abiertoEl?: string | null;
   readonly usuarioId: string;
 }
 
@@ -36,7 +38,8 @@ export class UpdateStockCommand {
       input.ubicacionId === undefined &&
       input.caducaEl === undefined &&
       input.categoria === undefined &&
-      input.cantidad === undefined
+      input.cantidad === undefined &&
+      input.abiertoEl === undefined
     ) {
       return err(PantryErrors.sinCambios());
     }
@@ -50,6 +53,15 @@ export class UpdateStockCommand {
         const d = Dia.create(input.caducaEl);
         if (!d.ok) return d;
         caducaEl = d.value;
+      }
+    }
+    let abiertoEl: Dia | null | undefined;
+    if (input.abiertoEl !== undefined) {
+      if (input.abiertoEl === null) abiertoEl = null;
+      else {
+        const d = Dia.create(input.abiertoEl);
+        if (!d.ok) return d;
+        abiertoEl = d.value;
       }
     }
     let cantidad: Cantidad | undefined;
@@ -78,6 +90,10 @@ export class UpdateStockCommand {
       linea.cambiarCategoria(input.categoria, ahora);
     }
     if (caducaEl !== undefined) linea.cambiarCaducidad(caducaEl, ahora);
+    if (abiertoEl !== undefined) {
+      const apertura = linea.cambiarApertura(abiertoEl, ahora);
+      if (!apertura.ok) return apertura;
+    }
     if (input.ubicacionId !== undefined) linea.mover(input.ubicacionId, ahora);
     despensa.registrar(
       linea,

@@ -1,3 +1,4 @@
+import type { AvisoAbierto } from "@/shared/kernel/abierto";
 import {
   Cantidad,
   convertirCantidad,
@@ -59,6 +60,10 @@ export interface InventoryItemSnapshot {
   /** La cantidad tras la última entrada o ajuste: la base de "queda poco" (D8). */
   readonly cantidadReferencia: Cantidad;
   readonly caducaEl: Dia | null;
+  /** Día en que se abrió el paquete; null si está cerrado. Avisa, no caduca. */
+  readonly abiertoEl: Dia | null;
+  /** Días abierto hasta amarillo y hasta rojo: se fijan al abrirlo. */
+  readonly avisoAbierto: AvisoAbierto | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly deletedAt: Date | null;
@@ -74,12 +79,17 @@ export interface NewInventoryItem {
   readonly caducaEl?: Dia | null;
 }
 
-/** Lo que identifica una línea: el mismo producto, en la misma ubicación y con la misma fecha. */
+/**
+ * Lo que identifica una línea: el mismo producto, en la misma ubicación, con la misma
+ * fecha y abierto el mismo día (o cerrado). Lo que entra de la compra está cerrado: nunca
+ * se suma a un paquete abierto.
+ */
 export interface ClaveLinea {
   readonly productoBaseId: string | null;
   readonly nombreNormalizado: string;
   readonly ubicacionId: string;
   readonly caducaEl: Dia | null;
+  readonly abiertoEl?: Dia | null;
   readonly unidad: Cantidad["unidad"];
 }
 
@@ -120,6 +130,8 @@ export class InventoryItem {
       cantidad: input.cantidad,
       cantidadReferencia: input.cantidad,
       caducaEl: input.caducaEl ?? null,
+      abiertoEl: null,
+      avisoAbierto: null,
       createdAt: ahora,
       updatedAt: ahora,
       deletedAt: null,
@@ -140,6 +152,9 @@ export class InventoryItem {
   get ubicacionId(): string {
     return this.state.ubicacionId;
   }
+  get estaAbierta(): boolean {
+    return this.state.abiertoEl !== null;
+  }
   get estaDeBaja(): boolean {
     return this.state.deletedAt !== null;
   }
@@ -150,11 +165,12 @@ export class InventoryItem {
       nombreNormalizado: this.state.nombreNormalizado,
       ubicacionId: this.state.ubicacionId,
       caducaEl: this.state.caducaEl,
+      abiertoEl: this.state.abiertoEl,
       unidad: this.state.cantidad.unidad,
     };
   }
 
-  /** Mismo producto, ubicación y caducidad (o ninguna de las dos), y unidades convertibles. */
+  /** Mismo producto, ubicación, caducidad y apertura (o ninguna), y unidades convertibles. */
   esMismaLinea(otra: ClaveLinea): boolean {
     const propia = this.clave();
     return (
@@ -162,6 +178,7 @@ export class InventoryItem {
       mismoProducto(propia, otra) &&
       propia.ubicacionId === otra.ubicacionId &&
       propia.caducaEl === otra.caducaEl &&
+      propia.abiertoEl === (otra.abiertoEl ?? null) &&
       sonConvertibles(propia.unidad, otra.unidad)
     );
   }
@@ -230,6 +247,64 @@ export class InventoryItem {
   cambiarCaducidad(caducaEl: Dia | null, ahora: Date): void {
     if (caducaEl === this.state.caducaEl) return;
     this.state = { ...this.state, caducaEl, updatedAt: ahora };
+  }
+
+  /**
+   * El paquete se abre ese día. Con varias unidades se abre solo una: se separa en una
+   * línea nueva (abierta) y en esta queda el resto, cerrado; las dos cantidades cambian
+   * con un movimiento de ajuste (no es ni compra ni consumo).
+   */
+  abrir(input: {
+    readonly abiertoEl: Dia;
+    readonly aviso: AvisoAbierto;
+    readonly nuevaLinea: { readonly id: string; readonly movimientoId: string };
+    readonly contexto: ContextoMovimiento;
+    readonly ahora: Date;
+  }): Result<{ abierta: InventoryItem; movimientos: MovimientoSnapshot[] }> {
+    if (this.state.abiertoEl !== null) return err(PantryErrors.yaAbierta());
+    const { abiertoEl, aviso, ahora } = input;
+    const { cantidad } = this.state;
+
+    if (cantidad.unidad !== "unidad" || cantidad.valor <= 1) {
+      this.state = { ...this.state, abiertoEl, avisoAbierto: aviso, updatedAt: ahora };
+      return ok({ abierta: this, movimientos: [] });
+    }
+
+    const resto = Cantidad.create(cantidad.valor - 1, "unidad");
+    const una = Cantidad.create(1, "unidad");
+    if (!resto.ok) return resto;
+    if (!una.ok) return una;
+    const movimientoResto = this.ajustar(resto.value, input.contexto, ahora);
+    const abierta = new InventoryItem({
+      ...this.state,
+      id: input.nuevaLinea.id,
+      cantidad: una.value,
+      cantidadReferencia: una.value,
+      abiertoEl,
+      avisoAbierto: aviso,
+      createdAt: ahora,
+      updatedAt: ahora,
+    });
+    const movimientoAbierta = abierta.movimiento(
+      "ajuste",
+      una.value,
+      { ...input.contexto, id: input.nuevaLinea.movimientoId },
+      ahora,
+    );
+    return ok({ abierta, movimientos: [movimientoResto, movimientoAbierta] });
+  }
+
+  /** Corregir el día en que se abrió, o null para marcarla como cerrada (se abrió por error). */
+  cambiarApertura(abiertoEl: Dia | null, ahora: Date): Result<void> {
+    if (abiertoEl === this.state.abiertoEl) return ok(undefined);
+    if (abiertoEl === null) {
+      this.state = { ...this.state, abiertoEl: null, avisoAbierto: null, updatedAt: ahora };
+      return ok(undefined);
+    }
+    // Poner una fecha a una línea cerrada es abrirla: va por `abrir`, que fija el aviso.
+    if (this.state.abiertoEl === null) return err(PantryErrors.noEstaAbierta());
+    this.state = { ...this.state, abiertoEl, updatedAt: ahora };
+    return ok(undefined);
   }
 
   cambiarCategoria(categoria: Categoria, ahora: Date): void {

@@ -25,6 +25,11 @@ export function lineaToDomain(fila: FilaLinea): InventoryItem {
     // La referencia siempre se guarda en la unidad de la línea.
     cantidadReferencia: cantidadDesdeBd(fila.cantidadReferencia, fila.cantidadUnidad),
     caducaEl: fila.caducaEl === null ? null : Dia.desdeFechaBd(fila.caducaEl),
+    abiertoEl: fila.abiertoEl === null ? null : Dia.desdeFechaBd(fila.abiertoEl),
+    avisoAbierto:
+      fila.avisoAbiertoAmarillo === null || fila.avisoAbiertoRojo === null
+        ? null
+        : { amarillo: fila.avisoAbiertoAmarillo, rojo: fila.avisoAbiertoRojo },
     createdAt: fila.createdAt,
     updatedAt: fila.updatedAt,
     deletedAt: fila.deletedAt,

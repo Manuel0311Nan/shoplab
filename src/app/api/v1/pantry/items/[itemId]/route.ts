@@ -20,6 +20,7 @@ export const PATCH = apiRoute(
       ...(body.caducaEl === undefined ? {} : { caducaEl: body.caducaEl }),
       ...(body.categoria === undefined ? {} : { categoria: body.categoria }),
       ...(body.cantidad === undefined ? {} : { cantidad: body.cantidad }),
+      ...(body.abiertoEl === undefined ? {} : { abiertoEl: body.abiertoEl }),
     });
     return resultResponse(mapResult(result, toLineaDesdeSnapshot));
   },

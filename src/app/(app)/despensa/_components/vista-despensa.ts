@@ -33,14 +33,56 @@ export interface GrupoDespensa {
   readonly subgrupos: readonly SubgrupoDespensa[];
 }
 
-const diasParaOrdenar = (l: LineaDespensaResponse) => l.caducidad.dias ?? Number.POSITIVE_INFINITY;
+/**
+ * Para ordenar: los días hasta la caducidad o, si está abierto, hasta que se pone rojo
+ * (lo que antes llegue). Sin ninguno de los dos, al final.
+ */
+const diasParaOrdenar = (l: LineaDespensaResponse) =>
+  Math.min(
+    l.caducidad.dias ?? Number.POSITIVE_INFINITY,
+    l.abierto === null ? Number.POSITIVE_INFINITY : l.abierto.aviso.rojo - l.abierto.dias,
+  );
 
 function compararLineas(a: LineaDespensaResponse, b: LineaDespensaResponse): number {
   return diasParaOrdenar(a) - diasParaOrdenar(b) || a.nombre.localeCompare(b.nombre, "es");
 }
 
-export const esUrgente = (l: LineaDespensaResponse) =>
+export const caducaPronto = (l: LineaDespensaResponse) =>
   l.caducidad.estado === "caducado" || l.caducidad.estado === "pronto";
+
+/** Abierto en amarillo o rojo: conviene mirar si sigue bueno. */
+export const abiertoParaRevisar = (l: LineaDespensaResponse) =>
+  l.abierto !== null && l.abierto.color !== "verde";
+
+/** Lo que filtra «ver»: lo que caduca esta semana y lo abierto que hay que revisar. */
+export const esUrgente = (l: LineaDespensaResponse) => caducaPronto(l) || abiertoParaRevisar(l);
+
+/** «1 producto caduca esta semana · 2 abiertos para revisar». null si no hay nada. */
+export function textoAvisos(lineas: readonly LineaDespensaResponse[]): string | null {
+  const caducan = lineas.filter(caducaPronto).length;
+  const abiertos = lineas.filter(abiertoParaRevisar).length;
+  const partes = [
+    caducan === 1 && "1 producto caduca esta semana",
+    caducan > 1 && `${caducan} productos caducan esta semana`,
+    abiertos === 1 && "1 abierto para revisar",
+    abiertos > 1 && `${abiertos} abiertos para revisar`,
+  ].filter((p): p is string => typeof p === "string");
+  return partes.length === 0 ? null : partes.join(" · ");
+}
+
+/** «Abierto hoy», «Abierto hace 4 días · revísalo»… null si está cerrado. */
+export function textoAbierto(abierto: LineaDespensaResponse["abierto"]): string | null {
+  if (abierto === null) return null;
+  const cuando =
+    abierto.dias === 0
+      ? "Abierto hoy"
+      : abierto.dias === 1
+        ? "Abierto ayer"
+        : `Abierto hace ${abierto.dias} días`;
+  if (abierto.color === "rojo") return `${cuando} · mira si sigue bueno`;
+  if (abierto.color === "amarillo") return `${cuando} · revísalo`;
+  return cuando;
+}
 
 function claveProducto(l: LineaDespensaResponse): string {
   const producto = l.productoBaseId ?? `n:${normalizarNombre(l.nombre)}`;

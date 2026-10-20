@@ -1,4 +1,5 @@
 import "server-only";
+import { AvisoAbiertoQuery } from "@/domains/catalog/application/queries/aviso-abierto.query";
 import { RecordarProductoCommand } from "@/domains/catalog/application/commands/recordar-producto.command";
 import { ListBaseProductsQuery } from "@/domains/catalog/application/queries/list-base-products.query";
 import { ListHouseholdProductsQuery } from "@/domains/catalog/application/queries/list-household-products.query";
@@ -10,7 +11,11 @@ import { PrismaProductoRecordadoRepository } from "./prisma-producto-recordado-r
 
 /** Catálogo global: no depende del hogar, así que no recibe AuthContext. */
 export function catalogModule() {
-  return { listBaseProducts: new ListBaseProductsQuery(new PrismaProductoBaseRepository()) };
+  const base = new PrismaProductoBaseRepository();
+  return {
+    listBaseProducts: new ListBaseProductsQuery(base),
+    avisoAbierto: new AvisoAbiertoQuery(base),
+  };
 }
 
 /** Lo del catálogo que depende del hogar: su memoria de productos. */

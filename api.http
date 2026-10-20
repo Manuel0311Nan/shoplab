@@ -229,6 +229,20 @@ Content-Type: application/json
 
 { "ubicacionId": "{{ubicacion}}", "caducaEl": null }
 
+### Lo he abierto (sin abiertoEl, hoy). Con varias ud. se abre una y vuelve el resto
+POST {{base}}/pantry/items/{{linea}}/open
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "abiertoEl": "2026-10-18" }
+
+### No está abierto (se marcó por error)
+PATCH {{base}}/pantry/items/{{linea}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "abiertoEl": null }
+
 ### Quitar (añadido por error): 204
 DELETE {{base}}/pantry/items/{{linea}}
 Authorization: Bearer {{token}}

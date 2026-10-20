@@ -4,9 +4,13 @@ import type {
   CompraGuardada,
   StoreShoppingInput,
 } from "@/domains/pantry/application/commands/store-shopping.command";
+import type {
+  OpenStockInput,
+  OpenStockResult,
+} from "@/domains/pantry/application/commands/open-stock.command";
 import type { UpdateStockInput } from "@/domains/pantry/application/commands/update-stock.command";
 import type { InventoryItemSnapshot } from "@/domains/pantry/domain/inventory-item";
-import { catalogHogarModule } from "@/domains/catalog/infrastructure/catalog-module";
+import { catalogHogarModule, catalogModule } from "@/domains/catalog/infrastructure/catalog-module";
 import { pantryModule } from "@/domains/pantry/infrastructure/pantry-module";
 import type { AuthContext } from "@/shared/kernel/auth-context";
 import type { Result } from "@/shared/kernel/result";
@@ -85,4 +89,23 @@ export async function actualizarEnDespensa(
   const result = await pantryModule(auth).updateStock.execute(input);
   if (result.ok && input.categoria !== undefined) await recordar(auth, result.value, "categoria");
   return result;
+}
+
+/**
+ * «Lo he abierto»: los días de aviso los decide el catálogo (excepción del producto en
+ * la lista base o, si no, su categoría).
+ */
+export async function abrirEnDespensa(
+  auth: AuthContext,
+  input: OpenStockInput,
+): Promise<Result<OpenStockResult>> {
+  const catalogo = catalogModule();
+  return pantryModule(auth, {
+    avisosAbierto: {
+      para: async (productoBaseId, categoria) => {
+        const aviso = await catalogo.avisoAbierto.execute({ productoBaseId, categoria });
+        return aviso.ok ? aviso.value : null;
+      },
+    },
+  }).openStock.execute(input);
 }

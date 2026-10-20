@@ -1,6 +1,7 @@
 import { type Caducidad, estadoCaducidad } from "@/domains/pantry/domain/estado-caducidad";
 import type { InventoryItemSnapshot } from "@/domains/pantry/domain/inventory-item";
 import type { UbicacionSnapshot } from "@/domains/pantry/domain/ubicacion";
+import { type EstadoAbierto, estadoAbierto } from "@/shared/kernel/abierto";
 import type { Clock } from "@/shared/kernel/clock";
 import { type Dia, hoyEn, ZONA_HOGAR } from "@/shared/kernel/dia";
 import { ok, type Result } from "@/shared/kernel/result";
@@ -10,7 +11,16 @@ export type LineaDespensa = InventoryItemSnapshot & {
   readonly caducidad: Caducidad;
   /** D8: queda 1 ud. o el 20 % (en g, kg, ml o l) de lo que entró. */
   readonly quedaPoco: boolean;
+  /** Abierto: cuántos días lleva y su color (verde, amarillo «revísalo», rojo). */
+  readonly abierto: EstadoAbierto | null;
 };
+
+/** Estado de «abierto» de una línea en un día; null si está cerrada. */
+export function abiertoDe(s: InventoryItemSnapshot, hoy: Dia): EstadoAbierto | null {
+  return s.abiertoEl === null || s.avisoAbierto === null
+    ? null
+    : estadoAbierto(s.abiertoEl, hoy, s.avisoAbierto);
+}
 
 export interface VistaDespensa {
   /** El día con el que se calculó la caducidad: la pantalla no vuelve a calcularlo. */
@@ -41,7 +51,12 @@ export class GetPantryQuery {
       ubicaciones: ubicaciones.map((u) => u.toSnapshot()),
       lineas: lineas.map((l) => {
         const s = l.toSnapshot();
-        return { ...s, caducidad: estadoCaducidad(s.caducaEl, hoy), quedaPoco: l.quedaPoco() };
+        return {
+          ...s,
+          caducidad: estadoCaducidad(s.caducaEl, hoy),
+          quedaPoco: l.quedaPoco(),
+          abierto: abiertoDe(s, hoy),
+        };
       }),
     });
   }
