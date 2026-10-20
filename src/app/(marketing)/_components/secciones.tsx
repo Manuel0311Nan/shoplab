@@ -300,6 +300,7 @@ export function Precios() {
               "1 hogar con miembros ilimitados",
               "Listas compartidas",
               "Despensa con ubicaciones y caducidades",
+              "Recetas con lo que tienes en casa",
             ].map((texto) => (
               <li key={texto} className="flex gap-2.5">
                 <Check className="mt-0.5 size-5 shrink-0 text-[#4f7d47]" aria-hidden="true" />
@@ -330,7 +331,6 @@ export function Precios() {
           </p>
           <ul className="flex flex-col gap-2.5">
             {[
-              "Recetas según tu despensa",
               "Avisos de caducidad en el móvil",
               "Importar tus recetas",
               "Historial de compras",

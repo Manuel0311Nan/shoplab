@@ -189,7 +189,18 @@ hay en casa: cantidad, caducidad, ubicación).
   cantidad obligatoria (la UI propone 1 ud.) y
   `compradoAt` en lugar de booleano. Comprado y cantidad se cambian con
   un único `UpdateItemCommand` (PATCH atómico)
-- **Recipes**: recetas e ingredientes de receta (referencian Ingredient)
+- **Recipes** (vista 4): biblioteca global de solo lectura (`Receta`,
+  `RecetaIngrediente`). Cada ingrediente nombra productos de la lista base
+  que lo cubren (alternativas, el primero es el que se compra), cantidad
+  para las raciones de la receta (o sin cantidad y con nota: «2 dientes») y
+  dos marcas: `basico` (de fondo de armario: sal, aceite, ajo, especias; no
+  se comprueba) y `opcional` (no bloquea). `evaluarReceta` cruza la receta
+  con las existencias de la despensa (por `productoBaseId` o por nombre):
+  se puede hacer si están todos los obligatorios; las raciones se ajustan
+  al ingrediente que da para menos, sin pasar de las de la receta; al
+  editar raciones, lo que no llega sale como «poco»/«falta». g↔kg y ml↔l se
+  convierten; si una línea no se puede medir (ud. frente a g), cuenta como
+  que hay. `calcularIngrediente` es pura y la usa también la pantalla
 - **Suggestions** (core): motor de puntuación de recetas según despensa,
   caducidades próximas y preferencias. Detalle en
   `src/domains/suggestions/README.md`
@@ -202,7 +213,7 @@ hay en casa: cantidad, caducidad, ubicación).
 Entre contextos, sin eventos todavía: orquestadores en `app/_lib/<contexto>/`
 que llaman a los módulos de varios contextos y los usan igual la API y las
 Server Actions (`productos-con-catalogo.ts`, `despensa-con-catalogo.ts`,
-`alta-hogar.ts`). Guardar la compra en la despensa es uno: lo decide el
+`alta-hogar.ts`, `recetas-con-despensa.ts`). Guardar la compra en la despensa es uno: lo decide el
 usuario en la hoja «Guardar en la despensa», no el hecho de marcar.
 
 - **Identity**: autenticación web y por token
@@ -284,10 +295,18 @@ Los clientes offline-first envían una cola de mutaciones. El backend:
 
 ## Recetas
 
-Importación desde EPUB de recetarios con arquitectura híbrida
-SQLite/Postgres; detalle en `src/domains/recipes/README.md`.
-<PENDING: origen y licencia del catálogo de recetas antes de ofrecerlo
-a otros hogares>
+La biblioteca vive en el repo como lotes JSON
+(`domains/recipes/infrastructure/biblioteca/lote-NNN.json`), validados con
+Zod y contra la lista base (`app/_lib/recipes/biblioteca.test.ts`).
+`prisma db seed` los carga (`prisma/seed-recetas.ts`: ids UUID v5 del slug,
+reescribe una receta si cambia su huella y borra las que ya no están en
+ningún lote). La app solo lee la BD.
+
+Lotes nuevos: `pnpm tsx scripts/generar-recetas.ts [cantidad] [tema]` con
+`ANTHROPIC_API_KEY` en `.env.local` (nunca en Vercel). Escribe solo las
+recetas que pasan la validación; el lote se revisa a mano en un PR antes
+de sembrar. El lote 1 (61 recetas caseras) se escribió así, a mano.
+Recetas escritas para Migas: no copiar textos de webs ni de libros.
 
 ## Convenciones de código
 
@@ -327,8 +346,9 @@ a otros hogares>
 - No romper `/api/v1` (renombrar campos, cambiar tipos): se versiona.
 - No leer cookies/headers fuera de `app/` y `shared/kernel/auth-context`.
 - No guardar cantidades sin unidad. El texto libre de lista y despensa va
-  siempre por el orquestador que lo vincula al catálogo (D1, vista 3);
-  Recipes sí exigirá Ingredient.
+  siempre por el orquestador que lo vincula al catálogo (D1, vista 3).
+- No añadir recetas a la BD a mano ni desde la app: van en un lote JSON y
+  pasan por el seed. Un producto que no está en la lista base no vale.
 - No guardar caducidades como instante: son `Dia` (`@db.Date`), y «hoy» se
   calcula con `hoyEn(ZONA_HOGAR, clock)` en el servidor.
 - No cambiar la cantidad de una línea de despensa sin su movimiento.
@@ -404,18 +424,18 @@ del seed>
 1. Lista de la compra (`/listas/[listId]`): hecha.
 2. Registro y login (adelantada): hecha.
 3. Mis listas (`/listas`): hecha.
-4. Despensa (`/despensa`) y categorías en la lista: hecha en
-   `feat/despensa`; pendiente aplicar las migraciones (`categoria_otros`,
-   `categorias`, `despensa`), volver a sembrar (sinónimos), probar en el
-   móvil y PR. Plan y decisiones D1–D9 en el documento «Migas · Plan de la
-   vista Despensa».
+4. Despensa (`/despensa`) y categorías en la lista: hecha. Plan y
+   decisiones D1–D9 en el documento «Migas · Plan de la vista Despensa».
+5. Recetas (`/recetas`, `/recetas/[recetaId]`): hecha en `feat/recetas`
+   (producto mínimo: sugerencias con lo que hay, raciones ajustables y lo
+   que falta a la lista). Pendiente: migración `recetas` y seed en
+   producción; descontar ingredientes al cocinar (`RecipeCooked`).
 
 - Home pública (`/`, `(marketing)`): hecha. Textos del «Plan de marketing —
   Migas»; capturas reales en `(marketing)/_img` (rehacerlas si cambian las
   pantallas). «Cómo funciona» es un carrusel con scroll-snap (móvil y
-  ordenador); su paso 4, Recetas, es una maqueta (`recetas-mock.tsx`) hasta
-  que exista la vista. Premium sale como «Próximamente» con el precio de
-  hipótesis del plan.
+  ordenador); el paso 4 enseña la pantalla de Recetas. Premium sale como
+  «Próximamente» con el precio de hipótesis del plan.
 
 Plan completo y orden en la guía de vistas (`docs/shoplab-guia-vista.pdf`).
 Antes de empezar una vista nueva, preguntar a Manuel.

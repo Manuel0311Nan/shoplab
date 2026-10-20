@@ -5,9 +5,9 @@ import { cn } from "@/shared/lib/utils";
 import gastar from "../_img/gastar.webp";
 import guardar from "../_img/guardar.webp";
 import lista from "../_img/lista.webp";
+import recetas from "../_img/recetas.webp";
 import { pasoVecino, pasoVisible } from "./carrusel";
-import { Captura, MarcoMovil } from "./marco-movil";
-import { RecetasMock } from "./recetas-mock";
+import { Captura } from "./marco-movil";
 
 const PASOS = [
   {
@@ -35,15 +35,10 @@ const PASOS = [
   },
   {
     titulo: "Cocinad con lo que hay",
-    pronto: true,
     texto:
-      "Migas mirará tu despensa y te propondrá recetas con lo que tienes, empezando por lo que caduca antes. Si falta algo, a la lista con un toque.",
+      "Migas mira tu despensa y te propone recetas con lo que tienes, empezando por lo que caduca antes y ajustando las raciones. Si quieres hacer más, lo que falta va a la lista con un toque.",
     pantalla: (
-      <MarcoMovil>
-        <div role="img" aria-label="Recetas sugeridas según lo que hay en la despensa">
-          <RecetasMock />
-        </div>
-      </MarcoMovil>
+      <Captura src={recetas} alt="Recetas que se pueden hacer con lo que hay en la despensa" />
     ),
   },
 ];
@@ -109,16 +104,9 @@ export function CarruselFuncionamiento() {
                 {paso.pantalla}
               </div>
               <div className="flex flex-col gap-4 text-center md:text-left">
-                <div className="flex items-center justify-center gap-3 md:justify-start">
-                  <span className="text-sm font-semibold tracking-wide text-primary uppercase">
-                    Paso {i + 1} de {total}
-                  </span>
-                  {paso.pronto && (
-                    <span className="rounded-full bg-secondary px-3 py-0.5 text-xs font-semibold text-secondary-foreground">
-                      Pronto
-                    </span>
-                  )}
-                </div>
+                <span className="text-sm font-semibold tracking-wide text-primary uppercase">
+                  Paso {i + 1} de {total}
+                </span>
                 <h3 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
                   {paso.titulo}
                 </h3>

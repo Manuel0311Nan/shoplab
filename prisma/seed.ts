@@ -11,6 +11,7 @@ import {
   DEV_USER_ID,
 } from "../src/shared/kernel/dev-identity";
 import { sembrarListaBase } from "./seed-lista-base";
+import { sembrarRecetas } from "./seed-recetas";
 
 const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd());
@@ -65,6 +66,8 @@ async function main() {
   });
 
   await sembrarListaBase(prisma);
+  // Después de la lista base: los ingredientes apuntan a sus productos.
+  await sembrarRecetas(prisma);
 
   console.log(`Seed completado. Entra con ${DEV_EMAIL} / ${DEV_PASSWORD}`);
 }
