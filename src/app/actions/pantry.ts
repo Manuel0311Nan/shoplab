@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import {
+  abrirEnDespensa,
   actualizarEnDespensa,
   anadirADespensa,
   guardarCompra,
@@ -17,6 +18,9 @@ import {
   type ConsumeStockResponse,
   consumeStockRequestSchema,
   type LineaDespensaResponse,
+  type OpenStockRequest,
+  type OpenStockResponse,
+  openStockRequestSchema,
   type StoreShoppingRequest,
   type StoreShoppingResponse,
   storeShoppingRequestSchema,
@@ -112,10 +116,36 @@ export async function actualizarLineaAction(
     ...(body.data.caducaEl === undefined ? {} : { caducaEl: body.data.caducaEl }),
     ...(body.data.categoria === undefined ? {} : { categoria: body.data.categoria }),
     ...(body.data.cantidad === undefined ? {} : { cantidad: body.data.cantidad }),
+    ...(body.data.abiertoEl === undefined ? {} : { abiertoEl: body.data.abiertoEl }),
   });
   if (!result.ok) return result;
   revalidar();
   return ok(toLineaDesdeSnapshot(result.value));
+}
+
+/** «Lo he abierto» (sin día, hoy). Devuelve la línea abierta y, si se separó, el resto. */
+export async function abrirLineaAction(
+  itemId: string,
+  input: OpenStockRequest,
+): Promise<Result<OpenStockResponse>> {
+  const auth = await getAuthContext();
+  if (!auth.ok) return auth;
+  const id = idSchema.safeParse(itemId);
+  const body = openStockRequestSchema.safeParse(input);
+  if (!id.success || !body.success) return datosNoValidos();
+
+  const result = await abrirEnDespensa(auth.value, {
+    itemId: id.data,
+    usuarioId: auth.value.userId,
+    ...(body.data.abiertoEl === undefined ? {} : { abiertoEl: body.data.abiertoEl }),
+    ...(body.data.lineaNuevaId === undefined ? {} : { lineaNuevaId: body.data.lineaNuevaId }),
+  });
+  if (!result.ok) return result;
+  revalidar();
+  return ok({
+    abierta: toLineaDesdeSnapshot(result.value.abierta),
+    resto: result.value.resto === null ? null : toLineaDesdeSnapshot(result.value.resto),
+  });
 }
 
 export async function quitarLineaAction(itemId: string): Promise<Result<void>> {

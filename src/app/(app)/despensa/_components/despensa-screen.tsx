@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 import {
+  abrirLineaAction,
   actualizarLineaAction,
   anadirADespensaAction,
   anadirALaListaAction,
@@ -21,13 +22,14 @@ import type {
 import { newId } from "@/shared/kernel/ids";
 import { NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
 import { cn } from "@/shared/lib/utils";
+import { AbrirDialog } from "./abrir-dialog";
 import { AnadirAListaDialog, type ProductoParaLista } from "./anadir-a-lista-dialog";
 import { ConsumirDialog } from "./consumir-dialog";
 import { aplicarAccionDespensa } from "./despensa-reducer";
 import { EditarLineaDialog } from "./editar-linea-dialog";
 import { NuevoProductoDialog } from "./nuevo-producto-dialog";
 import { TarjetaProducto } from "./tarjeta-producto";
-import { type Agrupar, agruparDespensa, esUrgente } from "./vista-despensa";
+import { type Agrupar, agruparDespensa, textoAvisos } from "./vista-despensa";
 
 type Props = {
   despensa: PantryResponse;
@@ -57,6 +59,7 @@ export function DespensaScreen({ despensa, listas }: Props) {
   const [aEditar, setAEditar] = useState<LineaDespensaResponse | null>(null);
   const [paraLista, setParaLista] = useState<ProductoParaLista | null>(null);
   const [nuevo, setNuevo] = useState(false);
+  const [aAbrir, setAAbrir] = useState<LineaDespensaResponse | null>(null);
 
   function cambiarParam(clave: string, valor: string | null) {
     const siguiente = new URLSearchParams(params);
@@ -115,6 +118,24 @@ export function DespensaScreen({ despensa, listas }: Props) {
     });
   }
 
+  function abrir(linea: LineaDespensaResponse, abiertoEl: string) {
+    setAAbrir(null);
+    hacer(async () => {
+      const r = await abrirLineaAction(linea.id, { abiertoEl, lineaNuevaId: newId() });
+      if (!r.ok) setError(r.error.message);
+      else if (r.value.resto !== null) {
+        setAviso(`Abierta 1 ud. de ${linea.nombre}; el resto sigue cerrado.`);
+      }
+    });
+  }
+
+  function cerrarAbierto(linea: LineaDespensaResponse) {
+    hacer(async () => {
+      const r = await actualizarLineaAction(linea.id, { abiertoEl: null });
+      if (!r.ok) setError(r.error.message);
+    });
+  }
+
   function quitar(linea: LineaDespensaResponse) {
     hacer(async () => {
       aplicarOptimista({ tipo: "quitar", lineaId: linea.id });
@@ -144,7 +165,7 @@ export function DespensaScreen({ despensa, listas }: Props) {
     });
   }
 
-  const urgentesTotal = lineas.filter(esUrgente).length;
+  const avisos = textoAvisos(lineas);
   const grupos = agruparDespensa(despensa.ubicaciones, lineas, agrupar, { ubicacionId, urgentes });
   const nombreUbicacion = new Map(despensa.ubicaciones.map((u) => [u.id, u.nombre]));
 
@@ -161,7 +182,7 @@ export function DespensaScreen({ despensa, listas }: Props) {
         </Link>
       </header>
 
-      {urgentesTotal > 0 && (
+      {avisos !== null && (
         <button
           type="button"
           aria-pressed={urgentes}
@@ -172,9 +193,7 @@ export function DespensaScreen({ despensa, listas }: Props) {
           )}
         >
           <AlertTriangle className="size-5 shrink-0" aria-hidden="true" />
-          {urgentesTotal === 1
-            ? "1 producto caduca esta semana"
-            : `${urgentesTotal} productos caducan esta semana`}
+          {avisos}
           {urgentes ? " · ver todo" : " · ver"}
         </button>
       )}
@@ -264,6 +283,8 @@ export function DespensaScreen({ despensa, listas }: Props) {
                         onEditar={setAEditar}
                         onAnadirALista={(l) => setParaLista(productoDe(l, "manual"))}
                         onQuitar={quitar}
+                        onAbrir={setAAbrir}
+                        onCerrarAbierto={cerrarAbierto}
                       />
                     ))}
                   </ul>
@@ -290,6 +311,12 @@ export function DespensaScreen({ despensa, listas }: Props) {
         hoy={despensa.hoy}
         onGuardar={editar}
         onCerrar={() => setAEditar(null)}
+      />
+      <AbrirDialog
+        linea={aAbrir}
+        hoy={despensa.hoy}
+        onAbrir={abrir}
+        onCerrar={() => setAAbrir(null)}
       />
       <AnadirAListaDialog
         producto={paraLista}

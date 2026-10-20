@@ -195,6 +195,9 @@ model ProductoBase {
   unidadPorDefecto  Unidad
   /// Otros nombres ya normalizados (\"banana\" para Plátano): también vinculan.
   sinonimos         String[]          @default([])
+  /// Excepción al aviso de «abierto» de su categoría (días hasta amarillo y hasta rojo).
+  diasAvisoAmarillo Int?
+  diasAvisoRojo     Int?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
@@ -263,22 +266,27 @@ model Ubicacion {
 
 /// Una línea de la despensa: un producto en una ubicación con (o sin) caducidad.
 model InventoryItem {
-  id                 String            @id @db.Uuid
-  hogarId            String            @db.Uuid
-  nombre             String
-  nombreNormalizado  String
-  productoBaseId     String?           @db.Uuid
-  categoria          CategoriaProducto
-  ubicacionId        String            @db.Uuid
-  cantidadValor      Decimal           @db.Decimal(10, 3)
-  cantidadUnidad     Unidad
+  id                   String            @id @db.Uuid
+  hogarId              String            @db.Uuid
+  nombre               String
+  nombreNormalizado    String
+  productoBaseId       String?           @db.Uuid
+  categoria            CategoriaProducto
+  ubicacionId          String            @db.Uuid
+  cantidadValor        Decimal           @db.Decimal(10, 3)
+  cantidadUnidad       Unidad
   /// Tras la última entrada o ajuste, en la misma unidad: base de "queda poco".
-  cantidadReferencia Decimal           @db.Decimal(10, 3)
+  cantidadReferencia   Decimal           @db.Decimal(10, 3)
   /// Un día, sin hora (D2: opcional).
-  caducaEl           DateTime?         @db.Date
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
-  deletedAt          DateTime?
+  caducaEl             DateTime?         @db.Date
+  /// Día en que se abrió el paquete (null: cerrado). Avisa para revisar, no caduca.
+  abiertoEl            DateTime?         @db.Date
+  /// Días abierto hasta amarillo y hasta rojo, fijados al abrirlo (producto o categoría).
+  avisoAbiertoAmarillo Int?
+  avisoAbiertoRojo     Int?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  deletedAt            DateTime?
 
   hogar        Hogar                @relation(fields: [hogarId], references: [id], onDelete: Cascade)
   ubicacion    Ubicacion            @relation(fields: [ubicacionId], references: [id], onDelete: Restrict)

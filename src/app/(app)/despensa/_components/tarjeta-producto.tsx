@@ -1,12 +1,13 @@
 "use client";
 import { Menu } from "@base-ui/react/menu";
-import { MoreVertical, Pencil, ShoppingCart, Trash2 } from "lucide-react";
-import type { LineaDespensaResponse } from "@/contracts/pantry";
+import { MoreVertical, PackageOpen, Pencil, ShoppingCart, Trash2, Undo2 } from "lucide-react";
+import type { ColorAbiertoDto, LineaDespensaResponse } from "@/contracts/pantry";
+import { sePuedeAbrir } from "@/shared/kernel/abierto";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { formatDiaYMes } from "../../_components/fechas";
 import { formatCantidad } from "../../listas/[listId]/_components/format-cantidad";
-import { type ProductoDespensa, textoCaducidad } from "./vista-despensa";
+import { type ProductoDespensa, textoAbierto, textoCaducidad } from "./vista-despensa";
 
 type Props = {
   producto: ProductoDespensa;
@@ -16,6 +17,8 @@ type Props = {
   onEditar: (linea: LineaDespensaResponse) => void;
   onAnadirALista: (linea: LineaDespensaResponse) => void;
   onQuitar: (linea: LineaDespensaResponse) => void;
+  onAbrir: (linea: LineaDespensaResponse) => void;
+  onCerrarAbierto: (linea: LineaDespensaResponse) => void;
 };
 
 const COLOR: Record<LineaDespensaResponse["caducidad"]["estado"], string> = {
@@ -42,6 +45,29 @@ function Caducidad({ linea }: { linea: LineaDespensaResponse }) {
   );
 }
 
+const COLOR_ABIERTO: Record<ColorAbiertoDto, string> = {
+  verde: "bg-secondary text-secondary-foreground",
+  amarillo: "bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200",
+  rojo: "bg-destructive/10 text-destructive",
+};
+
+/** Paquete abierto: verde, amarillo («revísalo») o rojo según los días que lleva. */
+function Abierto({ linea }: { linea: LineaDespensaResponse }) {
+  const texto = textoAbierto(linea.abierto);
+  if (texto === null || linea.abierto === null) return null;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 self-start rounded-full px-2 py-0.5 text-xs font-semibold",
+        COLOR_ABIERTO[linea.abierto.color],
+      )}
+    >
+      <PackageOpen className="size-3.5" aria-hidden="true" />
+      {texto}
+    </span>
+  );
+}
+
 const opcion =
   "flex h-11 cursor-default items-center gap-3 rounded-lg px-3 text-base outline-none select-none data-[highlighted]:bg-muted";
 
@@ -50,6 +76,8 @@ function MenuLinea({
   onEditar,
   onAnadirALista,
   onQuitar,
+  onAbrir,
+  onCerrarAbierto,
 }: Omit<Props, "producto" | "detalle" | "onGastar"> & { linea: LineaDespensaResponse }) {
   return (
     <Menu.Root>
@@ -66,6 +94,18 @@ function MenuLinea({
               <Pencil className="size-5" aria-hidden="true" />
               Mover, fecha, categoría…
             </Menu.Item>
+            {linea.abierto === null && sePuedeAbrir(linea.categoria) && (
+              <Menu.Item className={opcion} onClick={() => onAbrir(linea)}>
+                <PackageOpen className="size-5" aria-hidden="true" />
+                Lo he abierto
+              </Menu.Item>
+            )}
+            {linea.abierto !== null && (
+              <Menu.Item className={opcion} onClick={() => onCerrarAbierto(linea)}>
+                <Undo2 className="size-5" aria-hidden="true" />
+                No está abierto
+              </Menu.Item>
+            )}
             <Menu.Item className={opcion} onClick={() => onAnadirALista(linea)}>
               <ShoppingCart className="size-5" aria-hidden="true" />
               Añadir a la lista
@@ -96,7 +136,12 @@ export function TarjetaProducto({ producto, detalle, onGastar, ...acciones }: Pr
             {detalle ? ` · ${detalle}` : ""}
             {principal.quedaPoco ? " · queda poco" : ""}
           </p>
-          {!varias && <Caducidad linea={principal} />}
+          {!varias && (
+            <div className="flex flex-wrap gap-1.5">
+              <Caducidad linea={principal} />
+              <Abierto linea={principal} />
+            </div>
+          )}
         </div>
         {!varias && (
           <>
@@ -113,11 +158,14 @@ export function TarjetaProducto({ producto, detalle, onGastar, ...acciones }: Pr
             <li key={l.id} className="flex items-center gap-2 py-1 pr-1 pl-3">
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="text-sm font-semibold">{formatCantidad(l.cantidad)}</span>
-                {l.caducaEl === null ? (
-                  <span className="text-xs text-muted-foreground">Sin fecha</span>
-                ) : (
-                  <Caducidad linea={l} />
-                )}
+                <div className="flex flex-wrap gap-1.5">
+                  {l.caducaEl === null && l.abierto === null ? (
+                    <span className="text-xs text-muted-foreground">Sin fecha</span>
+                  ) : (
+                    <Caducidad linea={l} />
+                  )}
+                  <Abierto linea={l} />
+                </div>
               </div>
               <Button
                 variant="outline"

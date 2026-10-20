@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { LineaDespensaResponse, UbicacionResponse } from "@/contracts/pantry";
-import { agruparDespensa, agruparEnProductos, textoCaducidad } from "./vista-despensa";
+import {
+  agruparDespensa,
+  agruparEnProductos,
+  esUrgente,
+  textoAbierto,
+  textoAvisos,
+  textoCaducidad,
+} from "./vista-despensa";
 
 const NEVERA = "0199c000-0000-7000-8000-0000000000e1";
 const ARMARIO = "0199c000-0000-7000-8000-0000000000e3";
@@ -31,6 +38,7 @@ function linea(
     quedaPoco: false,
     updatedAt: "2026-10-20T10:00:00.000Z",
     ...resto,
+    abierto: resto.abierto ?? null,
   };
 }
 
@@ -103,5 +111,41 @@ describe("textoCaducidad", () => {
     [6, "Caduca en 6 días"],
   ])("%s → %s", (dias, texto) => {
     expect(textoCaducidad({ estado: "ok", dias })).toBe(texto);
+  });
+});
+
+const abierto = (dias: number, color: "verde" | "amarillo" | "rojo") => ({
+  el: "2026-10-15",
+  dias,
+  color,
+  aviso: { amarillo: 3, rojo: 5 },
+});
+
+describe("abiertos", () => {
+  it("textoAbierto dice cuánto lleva y si hay que revisarlo", () => {
+    expect(textoAbierto(null)).toBeNull();
+    expect(textoAbierto(abierto(0, "verde"))).toBe("Abierto hoy");
+    expect(textoAbierto(abierto(1, "verde"))).toBe("Abierto ayer");
+    expect(textoAbierto(abierto(4, "amarillo"))).toBe("Abierto hace 4 días · revísalo");
+    expect(textoAbierto(abierto(6, "rojo"))).toBe("Abierto hace 6 días · mira si sigue bueno");
+  });
+
+  it("los abiertos en amarillo o rojo entran en «ver» y en el aviso", () => {
+    const lineas = [
+      linea("Jamón york", { abierto: abierto(4, "amarillo") }),
+      linea("Leche", { abierto: abierto(1, "verde") }),
+      linea("Yogur", { dias: 2 }),
+    ];
+    expect(lineas.filter(esUrgente).map((l) => l.nombre)).toEqual(["Jamón york", "Yogur"]);
+    expect(textoAvisos(lineas)).toBe("1 producto caduca esta semana · 1 abierto para revisar");
+    expect(textoAvisos(lineas.slice(1, 2))).toBeNull();
+  });
+
+  it("un abierto que se pone rojo antes que otra caducidad va primero", () => {
+    const [producto] = agruparEnProductos([
+      linea("Tomate frito", { dias: 30 }),
+      linea("Tomate frito", { abierto: abierto(4, "amarillo") }),
+    ]);
+    expect(producto?.principal.abierto?.dias).toBe(4);
   });
 });

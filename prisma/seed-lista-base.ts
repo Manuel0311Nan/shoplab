@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 import type { PrismaClient } from "../src/generated/prisma/client";
-import { LISTA_BASE, SINONIMOS } from "../src/domains/catalog/infrastructure/lista-base.data";
+import {
+  AVISO_ABIERTO,
+  LISTA_BASE,
+  SINONIMOS,
+} from "../src/domains/catalog/infrastructure/lista-base.data";
 import { normalizarNombre } from "../src/shared/kernel/texto";
 
 /** Espacio de nombres fijo para que cada producto tenga el mismo id en todas las BD. */
@@ -35,6 +39,8 @@ export async function sembrarListaBase(prisma: PrismaClient): Promise<number> {
           categoria: true,
           unidadPorDefecto: true,
           sinonimos: true,
+          diasAvisoAmarillo: true,
+          diasAvisoRojo: true,
         },
       })
     ).map((p) => [p.nombreNormalizado, p]),
@@ -45,6 +51,7 @@ export async function sembrarListaBase(prisma: PrismaClient): Promise<number> {
   for (const [nombre, categoria, unidad] of LISTA_BASE) {
     const nombreNormalizado = normalizarNombre(nombre);
     const sinonimos = (SINONIMOS[nombre] ?? []).map(normalizarNombre);
+    const [diasAvisoAmarillo, diasAvisoRojo] = AVISO_ABIERTO[nombre] ?? [null, null];
     const actual = existentes.get(nombreNormalizado);
     if (actual === undefined) {
       nuevos.push({
@@ -54,14 +61,26 @@ export async function sembrarListaBase(prisma: PrismaClient): Promise<number> {
         categoria,
         unidadPorDefecto: unidad,
         sinonimos,
+        diasAvisoAmarillo,
+        diasAvisoRojo,
       });
     } else if (
       actual.nombre !== nombre ||
       actual.categoria !== categoria ||
       actual.unidadPorDefecto !== unidad ||
-      actual.sinonimos.join("|") !== sinonimos.join("|")
+      actual.sinonimos.join("|") !== sinonimos.join("|") ||
+      actual.diasAvisoAmarillo !== diasAvisoAmarillo ||
+      actual.diasAvisoRojo !== diasAvisoRojo
     ) {
-      cambiados.push({ nombreNormalizado, nombre, categoria, unidadPorDefecto: unidad, sinonimos });
+      cambiados.push({
+        nombreNormalizado,
+        nombre,
+        categoria,
+        unidadPorDefecto: unidad,
+        sinonimos,
+        diasAvisoAmarillo,
+        diasAvisoRojo,
+      });
     }
   }
 

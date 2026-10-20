@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { CATEGORIAS } from "@/shared/kernel/categoria";
 import { normalizarNombre } from "@/shared/kernel/texto";
 import { UNIDADES } from "@/shared/kernel/unidad";
-import { LISTA_BASE, SINONIMOS } from "./lista-base.data";
+import { esAvisoAbiertoValido, sePuedeAbrir } from "@/shared/kernel/abierto";
+import { AVISO_ABIERTO, LISTA_BASE, SINONIMOS } from "./lista-base.data";
 
 describe("LISTA_BASE", () => {
   it("tieneAlMenos200Productos", () => {
@@ -37,6 +38,16 @@ describe("LISTA_BASE", () => {
         expect(vistos.has(n), sinonimo).toBe(false);
         vistos.add(n);
       }
+    }
+  });
+
+  it("avisoAbierto_DeProductosQueExisten_QueSeAbren_YConDiasValidos", () => {
+    const categorias = new Map(LISTA_BASE.map(([nombre, categoria]) => [nombre, categoria]));
+    for (const [producto, [amarillo, rojo]] of Object.entries(AVISO_ABIERTO)) {
+      const categoria = categorias.get(producto);
+      expect(categoria, producto).toBeDefined();
+      if (categoria !== undefined) expect(sePuedeAbrir(categoria), producto).toBe(true);
+      expect(esAvisoAbiertoValido({ amarillo, rojo }), producto).toBe(true);
     }
   });
 });

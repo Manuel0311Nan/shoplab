@@ -8,6 +8,7 @@ export const diaSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Usa el formato
 export const tipoUbicacionSchema = z.enum(["frio", "congelado", "ambiente"]);
 export const estadoCaducidadSchema = z.enum(["caducado", "pronto", "ok", "sin_fecha"]);
 export const motivoConsumoSchema = z.enum(["gastado", "tirado"]);
+export const colorAbiertoSchema = z.enum(["verde", "amarillo", "rojo"]);
 
 const nombreProducto = z
   .string()
@@ -34,6 +35,18 @@ export const lineaDespensaSchema = z.object({
   /** Calculado en el servidor, en hora del hogar: el cliente no recalcula "hoy". */
   caducidad: z.object({ estado: estadoCaducidadSchema, dias: z.number().int().nullable() }),
   quedaPoco: z.boolean(),
+  /**
+   * Paquete abierto (null: cerrado). No es caducidad: avisa para revisar si sigue bueno.
+   * Verde hasta aviso.amarillo días abierto, amarillo hasta aviso.rojo, rojo después.
+   */
+  abierto: z
+    .object({
+      el: diaSchema,
+      dias: z.number().int(),
+      color: colorAbiertoSchema,
+      aviso: z.object({ amarillo: z.number().int(), rojo: z.number().int() }),
+    })
+    .nullable(),
   updatedAt: z.iso.datetime(),
 });
 
@@ -80,15 +93,34 @@ export const updateStockRequestSchema = z
     categoria: categoriaSchema.optional(),
     /** Corrige el total. */
     cantidad: cantidadSchema.optional(),
+    /** Solo en una línea abierta: corrige el día en que se abrió, o null para cerrarla. */
+    abiertoEl: diaSchema.nullable().optional(),
   })
   .refine(
     (b) =>
       b.ubicacionId !== undefined ||
       b.caducaEl !== undefined ||
       b.categoria !== undefined ||
-      b.cantidad !== undefined,
+      b.cantidad !== undefined ||
+      b.abiertoEl !== undefined,
     { message: "Indica al menos un cambio" },
   );
+
+/**
+ * POST /pantry/items/{id}/open. Sin `abiertoEl`, hoy. Con varias unidades se abre una:
+ * va a su propia línea (`lineaNuevaId`, generable en el cliente para que un reintento
+ * no separe otra) y en la original queda el resto.
+ */
+export const openStockRequestSchema = z.object({
+  abiertoEl: diaSchema.optional(),
+  lineaNuevaId: z.uuid().optional(),
+});
+
+export const openStockResponseSchema = z.object({
+  abierta: lineaDespensaSchema,
+  /** La línea original con lo que queda cerrado; null si se abrió entera. */
+  resto: lineaDespensaSchema.nullable(),
+});
 
 /** POST /pantry/items/{id}/consume. Sin cantidad, todo lo que queda. */
 export const consumeStockRequestSchema = z.object({
@@ -134,6 +166,9 @@ export type StoreShoppingRequest = z.input<typeof storeShoppingRequestSchema>;
 export type StoreShoppingResponse = z.infer<typeof storeShoppingResponseSchema>;
 export type UpdateStockRequest = z.input<typeof updateStockRequestSchema>;
 export type ConsumeStockRequest = z.input<typeof consumeStockRequestSchema>;
+export type OpenStockRequest = z.input<typeof openStockRequestSchema>;
+export type OpenStockResponse = z.infer<typeof openStockResponseSchema>;
+export type ColorAbiertoDto = z.infer<typeof colorAbiertoSchema>;
 export type ConsumeStockResponse = z.infer<typeof consumeStockResponseSchema>;
 export type CreateUbicacionRequest = z.input<typeof createUbicacionRequestSchema>;
 export type UpdateUbicacionRequest = z.input<typeof updateUbicacionRequestSchema>;

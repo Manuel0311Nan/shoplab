@@ -385,3 +385,79 @@ export const SINONIMOS: Readonly<Record<string, readonly string[]>> = {
   "Alubias blancas": ["alubias", "judías blancas"],
   "Refresco de cola": ["cola"],
 };
+
+/**
+ * Excepciones al aviso de «abierto» de su categoría (kernel/abierto.ts): días abierto
+ * hasta amarillo y hasta rojo. Solo lo que se aparta mucho de su categoría: el tomate
+ * frito dura días aunque «Despensa» sean meses; los curados, semanas aunque
+ * «Charcutería» sean días. Orientativo: la app dice «revísalo», nunca «tíralo».
+ */
+export const AVISO_ABIERTO: Readonly<Record<string, readonly [amarillo: number, rojo: number]>> = {
+  // Charcutería curada
+  "Jamón serrano": [10, 21],
+  "Jamón ibérico": [10, 21],
+  Chorizo: [10, 21],
+  Salchichón: [10, 21],
+  "Lomo embuchado": [10, 21],
+  Fuet: [10, 21],
+  // Lácteos y huevos
+  "Queso curado": [14, 28],
+  "Queso semicurado": [10, 21],
+  "Queso tierno": [5, 10],
+  "Queso rallado": [7, 14],
+  "Queso de untar": [7, 14],
+  "Queso fresco": [2, 4],
+  "Queso de Burgos": [2, 4],
+  Mozzarella: [2, 4],
+  Requesón: [2, 4],
+  Mantequilla: [21, 42],
+  Huevos: [14, 28],
+  "Bebida de avena": [4, 7],
+  "Bebida de soja": [4, 7],
+  "Bebida de almendras": [4, 7],
+  // Pescado
+  "Salmón ahumado": [2, 4],
+  "Atún en lata": [1, 2],
+  "Sardinas en lata": [1, 2],
+  "Berberechos en lata": [1, 2],
+  // Panadería
+  "Pan de barra": [1, 3],
+  "Pan rallado": [30, 60],
+  Picos: [14, 30],
+  Tostadas: [14, 30],
+  "Copos de avena": [60, 120],
+  "Cereales de desayuno": [30, 60],
+  Galletas: [14, 30],
+  "Tortillas de trigo": [5, 10],
+  Magdalenas: [3, 6],
+  "Bollería variada": [2, 4],
+  // Despensa
+  "Tomate triturado": [3, 5],
+  "Tomate frito": [3, 5],
+  "Caldo de pollo": [3, 5],
+  "Caldo de verduras": [3, 5],
+  "Garbanzos cocidos": [2, 4],
+  "Lentejas cocidas": [2, 4],
+  Mayonesa: [30, 60],
+  Ketchup: [30, 60],
+  Mostaza: [30, 90],
+  Mermelada: [21, 45],
+  Aceitunas: [10, 21],
+  "Café molido": [14, 30],
+  "Café en grano": [21, 45],
+  Chocolate: [30, 60],
+  Levadura: [30, 90],
+  Miel: [180, 365],
+  "Salsa de soja": [90, 180],
+  // Bebidas
+  "Refresco de cola": [2, 4],
+  "Refresco de limón": [2, 4],
+  "Agua con gas": [2, 4],
+  Cerveza: [1, 2],
+  "Cerveza sin alcohol": [1, 2],
+  "Agua mineral": [5, 10],
+  "Vino tinto": [3, 5],
+  "Vino blanco": [3, 5],
+  // Congelados
+  Helado: [30, 60],
+};

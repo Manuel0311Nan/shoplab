@@ -1,8 +1,12 @@
 import type { ProductoBaseRepository } from "@/domains/catalog/application/ports/producto-base-repository";
 import { compararProductos, type ProductoBase } from "@/domains/catalog/domain/producto-base";
+import type { AvisoAbierto } from "@/shared/kernel/abierto";
 import { normalizarNombre } from "@/shared/kernel/texto";
 
-export type ProductoBaseConSinonimos = ProductoBase & { readonly sinonimos?: readonly string[] };
+export type ProductoBaseConSinonimos = ProductoBase & {
+  readonly sinonimos?: readonly string[];
+  readonly avisoAbierto?: AvisoAbierto;
+};
 
 export class InMemoryProductoBaseRepository implements ProductoBaseRepository {
   constructor(private readonly productos: readonly ProductoBaseConSinonimos[] = []) {}
@@ -23,6 +27,10 @@ export class InMemoryProductoBaseRepository implements ProductoBaseRepository {
         (x.sinonimos ?? []).some((s) => normalizarNombre(s) === nombreNormalizado),
     );
     return p ? sinSinonimos(p) : null;
+  }
+
+  async avisoAbierto(id: string): Promise<AvisoAbierto | null> {
+    return this.productos.find((x) => x.id === id)?.avisoAbierto ?? null;
   }
 }
 

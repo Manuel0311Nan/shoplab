@@ -46,6 +46,14 @@ export const PantryErrors = {
 
   categoriaNoValida: () => validationError("CATEGORIA_NO_VALIDA", "Esa categoría no existe"),
 
+  yaAbierta: () => conflictError("LINEA_YA_ABIERTA", "Este paquete ya está abierto"),
+
+  noEstaAbierta: () =>
+    validationError("LINEA_NO_ABIERTA", "Ese producto no está abierto: ábrelo primero"),
+
+  noSeAbre: () =>
+    validationError("NO_SE_ABRE", "Este producto no se marca como abierto (fruta, verdura…)"),
+
   tipoNoValido: () =>
     validationError("TIPO_NO_VALIDO", "El tipo debe ser frío, congelado o ambiente"),
 };

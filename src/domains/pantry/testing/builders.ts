@@ -67,6 +67,8 @@ export function linea(cambios: Partial<InventoryItemSnapshot> = {}): InventoryIt
     cantidad: c,
     cantidadReferencia: c,
     caducaEl: null,
+    abiertoEl: null,
+    avisoAbierto: null,
     createdAt: AHORA,
     updatedAt: AHORA,
     deletedAt: null,
