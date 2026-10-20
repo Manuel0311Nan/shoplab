@@ -72,6 +72,7 @@ src/
     _lib/<contexto>/    → mappers dominio → DTO, compartidos por API, actions y páginas
     _lib/auth/          → authClient (navegador), rutaSegura, mensajes de error de login
     (auth)/             → /login, /registro, /bienvenida (sin cabecera de la app)
+    (marketing)/        → / home pública; con sesión válida redirige a /listas
     api/_lib/           → apiRoute(), parse, Result → HTTP
     api/v1/.../route.ts → API pública (rutas en inglés: /api/v1/lists)
     actions/            → Server Actions (solo web), delgadas
@@ -256,7 +257,7 @@ con hogar activo en el `AuthContext`>
   (403 → la web manda a `/bienvenida`). Ambas con `cache()`; leen cookie o
   Bearer sin distinguir. Hogar activo: el más antiguo (`elegirHogarActivo`).
 - Protección en dos capas: `middleware.ts` solo mira si existe la cookie
-  (sin ella, a `/login`; runtime Node); la seguridad real es `getAuthContext()`
+  (sin ella, a `/login`; runtime Node; públicas: `/`, `/login`, `/registro`); la seguridad real es `getAuthContext()`
   / `getIdentity()` en cada página, Server Action y endpoint. El middleware
   nunca saca de `/login` por tener cookie: con una caducada habría bucle.
 - Login y registro desde el navegador con `authClient` (acción de cliente en
@@ -408,6 +409,13 @@ del seed>
    `categorias`, `despensa`), volver a sembrar (sinónimos), probar en el
    móvil y PR. Plan y decisiones D1–D9 en el documento «Migas · Plan de la
    vista Despensa».
+
+- Home pública (`/`, `(marketing)`): hecha. Textos del «Plan de marketing —
+  Migas»; capturas reales en `(marketing)/_img` (rehacerlas si cambian las
+  pantallas). «Cómo funciona» es un carrusel con scroll-snap (móvil y
+  ordenador); su paso 4, Recetas, es una maqueta (`recetas-mock.tsx`) hasta
+  que exista la vista. Premium sale como «Próximamente» con el precio de
+  hipótesis del plan.
 
 Plan completo y orden en la guía de vistas (`docs/shoplab-guia-vista.pdf`).
 Antes de empezar una vista nueva, preguntar a Manuel.

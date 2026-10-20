@@ -12,7 +12,7 @@ const PRONTO = [{ nombre: "Recetas", icono: BookOpen }] as const;
  */
 export function BarraInferior() {
   const ruta = usePathname();
-  const enListas = ruta === "/" || ruta.startsWith("/listas");
+  const enListas = ruta.startsWith("/listas");
   const enDespensa = ruta.startsWith("/despensa");
 
   return (

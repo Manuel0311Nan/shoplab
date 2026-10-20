@@ -24,8 +24,12 @@ const inicial: Estado = { error: null, campos: {}, email: "" };
  * `<form action>` + `useActionState` con una acción de CLIENTE: llama a
  * `/api/v1/auth/sign-in/email` desde el navegador, así el login pasa por el
  * límite de peticiones (una Server Action con `auth.api` se lo saltaría).
+ * `Titulo`: h1 en /login; h2 cuando el formulario va dentro de otra página (la home).
  */
-export function LoginForm({ destino }: Readonly<{ destino: string }>) {
+export function LoginForm({
+  destino,
+  Titulo = "h1",
+}: Readonly<{ destino: string; Titulo?: "h1" | "h2" }>) {
   const router = useRouter();
 
   const [estado, accion] = useActionState(async (_: Estado, formData: FormData) => {
@@ -51,7 +55,7 @@ export function LoginForm({ destino }: Readonly<{ destino: string }>) {
 
   return (
     <form action={accion} noValidate className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Entrar</h1>
+      <Titulo className="text-2xl font-bold">Entrar</Titulo>
       <ErrorFormulario mensaje={estado.error} />
       <Campo
         etiqueta="Email"
