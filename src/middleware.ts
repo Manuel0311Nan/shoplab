@@ -1,8 +1,8 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
-/** Pantallas que se ven sin sesión. El resto exige al menos la cookie. */
-const PUBLICAS = ["/login", "/registro"];
+/** Pantallas que se ven sin sesión (la home pública y el acceso). El resto exige al menos la cookie. */
+const PUBLICAS = ["/", "/login", "/registro"];
 
 /**
  * Capa 1 de la protección de rutas: sin cookie de sesión, directo a /login,
@@ -23,7 +23,7 @@ export function middleware(request: NextRequest) {
   }
 
   const login = new URL("/login", request.url);
-  if (pathname !== "/") login.searchParams.set("next", `${pathname}${search}`);
+  login.searchParams.set("next", `${pathname}${search}`);
   return NextResponse.redirect(login);
 }
 
