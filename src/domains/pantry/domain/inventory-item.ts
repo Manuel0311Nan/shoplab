@@ -116,10 +116,9 @@ export class InventoryItem {
     contexto: ContextoMovimiento,
     ahora: Date,
   ): Result<{ item: InventoryItem; movimiento: MovimientoSnapshot }> {
-    const nombre = input.nombre.trim().replace(/\s+/g, " ");
-    if (nombre.length === 0 || nombre.length > MAX_NOMBRE_PRODUCTO) {
-      return err(PantryErrors.nombreNoValido(MAX_NOMBRE_PRODUCTO));
-    }
+    const limpio = nombreDeProducto(input.nombre);
+    if (!limpio.ok) return limpio;
+    const nombre = limpio.value;
     const item = new InventoryItem({
       id: input.id,
       nombre,
@@ -148,6 +147,9 @@ export class InventoryItem {
   }
   get cantidad(): Cantidad {
     return this.state.cantidad;
+  }
+  get nombre(): string {
+    return this.state.nombre;
   }
   get ubicacionId(): string {
     return this.state.ubicacionId;
@@ -225,6 +227,40 @@ export class InventoryItem {
       movimiento: this.movimiento(tipo, gastada, contexto, ahora),
       agotada: resto === 0,
     });
+  }
+
+  /**
+   * «Deshacer» un gasto o un desecho recién hecho: devuelve lo gastado con un ajuste.
+   * Si se había acabado, la línea vuelve; si se quitó por otro motivo (se juntó con otra,
+   * se dio de baja), ya no se puede.
+   */
+  deshacerConsumo(
+    consumo: MovimientoSnapshot,
+    contexto: ContextoMovimiento,
+    ahora: Date,
+  ): Result<MovimientoSnapshot> {
+    const esConsumo = consumo.tipo === "consumo" || consumo.tipo === "desecho";
+    if (!esConsumo || consumo.inventoryItemId !== this.state.id) {
+      return err(PantryErrors.noSePuedeDeshacer());
+    }
+    const devuelta = convertirCantidad(consumo.cantidad, this.state.cantidad.unidad);
+    if (devuelta === null) return err(PantryErrors.noSePuedeDeshacer());
+
+    let total: Cantidad;
+    if (this.state.deletedAt !== null) {
+      // Se acabó con este mismo consumo (misma marca de tiempo): vuelve con lo gastado.
+      if (this.state.deletedAt.getTime() !== consumo.createdAt.getTime()) {
+        return err(PantryErrors.noSePuedeDeshacer());
+      }
+      total = devuelta;
+    } else {
+      const suma = sumarCantidades([this.state.cantidad, devuelta], this.state.cantidad.unidad);
+      if (suma === null) return err(PantryErrors.noSePuedeDeshacer());
+      total = suma;
+    }
+    // Sin tocar la referencia de «queda poco»: es la misma compra.
+    this.state = { ...this.state, cantidad: total, deletedAt: null, updatedAt: ahora };
+    return ok(this.movimiento("ajuste", total, contexto, ahora));
   }
 
   /** Corrección a mano: "eran 3, no 4". Puede cambiar de unidad. */
@@ -312,6 +348,20 @@ export class InventoryItem {
     this.state = { ...this.state, categoria, updatedAt: ahora };
   }
 
+  /** Otro nombre (y su vínculo con la lista base): corregir o estandarizar. */
+  renombrar(nombre: string, productoBaseId: string | null, ahora: Date): Result<void> {
+    const limpio = nombreDeProducto(nombre);
+    if (!limpio.ok) return limpio;
+    this.state = {
+      ...this.state,
+      nombre: limpio.value,
+      nombreNormalizado: normalizarNombre(limpio.value),
+      productoBaseId,
+      updatedAt: ahora,
+    };
+    return ok(undefined);
+  }
+
   /**
    * D8: queda poco cuando, tras gastar, queda 1 ud. o, en g, kg, ml o l, el 20 % o menos
    * de lo que entró por última vez. Algo recién comprado nunca "queda poco", aunque sea
@@ -347,4 +397,13 @@ export class InventoryItem {
       createdAt: ahora,
     };
   }
+}
+
+/** Nombre de un producto de la despensa: espacios simples, ni vacío ni demasiado largo. */
+export function nombreDeProducto(nombre: string): Result<string> {
+  const limpio = nombre.trim().replace(/\s+/g, " ");
+  if (limpio.length === 0 || limpio.length > MAX_NOMBRE_PRODUCTO) {
+    return err(PantryErrors.nombreNoValido(MAX_NOMBRE_PRODUCTO));
+  }
+  return ok(limpio);
 }

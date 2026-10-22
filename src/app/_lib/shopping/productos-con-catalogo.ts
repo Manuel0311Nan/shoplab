@@ -12,7 +12,8 @@ import type { Result } from "@/shared/kernel/result";
  * sí. Lo usan igual la API y las Server Actions.
  *
  * Al añadir: el catálogo resuelve vínculo y categoría (lista base, sinónimo, memoria
- * del hogar u «otros»), y después el texto libre se apunta en la memoria del hogar.
+ * del hogar u «otros»), y después el texto libre se apunta en la memoria del hogar,
+ * igual que el pack con el que se compra.
  */
 export async function anadirProducto(
   auth: AuthContext,
@@ -31,21 +32,50 @@ export async function anadirProducto(
       }
     : input;
 
-  const result = await shoppingModule(auth).addItem.execute(datos);
+  const shopping = shoppingModule(auth);
+  const result = await shopping.addItem.execute(datos);
   if (result.ok && result.value.productoBaseId === null) {
     await recordar(auth, result.value, "uso");
+  }
+  if (result.ok) {
+    try {
+      await shopping.recordarPack.execute({
+        nombre: input.nombre,
+        unidad: input.cantidad.unidad,
+        unidadesPorPack: input.unidadesPorPack ?? null,
+      });
+    } catch (error) {
+      console.error("[shopping] no se pudo recordar el pack", error);
+    }
   }
   return result;
 }
 
-/** PATCH de un ítem; si cambia la categoría, el hogar la recuerda para la próxima vez. */
+/**
+ * PATCH de un ítem; si cambia la categoría, el hogar la recuerda para la próxima vez.
+ * Al renombrar, el catálogo vincula el nombre nuevo y, si no se eligió categoría, la
+ * decide; el texto libre nuevo se apunta en la memoria del hogar.
+ */
 export async function actualizarProducto(
   auth: AuthContext,
   input: UpdateItemInput,
 ): Promise<Result<ShoppingItemSnapshot>> {
-  const result = await shoppingModule(auth).updateItem.execute(input);
+  let datos = input;
+  if (input.producto !== undefined) {
+    const resuelto = await catalogHogarModule(auth).resolverProducto.execute(input.producto);
+    if (resuelto.ok) {
+      datos = {
+        ...input,
+        producto: { nombre: input.producto.nombre, productoBaseId: resuelto.value.productoBaseId },
+        categoria: input.categoria ?? resuelto.value.categoria,
+      };
+    }
+  }
+  const result = await shoppingModule(auth).updateItem.execute(datos);
   if (result.ok && input.categoria !== undefined) {
     await recordar(auth, result.value, "categoria");
+  } else if (result.ok && input.producto !== undefined && result.value.productoBaseId === null) {
+    await recordar(auth, result.value, "uso");
   }
   return result;
 }

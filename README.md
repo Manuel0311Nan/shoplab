@@ -21,13 +21,24 @@ consumirán otros clientes, como una futura app móvil (proyecto aparte).
   cantidad y unidad, marcar como comprado, autocompletado con una lista
   base de 328 productos y aviso de productos repetidos (unir sumando
   g↔kg y ml↔l, o añadir aparte). Las listas archivadas se borran solas
-  a los 15 días. Orden por tienda/pasillo (más adelante).
+  a los 15 días. Una **lista general** reúne todas las listas: lo que
+  cambias o quitas en ella se cambia en su lista, y lo que añades ahí se
+  queda solo en ella. Los productos se pueden añadir por **packs** (p. ej.
+  yogures de 4 en 4); Migas recuerda cómo compras cada producto y te propone
+  el pack la próxima vez. Orden por tienda/pasillo (más adelante).
 - **Despensa**: qué hay en casa, cuánto, en qué ubicación (configurables
-  por hogar) y, si se quiere, cuándo caduca, con aviso de lo que caduca esta
+  por hogar; cada producto se propone donde lo guardaste la última vez) y, si se quiere, cuándo caduca, con aviso de lo que caduca esta
   semana. Al terminar la compra se ofrece guardarla en la despensa, y lo
   que se acaba vuelve a la lista con un toque. Los paquetes abiertos avisan en
   verde, amarillo o rojo según los días que llevan abiertos, para revisar si
   siguen buenos.
+- **Gastar con un toque**: «−1» resta una unidad al momento (mantén pulsado
+  para gastar varias o tirar); en g, kg, ml o l, atajos de ¼, ½ y todo. Un
+  aviso abajo permite deshacer y, si se acaba, añadirlo a la lista.
+- **Mis productos**: lo que has escrito a mano, para corregir nombres, unir
+  duplicados («Yogures proteina» y «Yogur proteína») y fijar categoría, unidad
+  y pack; el cambio llega a todas tus listas y a la despensa. También se puede
+  renombrar un producto desde su tarjeta en la lista o en la despensa.
 - **Categorías**: cada producto tiene la suya; la lista se agrupa en el
   orden del súper y la despensa por ubicación o por categoría. El hogar
   recuerda cómo clasifica lo que escribe a mano.

@@ -5,7 +5,11 @@ import {
   type MovimientoSnapshot,
 } from "@/domains/pantry/domain/inventory-item";
 import { PantryErrors } from "@/domains/pantry/domain/pantry-errors";
-import { type UbicacionSnapshot, ubicacionPropuesta } from "@/domains/pantry/domain/ubicacion";
+import {
+  type UbicacionRecordada,
+  type UbicacionSnapshot,
+  ubicacionParaProducto,
+} from "@/domains/pantry/domain/ubicacion";
 import { Cantidad } from "@/shared/kernel/cantidad";
 import { type Categoria, esCategoria, tipoDeUbicacion } from "@/shared/kernel/categoria";
 import { Dia } from "@/shared/kernel/dia";
@@ -18,7 +22,7 @@ export interface ProductoEntrante {
   readonly nombre: string;
   readonly productoBaseId?: string | null;
   readonly categoria: string;
-  /** Sin ella, se propone por la categoría (D3). */
+  /** Sin ella: donde lo guardó el hogar la última vez o, si no, por la categoría (D3). */
   readonly ubicacionId?: string;
   readonly cantidad: { readonly valor: number; readonly unidad: string };
   /** AAAA-MM-DD, opcional (D2). */
@@ -40,11 +44,14 @@ interface EntradaValidada {
  */
 export class Despensa {
   private readonly cambiadas = new Map<string, InventoryItem>();
+  private readonly aRecordar = new Map<string, string>();
   readonly movimientos: MovimientoSnapshot[] = [];
 
   constructor(
     private readonly lineas: InventoryItem[],
     private readonly ubicaciones: readonly UbicacionSnapshot[],
+    /** Memoria del hogar: nombre normalizado → última ubicación elegida. */
+    private readonly recordadas: ReadonlyMap<string, string> = new Map(),
   ) {}
 
   validar(producto: ProductoEntrante): Result<EntradaValidada> {
@@ -61,7 +68,11 @@ export class Despensa {
 
     const ubicacion = producto.ubicacionId
       ? this.ubicaciones.find((u) => u.id === producto.ubicacionId)
-      : ubicacionPropuesta(this.ubicaciones, tipoDeUbicacion(producto.categoria));
+      : ubicacionParaProducto(
+          this.ubicaciones,
+          this.recordadas.get(normalizarNombre(producto.nombre)),
+          tipoDeUbicacion(producto.categoria),
+        );
     if (ubicacion === undefined) return err(PantryErrors.ubicacionNoEncontrada());
 
     return ok({
@@ -83,6 +94,8 @@ export class Despensa {
     const entrada = this.validar(producto);
     if (!entrada.ok) return entrada;
     const e = entrada.value;
+    // Solo se recuerda el sitio elegido; el propuesto ya sale de la memoria o la categoría.
+    if (producto.ubicacionId !== undefined) this.recordarUbicacion(e.nombre, e.ubicacionId);
 
     const igual = this.lineas.find((l) =>
       l.esMismaLinea({
@@ -123,6 +136,19 @@ export class Despensa {
     this.registrar(otra, entrada.value);
     this.registrar(linea, linea.darDeBaja({ id: newId(), usuarioId }, ahora));
     return ok(otra);
+  }
+
+  /** El usuario ha elegido dónde guardar este producto: la próxima vez se propone ahí. */
+  recordarUbicacion(nombre: string, ubicacionId: string): void {
+    const clave = normalizarNombre(nombre);
+    if (clave !== "") this.aRecordar.set(clave, ubicacionId);
+  }
+
+  ubicacionesARecordar(): UbicacionRecordada[] {
+    return [...this.aRecordar].map(([nombreNormalizado, ubicacionId]) => ({
+      nombreNormalizado,
+      ubicacionId,
+    }));
   }
 
   lineasCambiadas(): InventoryItem[] {

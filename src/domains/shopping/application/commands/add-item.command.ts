@@ -29,6 +29,8 @@ export interface AddItemInput {
   readonly unidadFinal?: string;
   /** Respuesta a UNIDADES_DISTINTAS cuando no se pueden convertir: el total exacto. */
   readonly cantidadFinal?: CantidadInput;
+  /** Por packs: unidades de cada pack (la cantidad llega ya en unidades). */
+  readonly unidadesPorPack?: number | null;
 }
 
 /**
@@ -62,6 +64,7 @@ export class AddItemCommand {
         cantidad: cantidad.value,
         nota: input.nota,
         productoBaseId: input.productoBaseId ?? null,
+        unidadesPorPack: input.unidadesPorPack ?? null,
         ...(input.categoria === undefined ? {} : { categoria: input.categoria }),
       },
       this.clock.now(),

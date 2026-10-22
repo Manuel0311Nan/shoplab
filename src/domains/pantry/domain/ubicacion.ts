@@ -107,10 +107,31 @@ export function mismoNombre(a: string, b: string): boolean {
  * Dónde proponer guardar algo: la primera ubicación (por orden) del tipo que pide su
  * categoría y, si el hogar no tiene ninguna de ese tipo, la primera de todas.
  */
-export function ubicacionPropuesta(
-  ubicaciones: readonly UbicacionSnapshot[],
+export function ubicacionPropuesta<U extends Pick<UbicacionSnapshot, "tipo" | "orden">>(
+  ubicaciones: readonly U[],
   tipo: TipoUbicacion,
-): UbicacionSnapshot | undefined {
+): U | undefined {
   const ordenadas = [...ubicaciones].sort((a, b) => a.orden - b.orden);
   return ordenadas.find((u) => u.tipo === tipo) ?? ordenadas.at(0);
+}
+
+/** Memoria del hogar: dónde se guardó un producto la última vez que se eligió sitio. */
+export interface UbicacionRecordada {
+  /** Clave dentro del hogar: normalizarNombre(nombre). */
+  readonly nombreNormalizado: string;
+  readonly ubicacionId: string;
+}
+
+/**
+ * Dónde proponer guardar un producto: donde lo guardó el hogar la última vez, si esa
+ * ubicación sigue existiendo; si no, la propuesta por su categoría. Lo usan el servidor
+ * y los formularios.
+ */
+export function ubicacionParaProducto<U extends Pick<UbicacionSnapshot, "id" | "tipo" | "orden">>(
+  ubicaciones: readonly U[],
+  recordadaId: string | undefined,
+  tipo: TipoUbicacion,
+): U | undefined {
+  const recordada = ubicaciones.find((u) => u.id === recordadaId);
+  return recordada ?? ubicacionPropuesta(ubicaciones, tipo);
 }

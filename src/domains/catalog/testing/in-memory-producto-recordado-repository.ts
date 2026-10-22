@@ -18,6 +18,10 @@ export class InMemoryProductoRecordadoRepository implements ProductoRecordadoRep
       .slice(0, limite);
   }
 
+  async borrar(nombreNormalizado: string): Promise<void> {
+    this.store.delete(nombreNormalizado);
+  }
+
   async guardar(producto: ProductoRecordado): Promise<void> {
     this.store.set(producto.nombreNormalizado, producto);
   }

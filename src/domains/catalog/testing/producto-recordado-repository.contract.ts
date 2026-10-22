@@ -33,6 +33,15 @@ export function productoRecordadoRepositoryContract(nombre: string, crear: Crear
       });
     });
 
+    it("borrar_LoOlvidaYSiNoEstaNoFalla", async () => {
+      const repo = await crear([recordado()]);
+
+      await repo.borrar("tarta de la abuela");
+      await repo.borrar("nada");
+
+      expect(await repo.buscar("tarta de la abuela")).toBeNull();
+    });
+
     it("listar_LoMasUsadoPrimeroYRespetaElLimite", async () => {
       const repo = await crear([
         recordado({ nombreNormalizado: "a", nombre: "A", usos: 1, ultimoUso: AHORA }),

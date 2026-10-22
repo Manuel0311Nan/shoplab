@@ -13,13 +13,15 @@ model Hogar {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  miembros            MiembroHogar[]
-  listas              ShoppingList[] // ← nuevo
-  shoppingItems       ShoppingItem[]
-  productosRecordados ProductoRecordado[]
-  ubicaciones         Ubicacion[]
-  inventario          InventoryItem[]
-  movimientosDespensa MovimientoDespensa[]
+  miembros              MiembroHogar[]
+  listas                ShoppingList[] // ← nuevo
+  shoppingItems         ShoppingItem[]
+  productosRecordados   ProductoRecordado[]
+  ubicaciones           Ubicacion[]
+  inventario            InventoryItem[]
+  movimientosDespensa   MovimientoDespensa[]
+  packsRecordados       PackRecordado[]
+  ubicacionesRecordadas UbicacionRecordada[]
 }
 
 model Usuario {
@@ -124,6 +126,9 @@ model ShoppingList {
   hogarId     String         @db.Uuid
   nombre      String
   archivadaAt DateTime?
+  /// La lista general del hogar: una por hogar. Enseña sus productos y los de todas las
+  /// listas activas; no se archiva ni se borra y no cuenta para el límite de 15.
+  general     Boolean        @default(false)
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   deletedAt   DateTime?
@@ -136,30 +141,47 @@ model ShoppingList {
 }
 
 model ShoppingItem {
-  id             String            @id @default(uuid(7)) @db.Uuid
-  hogarId        String            @db.Uuid
-  listaId        String            @db.Uuid
-  nombre         String
-  ingredientId   String?           @db.Uuid
+  id              String            @id @default(uuid(7)) @db.Uuid
+  hogarId         String            @db.Uuid
+  listaId         String            @db.Uuid
+  nombre          String
+  ingredientId    String?           @db.Uuid
   /// Producto de la lista base elegido al autocompletar (null si se escribió a mano).
-  productoBaseId String?           @db.Uuid
+  productoBaseId  String?           @db.Uuid
   /// Para agrupar la lista por el recorrido del súper.
-  categoria      CategoriaProducto @default(otros)
-  cantidadValor  Decimal           @db.Decimal(10, 3)
-  cantidadUnidad Unidad
-  nota           String?
-  compradoAt     DateTime?
-  compradoPorId  String?           @db.Uuid
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  deletedAt      DateTime?
-  hogar          Hogar             @relation(fields: [hogarId], references: [id], onDelete: Cascade)
-  lista          ShoppingList      @relation(fields: [listaId], references: [id], onDelete: Cascade)
-  compradoPor    Usuario?          @relation(fields: [compradoPorId], references: [id], onDelete: SetNull)
-  productoBase   ProductoBase?     @relation(fields: [productoBaseId], references: [id], onDelete: SetNull)
+  categoria       CategoriaProducto @default(otros)
+  cantidadValor   Decimal           @db.Decimal(10, 3)
+  cantidadUnidad  Unidad
+  /// Si se añadió por packs: unidades de cada pack (la cantidad va siempre en unidades).
+  unidadesPorPack Int?
+  nota            String?
+  compradoAt      DateTime?
+  compradoPorId   String?           @db.Uuid
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  deletedAt       DateTime?
+  hogar           Hogar             @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+  lista           ShoppingList      @relation(fields: [listaId], references: [id], onDelete: Cascade)
+  compradoPor     Usuario?          @relation(fields: [compradoPorId], references: [id], onDelete: SetNull)
+  productoBase    ProductoBase?     @relation(fields: [productoBaseId], references: [id], onDelete: SetNull)
 
   @@index([listaId, deletedAt])
   @@index([hogarId, updatedAt])
+}
+
+/// Memoria del hogar: cómo compra cada producto por packs (de cuántas unidades y si la
+/// última vez fue por packs). Propone el pack al añadirlo a una lista.
+model PackRecordado {
+  hogarId           String   @db.Uuid
+  nombreNormalizado String
+  unidadesPorPack   Int
+  /// La última vez que se añadió en unidades, ¿fue por packs?
+  enPack            Boolean
+  updatedAt         DateTime @updatedAt
+
+  hogar Hogar @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+
+  @@id([hogarId, nombreNormalizado])
 }
 
 // ─── Catalog ────────────────────────────────────────────────────────────────
@@ -258,10 +280,26 @@ model Ubicacion {
   updatedAt DateTime      @updatedAt
   deletedAt DateTime?
 
-  hogar      Hogar           @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+  hogar      Hogar                @relation(fields: [hogarId], references: [id], onDelete: Cascade)
   inventario InventoryItem[]
+  recordadas UbicacionRecordada[]
 
   @@index([hogarId, deletedAt, orden])
+}
+
+/// Memoria del hogar: dónde se guardó cada producto la última vez que se eligió sitio.
+/// Al borrar la ubicación pasa a la de destino (o se olvida y se propone por categoría).
+model UbicacionRecordada {
+  hogarId           String   @db.Uuid
+  nombreNormalizado String
+  ubicacionId       String   @db.Uuid
+  updatedAt         DateTime @updatedAt
+
+  hogar     Hogar     @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+  ubicacion Ubicacion @relation(fields: [ubicacionId], references: [id], onDelete: Cascade)
+
+  @@id([hogarId, nombreNormalizado])
+  @@index([ubicacionId])
 }
 
 /// Una línea de la despensa: un producto en una ubicación con (o sin) caducidad.

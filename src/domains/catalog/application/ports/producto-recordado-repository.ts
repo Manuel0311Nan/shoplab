@@ -7,4 +7,6 @@ export interface ProductoRecordadoRepository {
   listar(limite: number): Promise<ProductoRecordado[]>;
   /** Crea o reemplaza la entrada de ese nombre. */
   guardar(producto: ProductoRecordado): Promise<void>;
+  /** Deja de recordarlo (si no estaba, no hace nada). */
+  borrar(nombreNormalizado: string): Promise<void>;
 }

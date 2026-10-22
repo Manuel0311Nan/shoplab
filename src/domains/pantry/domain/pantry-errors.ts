@@ -44,6 +44,12 @@ export const PantryErrors = {
 
   sinCambios: () => validationError("SIN_CAMBIOS", "Indica al menos un cambio"),
 
+  movimientoNoEncontrado: () =>
+    notFoundError("MOVIMIENTO_NO_ENCONTRADO", "No encontramos ese gasto para deshacerlo"),
+
+  noSePuedeDeshacer: () =>
+    conflictError("NO_SE_PUEDE_DESHACER", "Ya no se puede deshacer: corrige la cantidad a mano"),
+
   categoriaNoValida: () => validationError("CATEGORIA_NO_VALIDA", "Esa categoría no existe"),
 
   yaAbierta: () => conflictError("LINEA_YA_ABIERTA", "Este paquete ya está abierto"),

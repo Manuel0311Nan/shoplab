@@ -31,7 +31,8 @@ export async function anadirFaltantesAction(
   });
   if (!result.ok) return result;
 
-  revalidatePath(`/listas/${result.value.listaId}`);
+  // Todas las listas: la general enseña los productos de cada una.
+  revalidatePath("/listas/[listId]", "page");
   revalidatePath("/listas");
   return ok(result.value);
 }

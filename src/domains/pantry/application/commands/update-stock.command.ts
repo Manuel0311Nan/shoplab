@@ -1,4 +1,7 @@
-import type { InventoryItemSnapshot } from "@/domains/pantry/domain/inventory-item";
+import {
+  type InventoryItemSnapshot,
+  nombreDeProducto,
+} from "@/domains/pantry/domain/inventory-item";
 import { PantryErrors } from "@/domains/pantry/domain/pantry-errors";
 import { Cantidad } from "@/shared/kernel/cantidad";
 import { esCategoria } from "@/shared/kernel/categoria";
@@ -19,6 +22,8 @@ export interface UpdateStockInput {
   readonly cantidad?: { readonly valor: number; readonly unidad: string };
   /** Solo en una línea abierta: otro día de apertura, o null para cerrarla. */
   readonly abiertoEl?: string | null;
+  /** Renombrar (corregir el nombre o vincularlo a otro producto de la lista base). */
+  readonly producto?: { readonly nombre: string; readonly productoBaseId: string | null };
   readonly usuarioId: string;
 }
 
@@ -39,12 +44,17 @@ export class UpdateStockCommand {
       input.caducaEl === undefined &&
       input.categoria === undefined &&
       input.cantidad === undefined &&
-      input.abiertoEl === undefined
+      input.abiertoEl === undefined &&
+      input.producto === undefined
     ) {
       return err(PantryErrors.sinCambios());
     }
     if (input.categoria !== undefined && !esCategoria(input.categoria)) {
       return err(PantryErrors.categoriaNoValida());
+    }
+    if (input.producto !== undefined) {
+      const nombre = nombreDeProducto(input.producto.nombre);
+      if (!nombre.ok) return nombre;
     }
     let caducaEl: Dia | null | undefined;
     if (input.caducaEl !== undefined) {
@@ -89,12 +99,19 @@ export class UpdateStockCommand {
     if (input.categoria !== undefined && esCategoria(input.categoria)) {
       linea.cambiarCategoria(input.categoria, ahora);
     }
+    if (input.producto !== undefined) {
+      // Ya validado arriba: no falla.
+      linea.renombrar(input.producto.nombre, input.producto.productoBaseId, ahora);
+    }
     if (caducaEl !== undefined) linea.cambiarCaducidad(caducaEl, ahora);
     if (abiertoEl !== undefined) {
       const apertura = linea.cambiarApertura(abiertoEl, ahora);
       if (!apertura.ok) return apertura;
     }
-    if (input.ubicacionId !== undefined) linea.mover(input.ubicacionId, ahora);
+    if (input.ubicacionId !== undefined) {
+      linea.mover(input.ubicacionId, ahora);
+      despensa.recordarUbicacion(linea.nombre, input.ubicacionId);
+    }
     despensa.registrar(
       linea,
       cantidad === undefined
@@ -108,6 +125,7 @@ export class UpdateStockCommand {
     await this.despensa.guardar({
       lineas: despensa.lineasCambiadas(),
       movimientos: despensa.movimientos,
+      recordar: despensa.ubicacionesARecordar(),
     });
     return ok(queda.value.toSnapshot());
   }

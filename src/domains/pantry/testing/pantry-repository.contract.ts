@@ -108,5 +108,56 @@ export function pantryRepositoryContract(nombre: string, crear: CrearRepositorio
       expect((await repo.listarUbicaciones()).map((u) => u.id)).not.toContain(NEVERA_ID);
       expect((await repo.findLinea(LINEA_ID))?.ubicacionId).toBe(ARMARIO_ID);
     });
+
+    it("buscarMovimiento_ConSuLineaAunqueEsteDeBaja", async () => {
+      const repo = await crear({ ubicaciones: ubicacionesPorDefecto(), lineas: [] });
+      const l = linea({ cantidad: cantidad(1, "unidad") });
+      await repo.guardar({ lineas: [l] });
+      const r = l.consumir(undefined, "gastado", contexto(40), AHORA);
+      if (!r.ok) throw new Error("debería consumir");
+      await repo.guardar({ lineas: [l], movimientos: [r.value.movimiento] });
+
+      const encontrado = await repo.buscarMovimiento(idN(40));
+
+      expect(encontrado?.movimiento).toMatchObject({
+        id: idN(40),
+        tipo: "consumo",
+        inventoryItemId: LINEA_ID,
+        cantidad: { valor: 1, unidad: "unidad" },
+      });
+      expect(encontrado?.linea.toSnapshot().deletedAt).not.toBeNull();
+      expect(await repo.buscarMovimiento(idN(41))).toBeNull();
+    });
+
+    it("memoria_RecordarReubicarYOlvidar", async () => {
+      const repo = await crear({ ubicaciones: ubicacionesPorDefecto(), lineas: [] });
+      expect((await repo.ubicacionesRecordadas()).size).toBe(0);
+
+      await repo.guardar({
+        recordar: [
+          { nombreNormalizado: "macarrones", ubicacionId: NEVERA_ID },
+          { nombreNormalizado: "arroz", ubicacionId: ARMARIO_ID },
+        ],
+      });
+      await repo.guardar({
+        recordar: [{ nombreNormalizado: "macarrones", ubicacionId: ARMARIO_ID }],
+      });
+      expect(Object.fromEntries(await repo.ubicacionesRecordadas())).toEqual({
+        macarrones: ARMARIO_ID,
+        arroz: ARMARIO_ID,
+      });
+
+      await repo.guardar({ reubicarRecordadas: { desde: ARMARIO_ID, hacia: NEVERA_ID } });
+      expect(Object.fromEntries(await repo.ubicacionesRecordadas())).toEqual({
+        macarrones: NEVERA_ID,
+        arroz: NEVERA_ID,
+      });
+
+      await repo.guardar({ olvidar: ["arroz"] });
+      expect([...(await repo.ubicacionesRecordadas()).keys()]).toEqual(["macarrones"]);
+
+      await repo.guardar({ reubicarRecordadas: { desde: NEVERA_ID, hacia: null } });
+      expect((await repo.ubicacionesRecordadas()).size).toBe(0);
+    });
   });
 }

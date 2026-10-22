@@ -1,7 +1,7 @@
 import { Minus, Plus } from "lucide-react";
 import type { CantidadDto } from "@/contracts/shopping";
 import { Button } from "@/shared/ui/button";
-import { formatCantidad, pasoDe } from "./format-cantidad";
+import { formatCantidadItem, pasoDe } from "./format-cantidad";
 
 // 40 px visibles + un área invisible que llega a 44 px (objetivo táctil mínimo).
 const TACTIL =
@@ -13,10 +13,18 @@ type Props = {
   cantidad: CantidadDto;
   onChange: (cantidad: CantidadDto) => void;
   disabled?: boolean;
+  /** Por packs: el paso es un pack entero. */
+  unidadesPorPack?: number | null;
 };
 
-export function QuantityStepper({ nombre, cantidad, onChange, disabled = false }: Props) {
-  const paso = pasoDe(cantidad.unidad);
+export function QuantityStepper({
+  nombre,
+  cantidad,
+  onChange,
+  disabled = false,
+  unidadesPorPack = null,
+}: Props) {
+  const paso = unidadesPorPack ?? pasoDe(cantidad.unidad);
   const cambiar = (delta: number) =>
     onChange({ ...cantidad, valor: Math.round((cantidad.valor + delta) * 1000) / 1000 });
   return (
@@ -32,7 +40,7 @@ export function QuantityStepper({ nombre, cantidad, onChange, disabled = false }
         <Minus aria-hidden="true" />
       </Button>
       <span className="min-w-0 flex-1 truncate text-center text-sm font-semibold tabular-nums">
-        {formatCantidad(cantidad)}
+        {formatCantidadItem(cantidad, unidadesPorPack)}
       </span>
       <Button
         variant="ghost"

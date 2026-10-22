@@ -173,7 +173,12 @@ hay en casa: cantidad, caducidad, ubicación).
   (`AVISO_ABIERTO`) o de su categoría (`AVISO_ABIERTO_POR_CATEGORIA`);
   fruta, verdura, limpieza e higiene no se abren. Con varias unidades se
   abre una: se separa en su línea (ajustes, no compra ni consumo). Abierta
-  y cerrada son líneas distintas: la compra nunca suma en una abierta
+  y cerrada son líneas distintas: la compra nunca suma en una abierta.
+  Memoria de ubicación (`UbicacionRecordada`, por nombre normalizado): se
+  apunta cuando el usuario elige sitio (alta, guardar la compra, mover). Se
+  propone con `ubicacionParaProducto` (la recordada si sigue viva; si no, por
+  categoría), en el servidor y en los formularios. Al borrar una ubicación lo
+  recordado pasa al destino de sus productos o, si estaba vacía, se olvida
 - **Catalog (hoy)**: `ProductoBase`, la lista base global (328 productos
   y sus sinónimos en `lista-base.data.ts`, cargados por `prisma db seed`
   sin transacción larga e ids UUID v5), y `ProductoRecordado`, la memoria
@@ -181,7 +186,18 @@ hay en casa: cantidad, caducidad, ubicación).
   3): lista y despensa guardan el nombre escrito + `productoBaseId`
   opcional; `ResolverProductoQuery` vincula (elegido, nombre o sinónimo de
   la lista base) y decide la categoría (memoria del hogar, lista base u
-  «otros»). Se descarga entero y se filtra en el cliente
+  «otros»). Se descarga entero y se filtra en el cliente.
+  Editar nombres: un ítem o una línea se renombra con `producto` en su PATCH
+  (el catálogo vincula y decide la categoría). «Mis productos» (`/productos`,
+  `app/_lib/catalog/mis-productos.ts`) muestra el texto libre del hogar y
+  estandariza en todo el hogar: `EstandarizarProductoCommand` (memoria; al
+  unir suma usos, al vincular a la lista base olvida el texto libre),
+  `RenombrarEnListasCommand` (listas activas), `RenombrarEnDespensaCommand`
+  (despensa, junta líneas iguales y mueve la ubicación recordada) y
+  `EditarPackCommand`. No es una transacción entre contextos: el orden es
+  memoria → listas → despensa → pack y se puede repetir sin daño. Los posibles
+  duplicados salen de `claveParecida` (sin plurales, tildes, palabras vacías
+  ni orden)
 - **Categorías**: las 15 de la lista base + «otros», en el kernel y en el
   orden del súper (`compararCategorias`). Cada línea de lista y despensa
   guarda la suya y se puede cambiar; cambiarla la recuerda el hogar
@@ -197,7 +213,20 @@ hay en casa: cantidad, caducidad, ubicación).
   Un ítem tiene `nombre` libre + `productoBaseId` y categoría (ver Catalog),
   cantidad obligatoria (la UI propone 1 ud.) y
   `compradoAt` en lugar de booleano. Comprado y cantidad se cambian con
-  un único `UpdateItemCommand` (PATCH atómico)
+  un único `UpdateItemCommand` (PATCH atómico).
+  Lista general (`ShoppingList.general`): una por hogar, la crea el alta
+  del hogar (y la migración para los existentes). Va primero, no se archiva
+  ni se borra (`LISTA_GENERAL`) y no cuenta para el límite de 15. Su vista
+  (`vistaGeneral`) junta sus ítems con los de todas las activas; cada ítem
+  lleva `listaId`/`listaNombre` y las acciones van a la lista de origen, así
+  que cambiar o quitar en una se ve en la otra. Lo añadido en la general solo
+  vive ahí. Terminar compra en la general termina todas («conservarPendientes»).
+  Packs: se guardan en unidades con `unidadesPorPack` (2..100, solo con
+  unidad «unidad»); el stepper sube de pack en pack y si la cantidad deja de
+  ser un número entero de packs se quita el pack. Memoria de packs
+  (`PackRecordado`, por nombre normalizado): cada alta apunta el tamaño y si
+  fue por packs (`packTrasAlta`); los formularios (lista y «Añadir a la
+  lista» de la despensa) proponen el pack con `propuestaDeUnidad`
 - **Recipes** (vista 4): biblioteca global de solo lectura (`Receta`,
   `RecetaIngrediente`). Cada ingrediente nombra productos de la lista base
   que lo cubren (alternativas, el primero es el que se compra), cantidad
@@ -361,6 +390,16 @@ Recetas escritas para Migas: no copiar textos de webs ni de libros.
 - No guardar caducidades como instante: son `Dia` (`@db.Date`), y «hoy» se
   calcula con `hoyEn(ZONA_HOGAR, clock)` en el servidor.
 - No cambiar la cantidad de una línea de despensa sin su movimiento.
+- No guardar «pack» como unidad: son unidades + `unidadesPorPack`.
+- No hacer que falle una operación por la memoria del hogar (packs, ubicaciones,
+  productos recordados): se lee y escribe en `try/catch` y se sigue.
+- No revalidar `/listas/${id}`: con la lista general hay que revalidar
+  `revalidatePath("/listas/[listId]", "page")`.
+- No pedir confirmación para gastar: «−1» (en unidades) y los atajos ¼ · ½ · todo
+  se aplican al momento; el aviso flotante ofrece «Deshacer»
+  (`DeshacerConsumoCommand`, ajuste con margen de `MINUTOS_PARA_DESHACER`) y,
+  si se acaba o queda poco, «A la lista» con el pack recordado. Nada de diálogos
+  que interrumpan tras gastar.
 - No tratar «abierto» como caducidad ni decir «tíralo»: es un aviso para
   revisar. Los días se cambian en la lista base o en el kernel, no en la UI.
 - No importar un repositorio de otro contexto: orquestador en `app/_lib`.

@@ -1,8 +1,13 @@
 import "server-only";
 import { AvisoAbiertoQuery } from "@/domains/catalog/application/queries/aviso-abierto.query";
+import {
+  EstandarizarProductoCommand,
+  OlvidarProductoCommand,
+} from "@/domains/catalog/application/commands/estandarizar-producto.command";
 import { RecordarProductoCommand } from "@/domains/catalog/application/commands/recordar-producto.command";
 import { ListBaseProductsQuery } from "@/domains/catalog/application/queries/list-base-products.query";
 import { ListHouseholdProductsQuery } from "@/domains/catalog/application/queries/list-household-products.query";
+import { MisProductosQuery } from "@/domains/catalog/application/queries/mis-productos.query";
 import { ResolverProductoQuery } from "@/domains/catalog/application/queries/resolver-producto.query";
 import type { AuthContext } from "@/shared/kernel/auth-context";
 import { systemClock } from "@/shared/kernel/clock";
@@ -26,6 +31,9 @@ export function catalogHogarModule(auth: Pick<AuthContext, "hogarId">) {
     resolverProducto: new ResolverProductoQuery(base, recordados),
     recordarProducto: new RecordarProductoCommand(recordados, systemClock),
     listHouseholdProducts: new ListHouseholdProductsQuery(recordados),
+    misProductos: new MisProductosQuery(base, recordados),
+    estandarizarProducto: new EstandarizarProductoCommand(recordados, systemClock),
+    olvidarProducto: new OlvidarProductoCommand(recordados),
   };
 }
 

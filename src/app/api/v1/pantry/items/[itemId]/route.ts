@@ -21,6 +21,7 @@ export const PATCH = apiRoute(
       ...(body.categoria === undefined ? {} : { categoria: body.categoria }),
       ...(body.cantidad === undefined ? {} : { cantidad: body.cantidad }),
       ...(body.abiertoEl === undefined ? {} : { abiertoEl: body.abiertoEl }),
+      ...(body.producto === undefined ? {} : { producto: body.producto }),
     });
     return resultResponse(mapResult(result, toLineaDesdeSnapshot));
   },

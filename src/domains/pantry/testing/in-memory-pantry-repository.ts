@@ -14,6 +14,8 @@ export class InMemoryPantryRepository implements PantryRepository {
   private readonly ubicaciones = new Map<string, UbicacionSnapshot>();
   private readonly lineas = new Map<string, InventoryItemSnapshot>();
   readonly movimientos = new Map<string, MovimientoSnapshot>();
+  /** Memoria del hogar: nombre normalizado → ubicación. */
+  readonly recordadas = new Map<string, string>();
   guardados = 0;
 
   constructor(
@@ -42,14 +44,37 @@ export class InMemoryPantryRepository implements PantryRepository {
     return l === undefined || l.deletedAt !== null ? null : InventoryItem.rehydrate(l);
   }
 
+  async buscarMovimiento(
+    id: string,
+  ): Promise<{ movimiento: MovimientoSnapshot; linea: InventoryItem } | null> {
+    const movimiento = this.movimientos.get(id);
+    const linea = movimiento && this.lineas.get(movimiento.inventoryItemId);
+    if (movimiento === undefined || linea === undefined) return null;
+    return { movimiento, linea: InventoryItem.rehydrate(linea) };
+  }
+
   async existeMovimiento(id: string): Promise<boolean> {
     return this.movimientos.has(id);
+  }
+
+  async ubicacionesRecordadas(): Promise<ReadonlyMap<string, string>> {
+    return new Map(this.recordadas);
   }
 
   async guardar(cambios: CambiosDespensa): Promise<void> {
     for (const u of cambios.ubicaciones ?? []) this.ubicaciones.set(u.id, u.toSnapshot());
     for (const l of cambios.lineas ?? []) this.lineas.set(l.id, l.toSnapshot());
     for (const m of cambios.movimientos ?? []) this.movimientos.set(m.id, m);
+    for (const r of cambios.recordar ?? []) this.recordadas.set(r.nombreNormalizado, r.ubicacionId);
+    for (const nombre of cambios.olvidar ?? []) this.recordadas.delete(nombre);
+    const cambio = cambios.reubicarRecordadas;
+    if (cambio !== undefined) {
+      for (const [nombre, ubicacionId] of this.recordadas) {
+        if (ubicacionId !== cambio.desde) continue;
+        if (cambio.hacia === null) this.recordadas.delete(nombre);
+        else this.recordadas.set(nombre, cambio.hacia);
+      }
+    }
     this.guardados += 1;
   }
 

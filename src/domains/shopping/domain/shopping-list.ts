@@ -10,6 +10,8 @@ export interface ShoppingListSnapshot {
   readonly id: string;
   readonly nombre: string;
   readonly archivadaAt: Date | null;
+  /** La lista general del hogar: reúne sus productos y los de todas las activas. */
+  readonly general: boolean;
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly deletedAt: Date | null;
@@ -20,6 +22,13 @@ export interface CambiosItem {
   readonly cantidad?: Cantidad;
   readonly comprado?: boolean;
   readonly categoria?: Categoria;
+  /** Otro nombre y su vínculo con la lista base (ya validado con nombreDeItem). */
+  readonly producto?: ProductoDeItem;
+}
+
+export interface ProductoDeItem {
+  readonly nombre: string;
+  readonly productoBaseId: string | null;
 }
 
 /**
@@ -55,6 +64,7 @@ export function limiteDeCaducidad(ahora: Date): Date {
 export interface NewShoppingList {
   readonly id: string;
   readonly nombre: string;
+  readonly general?: boolean;
 }
 
 function validarNombre(nombre: string): Result<string> {
@@ -83,6 +93,7 @@ export class ShoppingList {
           id: input.id,
           nombre: nombre.value,
           archivadaAt: null,
+          general: input.general ?? false,
           createdAt: ahora,
           updatedAt: ahora,
           deletedAt: null,
@@ -102,6 +113,10 @@ export class ShoppingList {
 
   get nombre(): string {
     return this.state.nombre;
+  }
+
+  get esGeneral(): boolean {
+    return this.state.general;
   }
 
   get estaArchivada(): boolean {
@@ -197,7 +212,32 @@ export class ShoppingList {
       if (cambios.comprado === true) item.marcarComprado(usuarioId, ahora);
       if (cambios.comprado === false) item.desmarcarComprado(ahora);
       if (cambios.categoria !== undefined) item.cambiarCategoria(cambios.categoria, ahora);
+      if (cambios.producto !== undefined) {
+        item.renombrar(cambios.producto.nombre, cambios.producto.productoBaseId, ahora);
+      }
     });
+  }
+
+  /**
+   * Estandarizar: todos los ítems activos que se llaman `desde` (nombre normalizado)
+   * pasan a llamarse como `hacia`, con su vínculo y su categoría. Devuelve cuántos.
+   */
+  renombrarProducto(
+    desde: string,
+    hacia: ProductoDeItem & { readonly categoria: Categoria },
+    ahora: Date,
+  ): Result<number> {
+    if (this.estaArchivada) return ok(0);
+    let cambiados = 0;
+    for (const item of this.itemsActivos()) {
+      if (normalizarNombre(item.nombre) !== desde) continue;
+      const r = item.renombrar(hacia.nombre, hacia.productoBaseId, ahora);
+      if (!r.ok) return r;
+      item.cambiarCategoria(hacia.categoria, ahora);
+      this.registrarCambio(item.id, ahora);
+      cambiados += 1;
+    }
+    return ok(cambiados);
   }
 
   quitarItem(itemId: string, ahora: Date): Result<ShoppingItem> {

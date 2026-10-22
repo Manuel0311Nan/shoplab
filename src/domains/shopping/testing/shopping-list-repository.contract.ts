@@ -68,6 +68,40 @@ export function shoppingListRepositoryContract(
       expect(await repo.contarActivas()).toBe(2);
     });
 
+    it("listaGeneral_VaPrimero_NoCuentaParaElLimite_YReuneLasActivasConItems", async () => {
+      const repo = await crear([
+        listaCon({ id: listaId(1), nombre: "Mercadona", updatedAt: minutos(10) }, [item()]),
+        listaCon({ id: listaId(2), nombre: "General", general: true, updatedAt: AHORA }),
+        listaCon({ id: listaId(3), nombre: "Archivada", archivadaAt: AHORA }),
+      ]);
+
+      expect((await repo.listarActivas()).map((l) => [l.nombre, l.general])).toEqual([
+        ["General", true],
+        ["Mercadona", false],
+      ]);
+      expect(await repo.contarActivas()).toBe(1);
+      const conItems = await repo.listarActivasConItems();
+      expect(conItems.map((l) => [l.nombre, l.itemsActivos().length])).toEqual([
+        ["General", 0],
+        ["Mercadona", 1],
+      ]);
+    });
+
+    it("save_ItemPorPacks_SeRecuperaConUnidadesPorPack", async () => {
+      const repo = await crear([lista()]);
+      const l = await repo.findById(LISTA_ID);
+      if (l === null) throw new Error("sin lista");
+      const r = l.agregarItem(
+        { id: ITEM_ID, nombre: "Yogur", cantidad: cantidad(8, "unidad"), unidadesPorPack: 4 },
+        DESPUES,
+      );
+      expect(r.ok).toBe(true);
+
+      await repo.save(l);
+
+      expect((await repo.findById(LISTA_ID))?.itemsActivos()[0]?.unidadesPorPack).toBe(4);
+    });
+
     it("listarActivas_MismaFecha_DesempataPorIdDescendente", async () => {
       const repo = await crear([listaCon({ id: listaId(1) }), listaCon({ id: listaId(2) })]);
 
@@ -172,6 +206,7 @@ export function shoppingListRepositoryContract(
         id: LISTA_ID,
         nombre: "Semana",
         archivadaAt: null,
+        general: false,
         createdAt: AHORA,
         updatedAt: AHORA,
         deletedAt: null,
@@ -197,6 +232,7 @@ export function shoppingListRepositoryContract(
         productoBaseId: null,
         categoria: "otros",
         cantidad: { valor: 1.5, unidad: "l" },
+        unidadesPorPack: null,
         nota: "Sin lactosa",
         compradoAt: null,
         compradoPorId: null,

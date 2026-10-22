@@ -16,10 +16,16 @@ export interface ResumenLista extends ShoppingListSnapshot {
  */
 export interface ShoppingListRepository {
   findById(id: string): Promise<ShoppingList | null>;
-  /** Todas las activas (máximo 15), la última modificada primero. Sin paginar. */
+  /**
+   * Todas las activas (máximo 15 más la general), la general primero y después la última
+   * modificada. Sin paginar.
+   */
   listarActivas(): Promise<ResumenLista[]>;
+  /** Las activas con sus ítems, para la lista general (que las reúne a todas). */
+  listarActivasConItems(): Promise<ShoppingList[]>;
   /** Archivadas vigentes, la última archivada primero, a partir del cursor. */
   listarArchivadas(opciones: { despuesDe?: Cursor; limite: number }): Promise<ResumenLista[]>;
+  /** Activas que cuentan para el límite de 15: todas menos la general. */
   contarActivas(): Promise<number>;
   save(list: ShoppingList): Promise<void>;
   /** Guarda varias listas en una sola transacción: todo o nada (intercambio de D5). */

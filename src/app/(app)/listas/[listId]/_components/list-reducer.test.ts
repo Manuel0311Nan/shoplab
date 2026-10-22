@@ -5,6 +5,7 @@ const leche: ShoppingItemResponse = {
   id: "0199c000-0000-7000-8000-0000000000aa",
   nombre: "Leche",
   cantidad: { valor: 2, unidad: "l" },
+  unidadesPorPack: null,
   nota: null,
   ingredientId: null,
   productoBaseId: null,
@@ -16,6 +17,26 @@ describe("aplicarAccion", () => {
   it("aplicarAccion_Comprado_MarcaSoloEseItem", () => {
     const result = aplicarAccion([leche], { tipo: "comprado", itemId: leche.id, comprado: true });
     expect(result[0]?.compradoAt).not.toBeNull();
+  });
+  it("aplicarAccion_Renombrar_CambiaNombreYVinculo", () => {
+    const result = aplicarAccion([leche], {
+      tipo: "renombrar",
+      itemId: leche.id,
+      nombre: "Leche entera",
+      productoBaseId: "0199c000-0000-7000-8000-0000000000cc",
+    });
+    expect(result[0]).toMatchObject({
+      nombre: "Leche entera",
+      productoBaseId: "0199c000-0000-7000-8000-0000000000cc",
+    });
+    expect(
+      aplicarAccion([leche], {
+        tipo: "renombrar",
+        itemId: "otro",
+        nombre: "X",
+        productoBaseId: null,
+      }),
+    ).toEqual([leche]);
   });
   it("aplicarAccion_Quitar_EliminaElItem", () => {
     const result = aplicarAccion([leche], { tipo: "quitar", itemId: leche.id });

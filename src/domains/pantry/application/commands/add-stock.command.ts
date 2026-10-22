@@ -23,13 +23,15 @@ export class AddStockCommand {
     // Reintento de un alta que ya entró: no se repite.
     if (await this.despensa.existeMovimiento(movimientoId)) return ok(null);
 
-    const [lineas, ubicaciones] = await Promise.all([
+    const [lineas, ubicaciones, recordadas] = await Promise.all([
       this.despensa.listarLineas(),
       this.despensa.listarUbicaciones(),
+      this.despensa.ubicacionesRecordadas(),
     ]);
     const despensa = new Despensa(
       lineas,
       ubicaciones.map((u) => u.toSnapshot()),
+      recordadas,
     );
 
     const linea = despensa.dar(
@@ -42,6 +44,7 @@ export class AddStockCommand {
     await this.despensa.guardar({
       lineas: despensa.lineasCambiadas(),
       movimientos: despensa.movimientos,
+      recordar: despensa.ubicacionesARecordar(),
     });
     return ok(linea.value.toSnapshot());
   }

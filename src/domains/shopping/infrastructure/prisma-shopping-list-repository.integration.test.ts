@@ -10,9 +10,11 @@ import {
   LISTA_ID,
   USUARIO_ID,
 } from "@/domains/shopping/testing/builders";
+import { packRecordadoRepositoryContract } from "@/domains/shopping/testing/pack-recordado-repository.contract";
 import { shoppingListRepositoryContract } from "@/domains/shopping/testing/shopping-list-repository.contract";
 import { prisma } from "@/shared/kernel/prisma";
 import { PrismaListasCaducadasRepository } from "./prisma-listas-caducadas-repository";
+import { PrismaPackRecordadoRepository } from "./prisma-pack-recordado-repository";
 import { PrismaShoppingListRepository } from "./prisma-shopping-list-repository";
 
 // Hogares propios de esta suite (ids fijos: la rama de test es solo para tests).
@@ -98,5 +100,29 @@ describe("PrismaListasCaducadasRepository", () => {
       select: { deletedAt: true },
     });
     expect(filas.map((f) => f.deletedAt)).toEqual([DESPUES, null, null]);
+  });
+});
+
+packRecordadoRepositoryContract("Prisma", async (iniciales) => {
+  await prisma.packRecordado.deleteMany({ where: { hogarId: { in: [HOGAR_ID, OTRO_HOGAR_ID] } } });
+  const repo = new PrismaPackRecordadoRepository({ hogarId: HOGAR_ID });
+  for (const p of iniciales) await repo.guardar(p);
+  return repo;
+});
+
+describe("PrismaPackRecordadoRepository: aislamiento entre hogares", () => {
+  it("buscar_PackDeOtroHogar_DevuelveNull", async () => {
+    await prisma.packRecordado.deleteMany({
+      where: { hogarId: { in: [HOGAR_ID, OTRO_HOGAR_ID] } },
+    });
+    await new PrismaPackRecordadoRepository({ hogarId: OTRO_HOGAR_ID }).guardar({
+      nombreNormalizado: "solo del otro",
+      unidadesPorPack: 6,
+      enPack: true,
+    });
+
+    const mio = new PrismaPackRecordadoRepository({ hogarId: HOGAR_ID });
+    expect(await mio.buscar("solo del otro")).toBeNull();
+    expect(await mio.listar()).toEqual([]);
   });
 });

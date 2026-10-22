@@ -170,6 +170,15 @@ export function MisListasScreen({ estado, pagina }: Props) {
             <TarjetaLista
               key={lista.id}
               lista={lista}
+              // La general cuenta lo de todas las listas activas (incluida ella).
+              {...(lista.general
+                ? {
+                    resumenGeneral: {
+                      pendientes: listas.reduce((n, l) => n + l.pendientes, 0),
+                      total: listas.reduce((n, l) => n + l.total, 0),
+                    },
+                  }
+                : {})}
               onRenombrar={(nombre) =>
                 ejecutar({ tipo: "renombrar", id: lista.id, nombre }, () =>
                   actualizarListaAction(lista.id, { nombre }),

@@ -11,9 +11,11 @@ export const TENANT_MODELS: ReadonlySet<Prisma.ModelName> = new Set<Prisma.Model
   "ShoppingList",
   "ShoppingItem",
   "ProductoRecordado",
+  "PackRecordado",
   "Ubicacion",
   "InventoryItem",
   "MovimientoDespensa",
+  "UbicacionRecordada",
 ]);
 
 /** Modelos con `hogarId` que NO se filtran automáticamente, y por qué. */

@@ -13,6 +13,7 @@ export class DeleteShoppingListCommand {
   async execute(input: { readonly listId: string }): Promise<Result<void>> {
     const list = await this.lists.findById(input.listId);
     if (list === null) return err(ShoppingErrors.listaNoEncontrada());
+    if (list.esGeneral) return err(ShoppingErrors.listaGeneral());
 
     list.eliminar(this.clock.now());
     await this.lists.save(list);

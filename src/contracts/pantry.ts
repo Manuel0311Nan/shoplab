@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { categoriaSchema } from "./categoria";
-import { cantidadSchema } from "./shopping";
+import { cantidadSchema, productoEditadoSchema } from "./shopping";
 
 /** Un día sin hora: AAAA-MM-DD. El dominio comprueba que existe (no 30 de febrero). */
 export const diaSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Usa el formato AAAA-MM-DD");
@@ -95,6 +95,8 @@ export const updateStockRequestSchema = z
     cantidad: cantidadSchema.optional(),
     /** Solo en una línea abierta: corrige el día en que se abrió, o null para cerrarla. */
     abiertoEl: diaSchema.nullable().optional(),
+    /** Renombrar: el nombre nuevo y, si se eligió en el autocompletado, su producto base. */
+    producto: productoEditadoSchema.optional(),
   })
   .refine(
     (b) =>
@@ -102,6 +104,7 @@ export const updateStockRequestSchema = z
       b.caducaEl !== undefined ||
       b.categoria !== undefined ||
       b.cantidad !== undefined ||
+      b.producto !== undefined ||
       b.abiertoEl !== undefined,
     { message: "Indica al menos un cambio" },
   );
@@ -135,6 +138,12 @@ export const consumeStockResponseSchema = z.object({
   avisarLista: z.boolean(),
 });
 
+/**
+ * POST /pantry/movements/{id}/undo: «Deshacer» un gasto o desecho recién hecho (unos
+ * minutos de margen). `id` es el del ajuste, generable en el cliente.
+ */
+export const deshacerConsumoRequestSchema = z.object({ id: z.uuid() });
+
 export const createUbicacionRequestSchema = z.object({
   id: z.uuid().optional(),
   nombre: nombreUbicacion,
@@ -166,6 +175,7 @@ export type StoreShoppingRequest = z.input<typeof storeShoppingRequestSchema>;
 export type StoreShoppingResponse = z.infer<typeof storeShoppingResponseSchema>;
 export type UpdateStockRequest = z.input<typeof updateStockRequestSchema>;
 export type ConsumeStockRequest = z.input<typeof consumeStockRequestSchema>;
+export type DeshacerConsumoRequest = z.input<typeof deshacerConsumoRequestSchema>;
 export type OpenStockRequest = z.input<typeof openStockRequestSchema>;
 export type OpenStockResponse = z.infer<typeof openStockResponseSchema>;
 export type ColorAbiertoDto = z.infer<typeof colorAbiertoSchema>;

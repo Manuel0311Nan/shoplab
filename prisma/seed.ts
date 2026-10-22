@@ -65,6 +65,15 @@ async function main() {
     create: { id: DEV_LISTA_ID, hogarId: DEV_HOGAR_ID, nombre: "Lista de la compra" },
   });
 
+  // La lista general del hogar (la migración la crea para los hogares que ya existían).
+  if (
+    (await prisma.shoppingList.count({ where: { hogarId: DEV_HOGAR_ID, general: true } })) === 0
+  ) {
+    await prisma.shoppingList.create({
+      data: { hogarId: DEV_HOGAR_ID, nombre: "Lista general", general: true },
+    });
+  }
+
   await sembrarListaBase(prisma);
   // Después de la lista base: los ingredientes apuntan a sus productos.
   await sembrarRecetas(prisma);

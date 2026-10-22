@@ -28,6 +28,10 @@ export class PrismaProductoRecordadoRepository
     });
   }
 
+  async borrar(nombreNormalizado: string): Promise<void> {
+    await this.db.productoRecordado.deleteMany({ where: { nombreNormalizado } });
+  }
+
   async guardar(producto: ProductoRecordado): Promise<void> {
     const { nombreNormalizado, ...datos } = producto;
     await this.db.productoRecordado.upsert({

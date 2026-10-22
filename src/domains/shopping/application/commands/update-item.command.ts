@@ -1,5 +1,5 @@
 import { ShoppingErrors } from "@/domains/shopping/domain/shopping-errors";
-import type { ShoppingItemSnapshot } from "@/domains/shopping/domain/shopping-item";
+import { nombreDeItem, type ShoppingItemSnapshot } from "@/domains/shopping/domain/shopping-item";
 import type { CambiosItem } from "@/domains/shopping/domain/shopping-list";
 import { Cantidad } from "@/shared/kernel/cantidad";
 import { esCategoria } from "@/shared/kernel/categoria";
@@ -14,6 +14,8 @@ export interface UpdateItemInput {
   readonly cantidad?: { readonly valor: number; readonly unidad: string };
   readonly comprado?: boolean;
   readonly categoria?: string;
+  /** Renombrar (corregir el nombre o vincularlo a otro producto de la lista base). */
+  readonly producto?: { readonly nombre: string; readonly productoBaseId: string | null };
 }
 
 /**
@@ -51,7 +53,8 @@ export class UpdateItemCommand {
     if (
       input.cantidad === undefined &&
       input.comprado === undefined &&
-      input.categoria === undefined
+      input.categoria === undefined &&
+      input.producto === undefined
     ) {
       return err(ShoppingErrors.sinCambios());
     }
@@ -61,6 +64,15 @@ export class UpdateItemCommand {
     if (input.categoria !== undefined) {
       if (!esCategoria(input.categoria)) return err(ShoppingErrors.categoriaNoValida());
       cambios = { ...cambios, categoria: input.categoria };
+    }
+
+    if (input.producto !== undefined) {
+      const nombre = nombreDeItem(input.producto.nombre);
+      if (!nombre.ok) return nombre;
+      cambios = {
+        ...cambios,
+        producto: { nombre: nombre.value, productoBaseId: input.producto.productoBaseId },
+      };
     }
 
     if (input.cantidad !== undefined) {

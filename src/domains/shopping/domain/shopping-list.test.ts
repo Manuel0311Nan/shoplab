@@ -21,6 +21,7 @@ describe("ShoppingList", () => {
       id: LISTA_ID,
       nombre: "Semana",
       archivadaAt: null,
+      general: false,
       createdAt: AHORA,
       updatedAt: AHORA,
       deletedAt: null,

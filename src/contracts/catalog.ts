@@ -26,6 +26,57 @@ export const productoHogarSchema = z.object({
 /** GET /catalog/household-products: la memoria del hogar, lo más usado primero. */
 export const householdProductsResponseSchema = z.object({ items: z.array(productoHogarSchema) });
 
+/** Uno de «Mis productos»: lo escrito a mano por el hogar, con su pack si lo tiene. */
+export const miProductoSchema = productoHogarSchema.extend({
+  nombreNormalizado: z.string(),
+  /** Tamaño del pack recordado (null si nunca se compró por packs). */
+  unidadesPorPack: z.number().int().nullable(),
+});
+
+export const grupoParecidoSchema = z.object({
+  /** Nombres normalizados de los productos del hogar que parecen el mismo. */
+  productos: z.array(z.object({ nombreNormalizado: z.string(), nombre: z.string() })),
+  base: z.object({ id: z.uuid(), nombre: z.string() }).nullable(),
+});
+
+/** GET /catalog/my-products: «Mis productos» y los posibles duplicados. */
+export const misProductosResponseSchema = z.object({
+  items: z.array(miProductoSchema),
+  parecidos: z.array(grupoParecidoSchema),
+});
+
+/**
+ * POST /catalog/my-products/standardize: renombrar o unir un producto del hogar. Se
+ * aplica en la memoria del hogar, en las listas activas y en la despensa.
+ */
+export const estandarizarProductoRequestSchema = z.object({
+  /** Nombre normalizado del producto que se edita. */
+  desde: z.string().min(1).max(200),
+  nombre: z.string().trim().min(1).max(80),
+  /** El elegido en el autocompletado, si se une a uno de la lista base. */
+  productoBaseId: z.uuid().nullish(),
+  categoria: categoriaSchema.optional(),
+  unidad: unidadSchema.optional(),
+  /** null deja de recordar el pack; sin el campo, no se toca. */
+  unidadesPorPack: z.number().int().min(2).max(100).nullable().optional(),
+});
+
+export const estandarizarProductoResponseSchema = z.object({
+  /** Ítems renombrados en las listas activas y líneas en la despensa. */
+  enListas: z.number().int(),
+  enDespensa: z.number().int(),
+});
+
+/** POST /catalog/my-products/forget: deja de sugerirse en el autocompletado. */
+export const olvidarProductoRequestSchema = z.object({
+  nombreNormalizado: z.string().min(1).max(200),
+});
+
+export type MiProductoResponse = z.infer<typeof miProductoSchema>;
+export type GrupoParecidoResponse = z.infer<typeof grupoParecidoSchema>;
+export type MisProductosResponse = z.infer<typeof misProductosResponseSchema>;
+export type EstandarizarProductoRequest = z.input<typeof estandarizarProductoRequestSchema>;
+export type EstandarizarProductoResponse = z.infer<typeof estandarizarProductoResponseSchema>;
 export type ProductoHogarResponse = z.infer<typeof productoHogarSchema>;
 export type HouseholdProductsResponse = z.infer<typeof householdProductsResponseSchema>;
 export type CategoriaProductoDto = z.infer<typeof categoriaProductoSchema>;

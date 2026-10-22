@@ -1,6 +1,6 @@
 "use client";
 import { Menu } from "@base-ui/react/menu";
-import { Archive, ArchiveRestore, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, Layers, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import type { ShoppingListSummary } from "@/contracts/shopping";
@@ -14,19 +14,28 @@ type Props = {
   onArchivar: () => void;
   onDesarchivar: () => void;
   onBorrar: () => void;
+  /** Solo la lista general: lo que suman todas las listas activas. */
+  resumenGeneral?: { pendientes: number; total: number };
 };
 
 const opcion =
   "flex h-11 cursor-default items-center gap-3 rounded-lg px-3 text-base outline-none select-none data-[highlighted]:bg-muted";
 
-function resumen(lista: ShoppingListSummary): string {
+function resumen(lista: Pick<ShoppingListSummary, "pendientes" | "total">): string {
   if (lista.total === 0) return "Vacía";
   if (lista.pendientes === 0) return `Todo en el carro · ${lista.total}`;
   return `${lista.pendientes} por comprar · ${lista.total} en total`;
 }
 
 /** Tarjeta de Mis listas: toda la tarjeta abre la lista; el botón ⋯ abre las acciones. */
-export function TarjetaLista({ lista, onRenombrar, onArchivar, onDesarchivar, onBorrar }: Props) {
+export function TarjetaLista({
+  lista,
+  onRenombrar,
+  onArchivar,
+  onDesarchivar,
+  onBorrar,
+  resumenGeneral,
+}: Props) {
   const [editando, setEditando] = useState(false);
 
   if (editando) {
@@ -65,7 +74,13 @@ export function TarjetaLista({ lista, onRenombrar, onArchivar, onDesarchivar, on
         className="flex min-w-0 flex-1 flex-col gap-1 rounded-xl p-4 pr-14 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         <h2 className="text-lg leading-7 font-semibold break-words">{lista.nombre}</h2>
-        <p className="text-sm text-muted-foreground">{resumen(lista)}</p>
+        {lista.general && (
+          <span className="inline-flex items-center gap-1 self-start rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground">
+            <Layers className="size-3.5" aria-hidden="true" />
+            Reúne todas tus listas
+          </span>
+        )}
+        <p className="text-sm text-muted-foreground">{resumen(resumenGeneral ?? lista)}</p>
         {lista.caducaEl !== null && (
           <p className="text-sm font-medium text-destructive">
             Se borrará el {formatDiaYMes(lista.caducaEl)}
@@ -87,7 +102,7 @@ export function TarjetaLista({ lista, onRenombrar, onArchivar, onDesarchivar, on
                 <Pencil className="size-5" aria-hidden="true" />
                 Renombrar
               </Menu.Item>
-              {lista.archivada ? (
+              {lista.general ? null : lista.archivada ? (
                 <Menu.Item className={opcion} onClick={onDesarchivar}>
                   <ArchiveRestore className="size-5" aria-hidden="true" />
                   Recuperar
@@ -98,10 +113,12 @@ export function TarjetaLista({ lista, onRenombrar, onArchivar, onDesarchivar, on
                   Archivar
                 </Menu.Item>
               )}
-              <Menu.Item className={`${opcion} text-destructive`} onClick={onBorrar}>
-                <Trash2 className="size-5" aria-hidden="true" />
-                Borrar…
-              </Menu.Item>
+              {!lista.general && (
+                <Menu.Item className={`${opcion} text-destructive`} onClick={onBorrar}>
+                  <Trash2 className="size-5" aria-hidden="true" />
+                  Borrar…
+                </Menu.Item>
+              )}
             </Menu.Popup>
           </Menu.Positioner>
         </Menu.Portal>

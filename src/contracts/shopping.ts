@@ -11,7 +11,10 @@ export const cantidadSchema = z.object({
 export const shoppingItemSchema = z.object({
   id: z.uuid(),
   nombre: z.string(),
+  /** Con packs, en unidades (2 packs de 4 = 8 ud.). */
   cantidad: cantidadSchema,
+  /** Si se añadió por packs: unidades de cada pack. */
+  unidadesPorPack: z.number().int().nullable(),
   nota: z.string().nullable(),
   ingredientId: z.uuid().nullable(),
   /** Producto de la lista base del que salió (autocompletado), o null. */
@@ -19,12 +22,20 @@ export const shoppingItemSchema = z.object({
   categoria: categoriaSchema,
   compradoAt: z.iso.datetime().nullable(),
   updatedAt: z.iso.datetime(),
+  /**
+   * La lista a la que pertenece. En la general cada ítem viene de la suya: los cambios
+   * (comprado, cantidad, quitar) van a /lists/{listaId}/items/{id}.
+   */
+  listaId: z.uuid().optional(),
+  listaNombre: z.string().optional(),
 });
 
 export const shoppingListResponseSchema = z.object({
   id: z.uuid(),
   nombre: z.string(),
   archivada: z.boolean(),
+  /** La lista general: reúne sus productos y los de todas las listas activas. */
+  general: z.boolean(),
   /** Solo archivadas: cuándo se borrará (archivadaAt + 15 días). */
   caducaEl: z.iso.datetime().nullable(),
   updatedAt: z.iso.datetime(),
@@ -45,6 +56,7 @@ export const shoppingListSummarySchema = z.object({
   archivadaAt: z.iso.datetime().nullable(),
   /** Solo archivadas: cuándo se borrará (archivadaAt + 15 días). */
   caducaEl: z.iso.datetime().nullable(),
+  general: z.boolean(),
   pendientes: z.number().int(),
   total: z.number().int(),
   updatedAt: z.iso.datetime(),
@@ -100,6 +112,8 @@ export const addItemRequestSchema = z.object({
   cantidad: cantidadSchema,
   nota: z.string().trim().max(200).nullish(),
   productoBaseId: z.uuid().nullish(),
+  /** Por packs: unidades de cada pack; la cantidad va en unidades (2 packs de 4 = 8 ud.). */
+  unidadesPorPack: z.number().int().min(2).max(100).nullish(),
   /** Si no llega, la decide el servidor: lista base, memoria del hogar u «otros». */
   categoria: categoriaSchema.optional(),
   /** Respuesta a POSIBLE_DUPLICADO. */
@@ -110,17 +124,28 @@ export const addItemRequestSchema = z.object({
   cantidadFinal: cantidadSchema.optional(),
 });
 
+/** Renombrar un ítem o una línea de la despensa. */
+export const productoEditadoSchema = z.object({
+  nombre: z.string().trim().min(1).max(80),
+  productoBaseId: z.uuid().nullable(),
+});
+
 export const updateItemRequestSchema = z
   .object({
     comprado: z.boolean().optional(),
     cantidad: cantidadSchema.optional(),
     /** Cambiarla también la guarda en la memoria del hogar. */
     categoria: categoriaSchema.optional(),
+    /** Renombrar: el nombre nuevo y, si se eligió en el autocompletado, su producto base. */
+    producto: productoEditadoSchema.optional(),
   })
   .refine(
     (body) =>
-      body.comprado !== undefined || body.cantidad !== undefined || body.categoria !== undefined,
-    { message: "Indica comprado, cantidad o categoría" },
+      body.comprado !== undefined ||
+      body.cantidad !== undefined ||
+      body.categoria !== undefined ||
+      body.producto !== undefined,
+    { message: "Indica comprado, cantidad, categoría o producto" },
   );
 
 export const modoTerminarCompraSchema = z.enum(["vaciar", "conservarPendientes"]);
@@ -133,6 +158,7 @@ export type CantidadDto = z.infer<typeof cantidadSchema>;
 export type ShoppingItemResponse = z.infer<typeof shoppingItemSchema>;
 export type ShoppingListResponse = z.infer<typeof shoppingListResponseSchema>;
 export type AddItemRequest = z.input<typeof addItemRequestSchema>;
+export type ProductoEditado = z.input<typeof productoEditadoSchema>;
 export type UpdateItemRequest = z.input<typeof updateItemRequestSchema>;
 export type ModoTerminarCompraDto = z.infer<typeof modoTerminarCompraSchema>;
 export type FinishShoppingRequest = z.input<typeof finishShoppingRequestSchema>;

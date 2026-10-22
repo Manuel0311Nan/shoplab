@@ -7,10 +7,13 @@ import {
   removeItemAction,
   setItemPurchasedAction,
   updateItemCategoryAction,
+  renombrarItemAction,
   updateItemQuantityAction,
 } from "@/app/actions/shopping-items";
+import { estandarizarProductoAction } from "@/app/actions/productos";
 import { actualizarListaAction, finishShoppingAction } from "@/app/actions/shopping-lists";
 import type { CategoriaDto } from "@/contracts/categoria";
+import type { PacksRecordados } from "@/contracts/memoria";
 import type {
   CantidadDto,
   LimiteDeListasDetails,
@@ -19,6 +22,8 @@ import type {
   ShoppingListResponse,
 } from "@/contracts/shopping";
 import { newId } from "@/shared/kernel/ids";
+import { normalizarNombre } from "@/shared/kernel/texto";
+import { EditarNombreDialog, type NombreEditado } from "../../../_components/editar-nombre-dialog";
 import type { Result } from "@/shared/kernel/result";
 import { Button } from "@/shared/ui/button";
 import { ElegirListaDialog } from "../../../_components/elegir-lista-dialog";
@@ -32,12 +37,16 @@ import { ItemList } from "./item-list";
 import { SelectorOrden, useOrdenLista } from "./orden-lista";
 import { type AccionLista, aplicarAccion } from "./list-reducer";
 
-type Props = { list: ShoppingListResponse };
+type Props = {
+  list: ShoppingListResponse;
+  /** Memoria del hogar: el formulario propone el pack de cada producto. */
+  packs?: PacksRecordados;
+};
 
 /** Alta que espera respuesta del usuario (producto repetido). */
 type AltaPendiente = EstadoDuplicado & { readonly values: NewItemValues; readonly id: string };
 
-export function ShoppingListScreen({ list }: Props) {
+export function ShoppingListScreen({ list, packs = {} }: Props) {
   const [items, aplicarOptimista] = useOptimistic(list.items, aplicarAccion);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +56,7 @@ export function ShoppingListScreen({ list }: Props) {
   const [orden, setOrden] = useOrdenLista();
   const [paraDespensa, setParaDespensa] = useState<ShoppingItemResponse[] | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [aEditar, setAEditar] = useState<ShoppingItemResponse | null>(null);
 
   function ejecutar(accion: AccionLista | null, llamada: () => Promise<Result<unknown>>) {
     setError(null);
@@ -75,6 +85,7 @@ export function ShoppingListScreen({ list }: Props) {
             id,
             nombre: values.nombre,
             cantidad: values.cantidad,
+            unidadesPorPack: values.unidadesPorPack ?? null,
             nota: values.nota ?? null,
             ingredientId: null,
             productoBaseId: values.productoBaseId ?? null,
@@ -82,6 +93,8 @@ export function ShoppingListScreen({ list }: Props) {
             categoria: values.categoria ?? "otros",
             compradoAt: null,
             updatedAt: new Date().toISOString(),
+            listaId: list.id,
+            listaNombre: list.nombre,
           },
         });
       }
@@ -123,20 +136,51 @@ export function ShoppingListScreen({ list }: Props) {
     });
   }
 
+  // En la general cada ítem pertenece a su lista: los cambios van allí.
+  const listaDe = (itemId: string) => items.find((i) => i.id === itemId)?.listaId ?? list.id;
   const marcar = (itemId: string, comprado: boolean) =>
     ejecutar({ tipo: "comprado", itemId, comprado }, () =>
-      setItemPurchasedAction(list.id, itemId, comprado),
+      setItemPurchasedAction(listaDe(itemId), itemId, comprado),
     );
   const cambiarCantidad = (itemId: string, cantidad: CantidadDto) =>
     ejecutar({ tipo: "cantidad", itemId, cantidad }, () =>
-      updateItemQuantityAction(list.id, itemId, cantidad),
+      updateItemQuantityAction(listaDe(itemId), itemId, cantidad),
     );
   const cambiarCategoria = (itemId: string, categoria: CategoriaDto) =>
     ejecutar({ tipo: "categoria", itemId, categoria }, () =>
-      updateItemCategoryAction(list.id, itemId, categoria),
+      updateItemCategoryAction(listaDe(itemId), itemId, categoria),
     );
   const quitar = (itemId: string) =>
-    ejecutar({ tipo: "quitar", itemId }, () => removeItemAction(list.id, itemId));
+    ejecutar({ tipo: "quitar", itemId }, () => removeItemAction(listaDe(itemId), itemId));
+  /** Solo este ítem, o en todo el hogar (todas las listas, la despensa y Mis productos). */
+  function renombrar(item: ShoppingItemResponse, cambio: NombreEditado) {
+    setAEditar(null);
+    const accion: AccionLista = {
+      tipo: "renombrar",
+      itemId: item.id,
+      nombre: cambio.nombre,
+      productoBaseId: cambio.productoBaseId,
+    };
+    ejecutar(accion, async () => {
+      if (!cambio.todoElHogar) {
+        return renombrarItemAction(listaDe(item.id), item.id, {
+          nombre: cambio.nombre,
+          productoBaseId: cambio.productoBaseId,
+        });
+      }
+      const r = await estandarizarProductoAction({
+        desde: normalizarNombre(item.nombre),
+        nombre: cambio.nombre,
+        productoBaseId: cambio.productoBaseId,
+      });
+      if (r.ok) {
+        setAviso(
+          `Cambiado en todo el hogar: ${r.value.enListas} en listas y ${r.value.enDespensa} en la despensa.`,
+        );
+      }
+      return r;
+    });
+  }
   /** D6: al terminar, lo que estaba en el carro se ofrece para guardarlo en la despensa. */
   function terminar(modo: ModoTerminarCompraDto) {
     const comprados = items.filter((item) => item.compradoAt !== null);
@@ -172,6 +216,12 @@ export function ShoppingListScreen({ list }: Props) {
         </Link>
         {/* El título ocupa todo el ancho y salta de línea si no cabe: nunca se corta. */}
         <h1 className="text-[28px] leading-9 font-bold text-balance break-words">{list.nombre}</h1>
+        {list.general && (
+          <p className="text-sm text-muted-foreground">
+            Reúne lo que añades aquí y lo de todas tus listas. Cambiar o quitar un producto aquí lo
+            cambia también en su lista.
+          </p>
+        )}
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <p className="text-muted-foreground" aria-live="polite">
             {isPending ? "Guardando…" : `${enElCarro.length} de ${items.length} en el carro`}
@@ -205,7 +255,7 @@ export function ShoppingListScreen({ list }: Props) {
           </Button>
         </div>
       ) : (
-        <AddItemForm onAdd={(values) => enviarAlta(values, newId())} />
+        <AddItemForm packs={packs} onAdd={(values) => enviarAlta(values, newId())} />
       )}
 
       {aviso !== null && (
@@ -236,8 +286,10 @@ export function ShoppingListScreen({ list }: Props) {
         onCantidad={cambiarCantidad}
         onCategoria={cambiarCategoria}
         onQuitar={quitar}
+        onEditar={setAEditar}
         agrupar={orden === "categoria"}
         soloLectura={soloLectura}
+        generalId={list.general ? list.id : null}
       />
       <ItemList
         titulo="En el carro"
@@ -247,11 +299,17 @@ export function ShoppingListScreen({ list }: Props) {
         onCantidad={cambiarCantidad}
         onCategoria={cambiarCategoria}
         onQuitar={quitar}
+        onEditar={setAEditar}
         soloLectura={soloLectura}
+        generalId={list.general ? list.id : null}
       />
 
       {!soloLectura && enElCarro.length > 0 && (
-        <FinishShoppingButton pendientes={pendientes.length} onTerminar={terminar} />
+        <FinishShoppingButton
+          // En la general lo pendiente es de cada lista: nunca se vacía, solo sale lo comprado.
+          pendientes={list.general ? 0 : pendientes.length}
+          onTerminar={terminar}
+        />
       )}
 
       {!soloLectura && (
@@ -265,6 +323,12 @@ export function ShoppingListScreen({ list }: Props) {
         </button>
       )}
 
+      <EditarNombreDialog
+        producto={aEditar}
+        soloAqui="Solo en esta lista"
+        onGuardar={(cambio) => aEditar && renombrar(aEditar, cambio)}
+        onCerrar={() => setAEditar(null)}
+      />
       <GuardarEnDespensaSheet
         listaId={list.id}
         productos={paraDespensa}

@@ -16,6 +16,7 @@ export const PATCH = apiRoute(
       cantidad: body.cantidad,
       comprado: body.comprado,
       categoria: body.categoria,
+      producto: body.producto,
     });
 
     return resultResponse(mapResult(result, toShoppingItemResponse));

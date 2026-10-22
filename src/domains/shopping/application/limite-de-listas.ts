@@ -16,7 +16,8 @@ export async function hacerSitio(
   archivarListaId: string | undefined,
   ahora: Date,
 ): Promise<Result<ShoppingList | null>> {
-  const activas = await lists.listarActivas();
+  // La general no cuenta para el límite ni se puede archivar para hacer sitio.
+  const activas = (await lists.listarActivas()).filter((l) => !l.general);
   if (activas.length < MAX_LISTAS_ACTIVAS) return ok(null);
 
   if (archivarListaId === undefined) {

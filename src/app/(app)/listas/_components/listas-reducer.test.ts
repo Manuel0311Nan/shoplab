@@ -8,6 +8,7 @@ const tarjeta = (id: string, nombre: string): ShoppingListSummary => ({
   archivada: false,
   archivadaAt: null,
   caducaEl: null,
+  general: false,
   pendientes: 0,
   total: 0,
   updatedAt: "2026-10-10T10:00:00.000Z",
