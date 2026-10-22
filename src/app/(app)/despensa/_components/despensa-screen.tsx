@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Plus, Settings2 } from "lucide-react";
+import { AlertTriangle, Plus, Settings } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -289,10 +289,11 @@ export function DespensaScreen({
         <h1 className="text-[28px] leading-9 font-bold">Despensa</h1>
         <Link
           href="/despensa/ubicaciones"
-          aria-label="Gestionar ubicaciones"
-          className="flex size-11 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+          aria-label="Ajustes de la despensa: ubicaciones"
+          title="Ubicaciones"
+          className="flex size-11 items-center justify-center rounded-full bg-muted text-foreground outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-95 motion-safe:transition-transform"
         >
-          <Settings2 className="size-5" aria-hidden="true" />
+          <Settings className="size-6" strokeWidth={1.75} aria-hidden="true" />
         </Link>
       </header>
 
