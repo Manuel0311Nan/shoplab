@@ -2,9 +2,14 @@
 import { ChevronLeft, Layers, Search } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { estandarizarProductoAction, olvidarProductoAction } from "@/app/actions/productos";
+import {
+  cambiarEmojiAction,
+  estandarizarProductoAction,
+  olvidarProductoAction,
+} from "@/app/actions/productos";
 import type { MiProductoResponse, MisProductosResponse } from "@/contracts/catalog";
 import { NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
+import { emojiPorDefecto } from "@/shared/kernel/emoji";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { ETIQUETA_UNIDAD } from "../../_components/cantidad-pack";
@@ -39,10 +44,18 @@ export function MisProductosScreen({ datos }: Props) {
   function guardar(producto: MiProductoResponse, cambios: CambiosProducto) {
     setAEditar(null);
     hacer(async () => {
-      const r = await estandarizarProductoAction({ desde: producto.nombreNormalizado, ...cambios });
+      const { emoji, ...resto } = cambios;
+      const r = await estandarizarProductoAction({ desde: producto.nombreNormalizado, ...resto });
       if (!r.ok) {
         setError(r.error.message);
         return null;
+      }
+      if (emoji !== undefined) {
+        const e = await cambiarEmojiAction({ nombre: cambios.nombre, emoji });
+        if (!e.ok) {
+          setError(e.error.message);
+          return null;
+        }
       }
       return `Guardado: ${r.value.enListas} en listas y ${r.value.enDespensa} en la despensa.`;
     });
@@ -193,7 +206,14 @@ export function MisProductosScreen({ datos }: Props) {
                   disabled={pendiente}
                   className="flex min-h-16 w-full flex-col gap-1 rounded-xl bg-card p-3 text-left shadow-card outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-60"
                 >
-                  <span className="text-lg leading-6 font-semibold break-words">{p.nombre}</span>
+                  <span className="text-lg leading-6 font-semibold break-words">
+                    {(p.emoji ?? emojiPorDefecto(p.nombre)) !== null && (
+                      <span className="mr-1.5" aria-hidden="true">
+                        {p.emoji ?? emojiPorDefecto(p.nombre)}
+                      </span>
+                    )}
+                    {p.nombre}
+                  </span>
                   <span className="flex flex-wrap gap-x-2 text-xs text-muted-foreground">
                     <span>{NOMBRE_CATEGORIA[p.categoria]}</span>
                     <span aria-hidden="true">·</span>

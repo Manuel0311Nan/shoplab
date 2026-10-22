@@ -6,6 +6,7 @@ import type { CategoriaDto } from "@/contracts/categoria";
 import type { MiProductoResponse } from "@/contracts/catalog";
 import { type UnidadDto, unidadSchema } from "@/contracts/shopping";
 import { CATEGORIAS, NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
+import { emojiPorDefecto } from "@/shared/kernel/emoji";
 import { normalizarNombre } from "@/shared/kernel/texto";
 import { Button } from "@/shared/ui/button";
 import {
@@ -18,6 +19,7 @@ import {
 import { Input } from "@/shared/ui/input";
 import { CampoProducto } from "../../_components/autocompletar/campo-producto";
 import { ETIQUETA_UNIDAD } from "../../_components/cantidad-pack";
+import { SelectorEmoji } from "../../_components/selector-emoji";
 
 /** Lo que se envía al guardar (el servidor lo aplica en todo el hogar). */
 export interface CambiosProducto {
@@ -27,6 +29,8 @@ export interface CambiosProducto {
   readonly unidad: UnidadDto;
   /** Sin el campo: no se toca; null: se olvida. */
   readonly unidadesPorPack?: number | null;
+  /** Sin el campo: no se toca; null: vuelve al de por defecto. */
+  readonly emoji?: string | null;
 }
 
 type Props = {
@@ -65,6 +69,9 @@ function Formulario({
   const [categoria, setCategoria] = useState<CategoriaDto>(producto.categoria);
   const [unidad, setUnidad] = useState<UnidadDto>(producto.unidad);
   const [porPack, setPorPack] = useState(producto.unidadesPorPack?.toString() ?? "");
+  // undefined: sin tocar; null: volver al de por defecto.
+  const [emoji, setEmoji] = useState<string | null | undefined>(undefined);
+  const emojiElegido = emoji === undefined ? producto.emoji : emoji;
   const [error, setError] = useState<string | null>(null);
   const nombre = register("nombre");
   const escrito = normalizarNombre(watch("nombre") ?? "");
@@ -99,6 +106,7 @@ function Formulario({
           categoria,
           unidad,
           ...(unidadesPorPack === undefined ? {} : { unidadesPorPack }),
+          ...(emoji === undefined ? {} : { emoji }),
         });
       })}
     >
@@ -161,6 +169,14 @@ function Formulario({
             ))}
           </select>
         </label>
+      </div>
+      <div className="flex flex-col gap-1">
+        <p className="text-sm font-semibold">Emoji</p>
+        <SelectorEmoji
+          actual={emojiElegido ?? emojiPorDefecto(watch("nombre") ?? producto.nombre)}
+          elegido={emojiElegido !== null}
+          onElegir={setEmoji}
+        />
       </div>
       <label className="flex items-center gap-2 text-sm font-semibold">
         Se compra en packs de

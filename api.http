@@ -287,6 +287,17 @@ Authorization: Bearer {{token}}
 GET {{base}}/catalog/household-products
 Authorization: Bearer {{token}}
 
+### Emojis elegidos por el hogar (los de por defecto salen del nombre)
+GET {{base}}/catalog/emojis
+Authorization: Bearer {{token}}
+
+### Elegir el emoji de un producto (null vuelve al de por defecto)
+PUT {{base}}/catalog/emojis
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nombre": "Yogur griego", "emoji": "🥣" }
+
 ### Mis productos: lo escrito a mano, con su pack y posibles duplicados
 GET {{base}}/catalog/my-products
 Authorization: Bearer {{token}}

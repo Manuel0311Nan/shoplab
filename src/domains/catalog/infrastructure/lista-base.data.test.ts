@@ -4,6 +4,7 @@ import { normalizarNombre } from "@/shared/kernel/texto";
 import { UNIDADES } from "@/shared/kernel/unidad";
 import { esAvisoAbiertoValido, sePuedeAbrir } from "@/shared/kernel/abierto";
 import { AVISO_ABIERTO, LISTA_BASE, SINONIMOS } from "./lista-base.data";
+import { emojiPorDefecto, esEmoji } from "@/shared/kernel/emoji";
 
 describe("LISTA_BASE", () => {
   it("tieneAlMenos200Productos", () => {
@@ -49,5 +50,13 @@ describe("LISTA_BASE", () => {
       if (categoria !== undefined) expect(sePuedeAbrir(categoria), producto).toBe(true);
       expect(esAvisoAbiertoValido({ amarillo, rojo }), producto).toBe(true);
     }
+  });
+});
+
+describe("emojis por defecto de la lista base", () => {
+  it("casi toda la lista base tiene uno, y todos son emojis válidos", () => {
+    const con = LISTA_BASE.map(([nombre]) => emojiPorDefecto(nombre)).filter((e) => e !== null);
+    expect(con.every((e) => esEmoji(e))).toBe(true);
+    expect(con.length / LISTA_BASE.length).toBeGreaterThan(0.8);
   });
 });

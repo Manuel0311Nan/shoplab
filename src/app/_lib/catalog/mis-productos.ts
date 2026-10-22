@@ -8,16 +8,17 @@ import type { Categoria } from "@/shared/kernel/categoria";
 import { ok, type Result } from "@/shared/kernel/result";
 import { normalizarNombre } from "@/shared/kernel/texto";
 import type { Unidad } from "@/shared/kernel/unidad";
-import { packsRecordados } from "../memoria-hogar";
+import { emojisProductos, packsRecordados } from "../memoria-hogar";
 
 /**
  * Orquestador de «Mis productos» (Catalog ↔ Shopping ↔ Pantry): la memoria de texto
  * libre del hogar, con su pack, y la estandarización que se propaga a listas y despensa.
  */
 export async function misProductos(auth: AuthContext): Promise<Result<MisProductosResponse>> {
-  const [result, packs] = await Promise.all([
+  const [result, packs, emojis] = await Promise.all([
     catalogHogarModule(auth).misProductos.execute(),
     packsRecordados(auth),
+    emojisProductos(auth),
   ]);
   if (!result.ok) return result;
   return ok({
@@ -28,6 +29,7 @@ export async function misProductos(auth: AuthContext): Promise<Result<MisProduct
       unidad: p.unidad,
       usos: p.usos,
       unidadesPorPack: packs[p.nombreNormalizado]?.unidadesPorPack ?? null,
+      emoji: emojis[p.nombreNormalizado] ?? null,
     })),
     parecidos: result.value.parecidos.map((g) => ({
       productos: g.productos.map(({ nombreNormalizado, nombre }) => ({

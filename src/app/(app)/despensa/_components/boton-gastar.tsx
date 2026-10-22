@@ -1,7 +1,7 @@
 "use client";
-import { useRef } from "react";
 import type { LineaDespensaResponse } from "@/contracts/pantry";
 import { Button } from "@/shared/ui/button";
+import { usePulsacionLarga } from "../../_components/pulsacion-larga";
 
 type Props = {
   linea: LineaDespensaResponse;
@@ -10,19 +10,17 @@ type Props = {
   variant?: "default" | "outline";
 };
 
-/** Lo que tarda una pulsación larga en abrir el diálogo completo. */
-const PULSACION_LARGA_MS = 500;
-
 /**
  * En unidades, «−1»: un toque gasta 1 ud. (con «Deshacer» después). Una pulsación larga
  * abre el diálogo (varias, tirar). En g, kg, ml o l, «Gastar» abre el diálogo directamente.
  */
 export function BotonGastar({ linea, onGastarUno, onGastar, variant = "default" }: Props) {
-  const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const fueLarga = useRef(false);
-  const enUnidades = linea.cantidad.unidad === "unidad";
+  const pulsacion = usePulsacionLarga({
+    onCorta: () => onGastarUno(linea),
+    onLarga: () => onGastar(linea),
+  });
 
-  if (!enUnidades) {
+  if (linea.cantidad.unidad !== "unidad") {
     return (
       <Button variant={variant} onClick={() => onGastar(linea)} className="h-11 px-4 font-semibold">
         Gastar
@@ -30,34 +28,10 @@ export function BotonGastar({ linea, onGastarUno, onGastar, variant = "default" 
     );
   }
 
-  const cancelar = () => {
-    if (temporizador.current !== null) clearTimeout(temporizador.current);
-    temporizador.current = null;
-  };
-
   return (
     <Button
       variant={variant}
-      onPointerDown={() => {
-        fueLarga.current = false;
-        cancelar();
-        temporizador.current = setTimeout(() => {
-          fueLarga.current = true;
-          onGastar(linea);
-        }, PULSACION_LARGA_MS);
-      }}
-      onPointerUp={cancelar}
-      onPointerLeave={cancelar}
-      onPointerCancel={cancelar}
-      // En el móvil, la pulsación larga no debe abrir el menú del navegador.
-      onContextMenu={(e) => e.preventDefault()}
-      onClick={() => {
-        if (fueLarga.current) {
-          fueLarga.current = false;
-          return;
-        }
-        onGastarUno(linea);
-      }}
+      {...pulsacion}
       className="h-11 min-w-16 px-4 text-base font-bold tabular-nums select-none"
     >
       −1

@@ -22,6 +22,7 @@ model Hogar {
   movimientosDespensa   MovimientoDespensa[]
   packsRecordados       PackRecordado[]
   ubicacionesRecordadas UbicacionRecordada[]
+  emojisProductos       EmojiProducto[]
 }
 
 model Usuario {
@@ -239,6 +240,19 @@ model ProductoRecordado {
   usos              Int               @default(1)
   ultimoUso         DateTime
   updatedAt         DateTime          @updatedAt
+
+  hogar Hogar @relation(fields: [hogarId], references: [id], onDelete: Cascade)
+
+  @@id([hogarId, nombreNormalizado])
+}
+
+/// Personalización del hogar: el emoji con que ve un producto (si no, el de por defecto
+/// según el nombre, y si no hay, el icono de su categoría).
+model EmojiProducto {
+  hogarId           String   @db.Uuid
+  nombreNormalizado String
+  emoji             String
+  updatedAt         DateTime @updatedAt
 
   hogar Hogar @relation(fields: [hogarId], references: [id], onDelete: Cascade)
 

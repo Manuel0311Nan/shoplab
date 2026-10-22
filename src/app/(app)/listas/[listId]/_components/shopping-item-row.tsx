@@ -14,6 +14,8 @@ type Props = {
   onQuitar: () => void;
   /** Corregir el nombre (o estandarizarlo en todo el hogar). */
   onEditar?: () => void;
+  /** El emoji del producto (elegido o por defecto); null: sin emoji. */
+  emoji?: string | null;
   soloLectura?: boolean;
   /** En la lista general: de qué lista viene (null si es de la propia general). */
   origen?: string | null;
@@ -31,10 +33,18 @@ export function ShoppingItemRow({
   onCategoria,
   onQuitar,
   onEditar,
+  emoji = null,
   soloLectura = false,
   origen = null,
 }: Props) {
   const comprado = item.compradoAt !== null;
+  // Dentro del mismo texto que el nombre: así nunca se queda solo en una línea.
+  const emojiDelante =
+    emoji === null ? null : (
+      <span className="mr-1.5 inline-block" aria-hidden="true">
+        {emoji}
+      </span>
+    );
   return (
     <li
       className={cn(
@@ -51,13 +61,17 @@ export function ShoppingItemRow({
             )}
           >
             {soloLectura || onEditar === undefined ? (
-              item.nombre
+              <>
+                {emojiDelante}
+                {item.nombre}
+              </>
             ) : (
               <button
                 type="button"
                 onClick={onEditar}
                 className="-mx-1 rounded-md px-1 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
               >
+                {emojiDelante}
                 {item.nombre}
                 <Pencil
                   className="ml-1.5 inline size-4 align-[-2px] text-muted-foreground"

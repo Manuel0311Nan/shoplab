@@ -18,3 +18,19 @@ export function formatCantidadItem(cantidad: CantidadDto, unidadesPorPack: numbe
   if (!Number.isInteger(packs)) return formatCantidad(cantidad);
   return `${packs} ${packs === 1 ? "pack" : "packs"} · ${formatCantidad(cantidad)}`;
 }
+
+/**
+ * Para la esquina de la vista rápida: nada si es 1 ud. (lo normal); «3», «2×4» por
+ * packs, o la cantidad con su unidad («500 g», «1,5 l»).
+ */
+export function cantidadCorta(
+  cantidad: CantidadDto,
+  unidadesPorPack: number | null,
+): string | null {
+  if (cantidad.unidad !== "unidad") return formatCantidad(cantidad);
+  if (unidadesPorPack !== null) {
+    const packs = cantidad.valor / unidadesPorPack;
+    if (Number.isInteger(packs)) return `${packs}×${unidadesPorPack}`;
+  }
+  return cantidad.valor === 1 ? null : numero.format(cantidad.valor);
+}

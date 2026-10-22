@@ -1,7 +1,9 @@
 import { useId } from "react";
 import type { CategoriaDto } from "@/contracts/categoria";
 import type { CantidadDto, ShoppingItemResponse } from "@/contracts/shopping";
+import type { EmojisProductos } from "@/contracts/memoria";
 import { NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
+import { emojiDe } from "../../../_components/emoji-producto";
 import { agruparPorCategoria } from "./agrupar-por-categoria";
 import { ShoppingItemRow } from "./shopping-item-row";
 
@@ -14,6 +16,8 @@ type Props = {
   onCategoria: (itemId: string, categoria: CategoriaDto) => void;
   onQuitar: (itemId: string) => void;
   onEditar?: (item: ShoppingItemResponse) => void;
+  /** Emojis elegidos por el hogar (los de por defecto salen del nombre). */
+  emojis?: EmojisProductos;
   /** Agrupar por categoría, en el orden del súper. */
   agrupar?: boolean;
   /** Lista archivada: se ve, pero no se puede cambiar. */
@@ -31,6 +35,7 @@ export function ItemList({
   onCategoria,
   onQuitar,
   onEditar,
+  emojis = {},
   agrupar = false,
   soloLectura = false,
   generalId = null,
@@ -46,6 +51,7 @@ export function ItemList({
       onQuitar={() => onQuitar(item.id)}
       {...(onEditar === undefined ? {} : { onEditar: () => onEditar(item) })}
       soloLectura={soloLectura}
+      emoji={emojiDe(emojis, item.nombre)}
       origen={
         generalId !== null && item.listaId !== undefined && item.listaId !== generalId
           ? (item.listaNombre ?? null)

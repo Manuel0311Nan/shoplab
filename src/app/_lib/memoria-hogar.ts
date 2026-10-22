@@ -1,5 +1,6 @@
 import "server-only";
-import type { PacksRecordados, UbicacionesRecordadas } from "@/contracts/memoria";
+import type { EmojisProductos, PacksRecordados, UbicacionesRecordadas } from "@/contracts/memoria";
+import { catalogHogarModule } from "@/domains/catalog/infrastructure/catalog-module";
 import { pantryModule } from "@/domains/pantry/infrastructure/pantry-module";
 import { shoppingModule } from "@/domains/shopping/infrastructure/shopping-module";
 import type { AuthContext } from "@/shared/kernel/auth-context";
@@ -20,6 +21,18 @@ export async function packsRecordados(auth: AuthContext): Promise<PacksRecordado
     );
   } catch (error) {
     console.error("[memoria] no se pudieron leer los packs", error);
+    return {};
+  }
+}
+
+export async function emojisProductos(
+  auth: Pick<AuthContext, "hogarId">,
+): Promise<EmojisProductos> {
+  try {
+    const r = await catalogHogarModule(auth).emojis.execute();
+    return r.ok ? Object.fromEntries(r.value) : {};
+  } catch (error) {
+    console.error("[memoria] no se pudieron leer los emojis", error);
     return {};
   }
 }

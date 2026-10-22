@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Plus, Settings2 } from "lucide-react";
+import { AlertTriangle, Plus, Settings } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -13,7 +13,7 @@ import {
   consumirAction,
   quitarLineaAction,
 } from "@/app/actions/pantry";
-import type { PacksRecordados, UbicacionesRecordadas } from "@/contracts/memoria";
+import type { EmojisProductos, PacksRecordados, UbicacionesRecordadas } from "@/contracts/memoria";
 import type {
   AddStockRequest,
   LineaDespensaResponse,
@@ -28,6 +28,7 @@ import { NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
 import { cn } from "@/shared/lib/utils";
 import { type Aviso, AvisoFlotante } from "../../_components/aviso-flotante";
 import { propuestaDeUnidad } from "../../_components/cantidad-pack";
+import { emojiDe } from "../../_components/emoji-producto";
 import { EditarNombreDialog, type NombreEditado } from "../../_components/editar-nombre-dialog";
 import { formatCantidad } from "../../listas/[listId]/_components/format-cantidad";
 import { AbrirDialog } from "./abrir-dialog";
@@ -50,6 +51,7 @@ type Props = {
   /** Memoria del hogar: el pack de cada producto y dónde se guardó la última vez. */
   packs?: PacksRecordados;
   recordadas?: UbicacionesRecordadas;
+  emojis?: EmojisProductos;
 };
 
 const segmento = (activo: boolean) =>
@@ -58,7 +60,13 @@ const segmento = (activo: boolean) =>
     activo ? "bg-card shadow-card" : "text-muted-foreground",
   );
 
-export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }: Props) {
+export function DespensaScreen({
+  despensa,
+  listas,
+  packs = {},
+  recordadas = {},
+  emojis = {},
+}: Props) {
   const router = useRouter();
   const ruta = usePathname();
   const params = useSearchParams();
@@ -281,10 +289,11 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
         <h1 className="text-[28px] leading-9 font-bold">Despensa</h1>
         <Link
           href="/despensa/ubicaciones"
-          aria-label="Gestionar ubicaciones"
-          className="flex size-11 items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+          aria-label="Ajustes de la despensa: ubicaciones"
+          title="Ubicaciones"
+          className="flex size-11 items-center justify-center rounded-full bg-muted text-foreground outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-95 motion-safe:transition-transform"
         >
-          <Settings2 className="size-5" aria-hidden="true" />
+          <Settings className="size-6" strokeWidth={1.75} aria-hidden="true" />
         </Link>
       </header>
 
@@ -393,6 +402,7 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
                         onAbrir={setAAbrir}
                         onCerrarAbierto={cerrarAbierto}
                         onRenombrar={setARenombrar}
+                        emoji={emojiDe(emojis, p.nombre)}
                       />
                     ))}
                   </ul>
