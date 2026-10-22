@@ -36,6 +36,9 @@ consumirán otros clientes, como una futura app móvil (proyecto aparte).
   deprisa: un toque lo pasa al carro, la cantidad va en la esquina y mantener
   pulsado deja cambiarla o quitarlo. La vista de lista sigue para una compra
   con calma; cada dispositivo recuerda la elegida.
+- **Emojis**: cada producto se ve con su emoji (🥑, 🥛, 🍝…), elegido según el
+  nombre; el hogar puede cambiarlo manteniendo pulsado en la vista rápida o en
+  Mis productos. Sin emoji, se ve el icono de su categoría.
 - **Gastar con un toque**: «−1» resta una unidad al momento (mantén pulsado
   para gastar varias o tirar); en g, kg, ml o l, atajos de ¼, ½ y todo. Un
   aviso abajo permite deshacer y, si se acaba, añadirlo a la lista.

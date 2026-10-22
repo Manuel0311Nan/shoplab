@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Clock } from "@/shared/kernel/clock";
 import { DESPUES, LECHE, LECHE_ID, PLATANO, recordado } from "../../testing/builders";
 import { InMemoryProductoBaseRepository } from "../../testing/in-memory-producto-base-repository";
+import { InMemoryEmojiProductoRepository } from "../../testing/in-memory-emoji-producto-repository";
 import { InMemoryProductoRecordadoRepository } from "../../testing/in-memory-producto-recordado-repository";
 import { MisProductosQuery } from "../queries/mis-productos.query";
 import {
@@ -53,6 +54,20 @@ describe("EstandarizarProductoCommand", () => {
     expect((await repo.listar(10)).map((p) => [p.nombreNormalizado, p.usos])).toEqual([
       ["yogur proteina", 5],
     ]);
+  });
+
+  it("el emoji elegido pasa al nombre nuevo si allí no había otro", async () => {
+    const emojis = new InMemoryEmojiProductoRepository({ "yogures proteina": "🥣" });
+    const repo = new InMemoryProductoRecordadoRepository([yogures]);
+    const estandarizar = new EstandarizarProductoCommand(repo, reloj, emojis);
+
+    await estandarizar.execute({ ...entrada, desde: "yogures proteina", nombre: "Yogur proteína" });
+    expect(Object.fromEntries(emojis.store)).toEqual({ "yogur proteina": "🥣" });
+
+    emojis.store.set("otro", "🍓");
+    emojis.store.set("yogur", "🥛");
+    await estandarizar.execute({ ...entrada, desde: "otro", nombre: "Yogur" });
+    expect(Object.fromEntries(emojis.store)).toEqual({ "yogur proteina": "🥣", yogur: "🥛" });
   });
 
   it("solo cambiar categoría: mismo nombre", async () => {

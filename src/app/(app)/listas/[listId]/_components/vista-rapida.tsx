@@ -11,7 +11,11 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/shared/ui/dialog";
+import type { EmojisProductos } from "@/contracts/memoria";
+import { normalizarNombre } from "@/shared/kernel/texto";
+import { emojiDe } from "../../../_components/emoji-producto";
 import { IconoCategoria } from "../../../_components/icono-categoria";
+import { SelectorEmoji } from "../../../_components/selector-emoji";
 import { usePulsacionLarga } from "../../../_components/pulsacion-larga";
 import { agruparPorCategoria } from "./agrupar-por-categoria";
 import { cantidadCorta } from "./format-cantidad";
@@ -25,6 +29,10 @@ type Props = {
   onToggle: (itemId: string, comprado: boolean) => void;
   onCantidad: (itemId: string, cantidad: CantidadDto) => void;
   onQuitar: (itemId: string) => void;
+  /** Emojis elegidos por el hogar (nombre normalizado → emoji). */
+  emojis: EmojisProductos;
+  /** null: vuelve al de por defecto. */
+  onEmoji: (nombre: string, emoji: string | null) => void;
 };
 
 /**
@@ -40,6 +48,8 @@ export function VistaRapida({
   onToggle,
   onCantidad,
   onQuitar,
+  emojis,
+  onEmoji,
 }: Props) {
   const [ajustarId, setAjustarId] = useState<string | null>(null);
   const ajustar = [...pendientes, ...enElCarro].find((i) => i.id === ajustarId) ?? null;
@@ -52,6 +62,7 @@ export function VistaRapida({
       comprado={comprado}
       soloLectura={soloLectura}
       ayudaId={ayudaId}
+      emoji={emojiDe(emojis, item.nombre)}
       onToque={() => {
         vibrar();
         onToggle(item.id, !comprado);
@@ -85,6 +96,9 @@ export function VistaRapida({
 
       <AjustarDialog
         item={ajustar}
+        emoji={ajustar === null ? null : emojiDe(emojis, ajustar.nombre)}
+        emojiElegido={ajustar !== null && normalizarNombre(ajustar.nombre) in emojis}
+        onEmoji={onEmoji}
         onCantidad={onCantidad}
         onQuitar={(id) => {
           setAjustarId(null);
@@ -126,6 +140,7 @@ function Casilla({
   comprado,
   soloLectura,
   ayudaId,
+  emoji,
   onToque,
   onLarga,
 }: {
@@ -133,6 +148,7 @@ function Casilla({
   comprado: boolean;
   soloLectura: boolean;
   ayudaId: string;
+  emoji: string | null;
   onToque: () => void;
   onLarga: () => void;
 }) {
@@ -163,6 +179,10 @@ function Casilla({
         )}
         {comprado ? (
           <Check className="size-8" aria-hidden="true" />
+        ) : emoji !== null ? (
+          <span className="text-4xl leading-none" aria-hidden="true">
+            {emoji}
+          </span>
         ) : (
           <IconoCategoria categoria={item.categoria} className="size-9" />
         )}
@@ -180,11 +200,17 @@ function Casilla({
 
 function AjustarDialog({
   item,
+  emoji,
+  emojiElegido,
+  onEmoji,
   onCantidad,
   onQuitar,
   onCerrar,
 }: {
   item: ShoppingItemResponse | null;
+  emoji: string | null;
+  emojiElegido: boolean;
+  onEmoji: (nombre: string, emoji: string | null) => void;
   onCantidad: (itemId: string, cantidad: CantidadDto) => void;
   onQuitar: (itemId: string) => void;
   onCerrar: () => void;
@@ -195,12 +221,20 @@ function AjustarDialog({
         {item && (
           <>
             <DialogTitle>{item.nombre}</DialogTitle>
-            <DialogDescription>Cambia la cantidad o quítalo de la lista.</DialogDescription>
+            <DialogDescription>
+              Cambia la cantidad, su emoji o quítalo de la lista.
+            </DialogDescription>
             <QuantityStepper
               nombre={item.nombre}
               cantidad={item.cantidad}
               unidadesPorPack={item.unidadesPorPack}
               onChange={(c) => onCantidad(item.id, c)}
+            />
+            <SelectorEmoji
+              key={item.id}
+              actual={emoji}
+              elegido={emojiElegido}
+              onElegir={(e) => onEmoji(item.nombre, e)}
             />
             <div className="flex gap-2">
               <Button

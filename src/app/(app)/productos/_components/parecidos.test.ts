@@ -9,6 +9,7 @@ const producto = (nombre: string, usos: number): MiProductoResponse => ({
   unidad: "unidad",
   usos,
   unidadesPorPack: null,
+  emoji: null,
 });
 
 describe("unionPropuesta", () => {

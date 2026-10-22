@@ -1,8 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { LECHE, PLATANO, PLATANO_ID } from "@/domains/catalog/testing/builders";
+import { emojiProductoRepositoryContract } from "@/domains/catalog/testing/emoji-producto-repository.contract";
 import { productoRecordadoRepositoryContract } from "@/domains/catalog/testing/producto-recordado-repository.contract";
 import { prisma } from "@/shared/kernel/prisma";
 import { normalizarNombre } from "@/shared/kernel/texto";
+import { PrismaEmojiProductoRepository } from "./prisma-emoji-producto-repository";
 import { PrismaProductoBaseRepository } from "./prisma-producto-base-repository";
 import { PrismaProductoRecordadoRepository } from "./prisma-producto-recordado-repository";
 
@@ -75,5 +77,28 @@ describe("PrismaProductoBaseRepository", () => {
       categoria: "frutas",
       unidadPorDefecto: "kg",
     });
+  });
+});
+
+emojiProductoRepositoryContract("Prisma", async (iniciales) => {
+  await prisma.emojiProducto.deleteMany({ where: { hogarId: { in: [HOGAR_ID, OTRO_HOGAR_ID] } } });
+  const repo = new PrismaEmojiProductoRepository({ hogarId: HOGAR_ID });
+  for (const [nombre, emoji] of Object.entries(iniciales)) await repo.guardar(nombre, emoji);
+  return repo;
+});
+
+describe("PrismaEmojiProductoRepository: aislamiento entre hogares", () => {
+  it("listar_SoloLosDelHogar", async () => {
+    await prisma.emojiProducto.deleteMany({
+      where: { hogarId: { in: [HOGAR_ID, OTRO_HOGAR_ID] } },
+    });
+    await new PrismaEmojiProductoRepository({ hogarId: OTRO_HOGAR_ID }).guardar(
+      "solo del otro",
+      "🍓",
+    );
+
+    const mio = new PrismaEmojiProductoRepository({ hogarId: HOGAR_ID });
+    expect((await mio.listar()).size).toBe(0);
+    expect(await mio.buscar("solo del otro")).toBeNull();
   });
 });

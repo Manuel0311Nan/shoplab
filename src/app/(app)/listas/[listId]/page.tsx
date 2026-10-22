@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { packsRecordados } from "@/app/_lib/memoria-hogar";
+import { emojisProductos, packsRecordados } from "@/app/_lib/memoria-hogar";
 import { toShoppingListResponse } from "@/app/_lib/shopping/to-response";
 import { getAuthContext } from "@/shared/kernel/auth-context";
 import { ShoppingListScreen } from "./_components/shopping-list-screen";
@@ -28,6 +28,10 @@ export default async function ShoppingListPage({ params }: Props) {
   }
   // Con la lista ya cargada hay sesión: la memoria es una ayuda y nunca falla la página.
   const auth = await getAuthContext();
-  const packs = auth.ok ? await packsRecordados(auth.value) : {};
-  return <ShoppingListScreen list={toShoppingListResponse(result.value)} packs={packs} />;
+  const [packs, emojis] = auth.ok
+    ? await Promise.all([packsRecordados(auth.value), emojisProductos(auth.value)])
+    : [{}, {}];
+  return (
+    <ShoppingListScreen list={toShoppingListResponse(result.value)} packs={packs} emojis={emojis} />
+  );
 }

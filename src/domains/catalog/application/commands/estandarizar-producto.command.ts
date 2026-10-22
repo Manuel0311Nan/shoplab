@@ -4,6 +4,7 @@ import { validationError } from "@/shared/kernel/errors";
 import { err, ok, type Result } from "@/shared/kernel/result";
 import { normalizarNombre } from "@/shared/kernel/texto";
 import { esUnidad } from "@/shared/kernel/unidad";
+import type { EmojiProductoRepository } from "../ports/emoji-producto-repository";
 import type { ProductoRecordadoRepository } from "../ports/producto-recordado-repository";
 
 /** Como el nombre de un ítem de lista. */
@@ -28,6 +29,8 @@ export class EstandarizarProductoCommand {
   constructor(
     private readonly recordados: ProductoRecordadoRepository,
     private readonly clock: Clock,
+    /** El emoji elegido pasa al nombre nuevo (si allí no había otro). */
+    private readonly emojis?: EmojiProductoRepository,
   ) {}
 
   async execute(input: EstandarizarProductoInput): Promise<Result<void>> {
@@ -46,6 +49,17 @@ export class EstandarizarProductoCommand {
     }
     if (!esUnidad(input.unidad)) {
       return err(validationError("UNIDAD_NO_VALIDA", `Unidad desconocida: ${input.unidad}`));
+    }
+
+    if (this.emojis !== undefined && input.desde !== hacia) {
+      const [antes, despues] = await Promise.all([
+        this.emojis.buscar(input.desde),
+        this.emojis.buscar(hacia),
+      ]);
+      if (antes !== null) {
+        if (despues === null) await this.emojis.guardar(hacia, antes);
+        await this.emojis.borrar(input.desde);
+      }
     }
 
     const actual = await this.recordados.buscar(input.desde);

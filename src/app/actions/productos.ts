@@ -3,11 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { estandarizarProducto, olvidarProducto } from "@/app/_lib/catalog/mis-productos";
 import {
+  type CambiarEmojiRequest,
+  cambiarEmojiRequestSchema,
   type EstandarizarProductoRequest,
   type EstandarizarProductoResponse,
   estandarizarProductoRequestSchema,
   olvidarProductoRequestSchema,
 } from "@/contracts/catalog";
+import { catalogHogarModule } from "@/domains/catalog/infrastructure/catalog-module";
 import { getAuthContext } from "@/shared/kernel/auth-context";
 import { validationError } from "@/shared/kernel/errors";
 import { err, ok, type Result } from "@/shared/kernel/result";
@@ -58,5 +61,18 @@ export async function olvidarProductoAction(nombreNormalizado: string): Promise<
   const result = await olvidarProducto(auth.value, body.data.nombreNormalizado);
   if (!result.ok) return result;
   revalidatePath("/productos");
+  return ok(undefined);
+}
+
+/** Elegir el emoji con que el hogar ve un producto; null vuelve al de por defecto. */
+export async function cambiarEmojiAction(input: CambiarEmojiRequest): Promise<Result<void>> {
+  const auth = await getAuthContext();
+  if (!auth.ok) return auth;
+  const body = cambiarEmojiRequestSchema.safeParse(input);
+  if (!body.success) return datosNoValidos();
+
+  const result = await catalogHogarModule(auth.value).cambiarEmoji.execute(body.data);
+  if (!result.ok) return result;
+  revalidar();
   return ok(undefined);
 }

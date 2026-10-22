@@ -33,6 +33,8 @@ type Props = {
   onCerrarAbierto: (linea: LineaDespensaResponse) => void;
   /** Corregir el nombre (o estandarizarlo en todo el hogar). */
   onRenombrar: (linea: LineaDespensaResponse) => void;
+  /** El emoji del producto (elegido o por defecto); null: sin emoji. */
+  emoji?: string | null;
 };
 
 const COLOR: Record<LineaDespensaResponse["caducidad"]["estado"], string> = {
@@ -94,7 +96,9 @@ function MenuLinea({
   onCerrarAbierto,
   onRenombrar,
   onGastar,
-}: Omit<Props, "producto" | "detalle" | "onGastarUno"> & { linea: LineaDespensaResponse }) {
+}: Omit<Props, "producto" | "detalle" | "onGastarUno" | "emoji"> & {
+  linea: LineaDespensaResponse;
+}) {
   return (
     <Menu.Root>
       <Menu.Trigger
@@ -146,7 +150,13 @@ function MenuLinea({
 }
 
 /** Un producto: con fechas distintas, una fila por lote; si no, una sola. */
-export function TarjetaProducto({ producto, detalle, onGastarUno, ...acciones }: Props) {
+export function TarjetaProducto({
+  producto,
+  detalle,
+  onGastarUno,
+  emoji = null,
+  ...acciones
+}: Props) {
   const varias = producto.lineas.length > 1;
   const principal = producto.principal;
 
@@ -154,7 +164,14 @@ export function TarjetaProducto({ producto, detalle, onGastarUno, ...acciones }:
     <li className="flex flex-col gap-2 rounded-xl bg-card p-3 shadow-card">
       <div className="flex items-start gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-1 pt-1">
-          <h3 className="text-lg leading-6 font-semibold break-words">{producto.nombre}</h3>
+          <h3 className="text-lg leading-6 font-semibold break-words">
+            {emoji !== null && (
+              <span className="mr-1.5" aria-hidden="true">
+                {emoji}
+              </span>
+            )}
+            {producto.nombre}
+          </h3>
           <p className="text-sm text-muted-foreground">
             {/* La clave reinicia la animación cuando cambia la cantidad (al gastar). */}
             <span

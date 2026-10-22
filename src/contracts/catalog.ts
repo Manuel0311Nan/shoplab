@@ -31,6 +31,8 @@ export const miProductoSchema = productoHogarSchema.extend({
   nombreNormalizado: z.string(),
   /** Tamaño del pack recordado (null si nunca se compró por packs). */
   unidadesPorPack: z.number().int().nullable(),
+  /** El que eligió el hogar (null: el de por defecto según el nombre, o ninguno). */
+  emoji: z.string().nullable(),
 });
 
 export const grupoParecidoSchema = z.object({
@@ -72,6 +74,19 @@ export const olvidarProductoRequestSchema = z.object({
   nombreNormalizado: z.string().min(1).max(200),
 });
 
+/** PUT /catalog/emojis: el emoji con que el hogar ve un producto; null vuelve al de por defecto. */
+export const cambiarEmojiRequestSchema = z.object({
+  nombre: z.string().trim().min(1).max(80),
+  emoji: z.string().trim().min(1).max(16).nullable(),
+});
+
+/** GET /catalog/emojis: los emojis elegidos por el hogar. */
+export const emojisResponseSchema = z.object({
+  items: z.array(z.object({ nombreNormalizado: z.string(), emoji: z.string() })),
+});
+
+export type CambiarEmojiRequest = z.input<typeof cambiarEmojiRequestSchema>;
+export type EmojisResponse = z.infer<typeof emojisResponseSchema>;
 export type MiProductoResponse = z.infer<typeof miProductoSchema>;
 export type GrupoParecidoResponse = z.infer<typeof grupoParecidoSchema>;
 export type MisProductosResponse = z.infer<typeof misProductosResponseSchema>;

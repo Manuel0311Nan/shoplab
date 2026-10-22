@@ -395,6 +395,10 @@ Recetas escritas para Migas: no copiar textos de webs ni de libros.
   productos recordados): se lee y escribe en `try/catch` y se sigue.
 - No revalidar `/listas/${id}`: con la lista general hay que revalidar
   `revalidatePath("/listas/[listId]", "page")`.
+- No guardar emojis por defecto en la base de datos: salen del nombre con
+  `emojiPorDefecto` (kernel, igual en servidor y cliente). Solo se guarda lo que
+  elige el hogar (`EmojiProducto`, por nombre normalizado; al renombrar o unir
+  pasa al nombre nuevo). Se muestra con `emojiDe` y, sin emoji, `IconoCategoria`.
 - No duplicar la lógica de la lista en la vista rápida (`vista-rapida.tsx`): usa
   las mismas acciones (`marcar`, `cambiarCantidad`, `quitar`); el toque largo va
   por `usePulsacionLarga`, que ignora el scroll.

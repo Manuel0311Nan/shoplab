@@ -1,7 +1,7 @@
 "use client";
 import { ArchiveRestore, ChevronLeft, Plus } from "lucide-react";
 import Link from "next/link";
-import { useOptimistic, useState, useTransition } from "react";
+import { useEffect, useOptimistic, useState, useTransition } from "react";
 import {
   addItemAction,
   removeItemAction,
@@ -10,10 +10,10 @@ import {
   renombrarItemAction,
   updateItemQuantityAction,
 } from "@/app/actions/shopping-items";
-import { estandarizarProductoAction } from "@/app/actions/productos";
+import { cambiarEmojiAction, estandarizarProductoAction } from "@/app/actions/productos";
 import { actualizarListaAction, finishShoppingAction } from "@/app/actions/shopping-lists";
 import type { CategoriaDto } from "@/contracts/categoria";
-import type { PacksRecordados } from "@/contracts/memoria";
+import type { EmojisProductos, PacksRecordados } from "@/contracts/memoria";
 import type {
   CantidadDto,
   LimiteDeListasDetails,
@@ -43,12 +43,14 @@ type Props = {
   list: ShoppingListResponse;
   /** Memoria del hogar: el formulario propone el pack de cada producto. */
   packs?: PacksRecordados;
+  /** Emojis elegidos por el hogar. */
+  emojis?: EmojisProductos;
 };
 
 /** Alta que espera respuesta del usuario (producto repetido). */
 type AltaPendiente = EstadoDuplicado & { readonly values: NewItemValues; readonly id: string };
 
-export function ShoppingListScreen({ list, packs = {} }: Props) {
+export function ShoppingListScreen({ list, packs = {}, emojis: emojisIniciales = {} }: Props) {
   const [items, aplicarOptimista] = useOptimistic(list.items, aplicarAccion);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +62,9 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
   const [paraDespensa, setParaDespensa] = useState<ShoppingItemResponse[] | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [aEditar, setAEditar] = useState<ShoppingItemResponse | null>(null);
+  // Elegir un emoji se ve al momento; el servidor lo guarda después.
+  const [emojis, setEmojis] = useState<EmojisProductos>(emojisIniciales);
+  useEffect(() => setEmojis(emojisIniciales), [emojisIniciales]);
 
   function ejecutar(accion: AccionLista | null, llamada: () => Promise<Result<unknown>>) {
     setError(null);
@@ -155,6 +160,17 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
     );
   const quitar = (itemId: string) =>
     ejecutar({ tipo: "quitar", itemId }, () => removeItemAction(listaDe(itemId), itemId));
+  function cambiarEmoji(nombre: string, emoji: string | null) {
+    const clave = normalizarNombre(nombre);
+    setEmojis((actuales) => {
+      const siguientes = { ...actuales };
+      if (emoji === null) delete siguientes[clave];
+      else siguientes[clave] = emoji;
+      return siguientes;
+    });
+    ejecutar(null, () => cambiarEmojiAction({ nombre, emoji }));
+  }
+
   /** Solo este ítem, o en todo el hogar (todas las listas, la despensa y Mis productos). */
   function renombrar(item: ShoppingItemResponse, cambio: NombreEditado) {
     setAEditar(null);
@@ -295,6 +311,8 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
           onToggle={marcar}
           onCantidad={cambiarCantidad}
           onQuitar={quitar}
+          emojis={emojis}
+          onEmoji={cambiarEmoji}
         />
       ) : (
         <>
@@ -307,6 +325,7 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
             onCategoria={cambiarCategoria}
             onQuitar={quitar}
             onEditar={setAEditar}
+            emojis={emojis}
             agrupar={orden === "categoria"}
             soloLectura={soloLectura}
             generalId={list.general ? list.id : null}
@@ -320,6 +339,7 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
             onCategoria={cambiarCategoria}
             onQuitar={quitar}
             onEditar={setAEditar}
+            emojis={emojis}
             soloLectura={soloLectura}
             generalId={list.general ? list.id : null}
           />

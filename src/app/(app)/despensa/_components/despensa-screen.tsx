@@ -13,7 +13,7 @@ import {
   consumirAction,
   quitarLineaAction,
 } from "@/app/actions/pantry";
-import type { PacksRecordados, UbicacionesRecordadas } from "@/contracts/memoria";
+import type { EmojisProductos, PacksRecordados, UbicacionesRecordadas } from "@/contracts/memoria";
 import type {
   AddStockRequest,
   LineaDespensaResponse,
@@ -28,6 +28,7 @@ import { NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
 import { cn } from "@/shared/lib/utils";
 import { type Aviso, AvisoFlotante } from "../../_components/aviso-flotante";
 import { propuestaDeUnidad } from "../../_components/cantidad-pack";
+import { emojiDe } from "../../_components/emoji-producto";
 import { EditarNombreDialog, type NombreEditado } from "../../_components/editar-nombre-dialog";
 import { formatCantidad } from "../../listas/[listId]/_components/format-cantidad";
 import { AbrirDialog } from "./abrir-dialog";
@@ -50,6 +51,7 @@ type Props = {
   /** Memoria del hogar: el pack de cada producto y dónde se guardó la última vez. */
   packs?: PacksRecordados;
   recordadas?: UbicacionesRecordadas;
+  emojis?: EmojisProductos;
 };
 
 const segmento = (activo: boolean) =>
@@ -58,7 +60,13 @@ const segmento = (activo: boolean) =>
     activo ? "bg-card shadow-card" : "text-muted-foreground",
   );
 
-export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }: Props) {
+export function DespensaScreen({
+  despensa,
+  listas,
+  packs = {},
+  recordadas = {},
+  emojis = {},
+}: Props) {
   const router = useRouter();
   const ruta = usePathname();
   const params = useSearchParams();
@@ -393,6 +401,7 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
                         onAbrir={setAAbrir}
                         onCerrarAbierto={cerrarAbierto}
                         onRenombrar={setARenombrar}
+                        emoji={emojiDe(emojis, p.nombre)}
                       />
                     ))}
                   </ul>
