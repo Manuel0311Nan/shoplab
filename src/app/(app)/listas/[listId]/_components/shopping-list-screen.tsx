@@ -45,12 +45,26 @@ type Props = {
   packs?: PacksRecordados;
   /** Emojis elegidos por el hogar. */
   emojis?: EmojisProductos;
+  /** En la lista general: las demás listas activas, para elegir dónde añadir. */
+  listas?: readonly { id: string; nombre: string }[];
 };
 
 /** Alta que espera respuesta del usuario (producto repetido). */
-type AltaPendiente = EstadoDuplicado & { readonly values: NewItemValues; readonly id: string };
+type AltaPendiente = EstadoDuplicado & {
+  readonly values: NewItemValues;
+  readonly id: string;
+  /** Lista en la que se añade (la propia, u otra desde la general). */
+  readonly destinoId: string;
+};
 
-export function ShoppingListScreen({ list, packs = {}, emojis: emojisIniciales = {} }: Props) {
+export function ShoppingListScreen({
+  list,
+  packs = {},
+  emojis: emojisIniciales = {},
+  listas = [],
+}: Props) {
+  // Desde la general, lo nuevo puede ir a otra lista; sin elegir, se queda en la general.
+  const [destinoId, setDestinoId] = useState<string | null>(null);
   const [items, aplicarOptimista] = useOptimistic(list.items, aplicarAccion);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +97,9 @@ export function ShoppingListScreen({ list, packs = {}, emojis: emojisIniciales =
     values: NewItemValues,
     id: string,
     respuesta: RespuestaUnir & { duplicado?: "unir" | "separar" } = {},
+    destino: string = destinoId ?? list.id,
   ) {
+    const listaDestino = listas.find((l) => l.id === destino) ?? list;
     setError(null);
     startTransition(async () => {
       if (respuesta.duplicado === undefined) {
@@ -101,12 +117,12 @@ export function ShoppingListScreen({ list, packs = {}, emojis: emojisIniciales =
             categoria: values.categoria ?? "otros",
             compradoAt: null,
             updatedAt: new Date().toISOString(),
-            listaId: list.id,
-            listaNombre: list.nombre,
+            listaId: listaDestino.id,
+            listaNombre: listaDestino.nombre,
           },
         });
       }
-      const result = await addItemAction(list.id, { ...values, id, ...respuesta });
+      const result = await addItemAction(listaDestino.id, { ...values, id, ...respuesta });
       if (result.ok) return;
 
       const existente = duplicado(result.error);
@@ -117,6 +133,7 @@ export function ShoppingListScreen({ list, packs = {}, emojis: emojisIniciales =
       setAlta({
         values,
         id,
+        destinoId: listaDestino.id,
         existente,
         nueva: values.cantidad,
         paso: result.error.code === "POSIBLE_DUPLICADO" ? "decidir" : "unidad",
@@ -127,7 +144,7 @@ export function ShoppingListScreen({ list, packs = {}, emojis: emojisIniciales =
   function responderAlta(respuesta: RespuestaUnir & { duplicado: "unir" | "separar" }) {
     if (alta === null) return;
     setAlta(null);
-    enviarAlta(alta.values, alta.id, respuesta);
+    enviarAlta(alta.values, alta.id, respuesta, alta.destinoId);
   }
 
   function recuperar(archivarListaId?: string) {
@@ -274,7 +291,13 @@ export function ShoppingListScreen({ list, packs = {}, emojis: emojisIniciales =
           </Button>
         </div>
       ) : (
-        <AddItemForm packs={packs} onAdd={(values) => enviarAlta(values, newId())} />
+        <AddItemForm
+          packs={packs}
+          onAdd={(values) => enviarAlta(values, newId())}
+          {...(list.general
+            ? { destino: { listas, elegida: destinoId, onElegir: setDestinoId } }
+            : {})}
+        />
       )}
 
       {aviso !== null && (
@@ -298,7 +321,10 @@ export function ShoppingListScreen({ list, packs = {}, emojis: emojisIniciales =
       {items.length > 0 && (
         <div className="flex flex-col gap-2">
           <SelectorVista vista={vista} onCambiar={setVista} />
-          {pendientes.length > 1 && <SelectorOrden orden={orden} onCambiar={setOrden} />}
+          {/* En la cuadrícula el orden es siempre el del súper: no hay nada que elegir. */}
+          {vista === "detalle" && pendientes.length > 1 && (
+            <SelectorOrden orden={orden} onCambiar={setOrden} />
+          )}
         </div>
       )}
 
@@ -306,7 +332,7 @@ export function ShoppingListScreen({ list, packs = {}, emojis: emojisIniciales =
         <VistaRapida
           pendientes={pendientes}
           enElCarro={enElCarro}
-          agrupar={orden === "categoria"}
+          agrupar
           soloLectura={soloLectura}
           onToggle={marcar}
           onCantidad={cambiarCantidad}

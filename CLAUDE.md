@@ -229,8 +229,9 @@ hay en casa: cantidad, caducidad, ubicación).
   ni se borra (`LISTA_GENERAL`) y no cuenta para el límite de 15. Su vista
   (`vistaGeneral`) junta sus ítems con los de todas las activas; cada ítem
   lleva `listaId`/`listaNombre` y las acciones van a la lista de origen, así
-  que cambiar o quitar en una se ve en la otra. Lo añadido en la general solo
-  vive ahí. Terminar compra en la general termina todas («conservarPendientes»).
+  que cambiar o quitar en una se ve en la otra. Al añadir en la general se
+  puede elegir otra lista activa como destino («Añadir en», opcional); sin
+  elegir, el producto solo vive en la general. Terminar compra en la general termina todas («conservarPendientes»).
   Packs: se guardan en unidades con `unidadesPorPack` (2..100, solo con
   unidad «unidad»); el stepper sube de pack en pack y si la cantidad deja de
   ser un número entero de packs se quita el pack. Memoria de packs
