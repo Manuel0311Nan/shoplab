@@ -1,6 +1,14 @@
 "use client";
 import { Menu } from "@base-ui/react/menu";
-import { MoreVertical, PackageOpen, Pencil, ShoppingCart, Trash2, Undo2 } from "lucide-react";
+import {
+  MoreVertical,
+  PackageOpen,
+  Pencil,
+  ShoppingCart,
+  TextCursorInput,
+  Trash2,
+  Undo2,
+} from "lucide-react";
 import type { ColorAbiertoDto, LineaDespensaResponse } from "@/contracts/pantry";
 import { sePuedeAbrir } from "@/shared/kernel/abierto";
 import { cn } from "@/shared/lib/utils";
@@ -19,6 +27,8 @@ type Props = {
   onQuitar: (linea: LineaDespensaResponse) => void;
   onAbrir: (linea: LineaDespensaResponse) => void;
   onCerrarAbierto: (linea: LineaDespensaResponse) => void;
+  /** Corregir el nombre (o estandarizarlo en todo el hogar). */
+  onRenombrar: (linea: LineaDespensaResponse) => void;
 };
 
 const COLOR: Record<LineaDespensaResponse["caducidad"]["estado"], string> = {
@@ -78,6 +88,7 @@ function MenuLinea({
   onQuitar,
   onAbrir,
   onCerrarAbierto,
+  onRenombrar,
 }: Omit<Props, "producto" | "detalle" | "onGastar"> & { linea: LineaDespensaResponse }) {
   return (
     <Menu.Root>
@@ -93,6 +104,10 @@ function MenuLinea({
             <Menu.Item className={opcion} onClick={() => onEditar(linea)}>
               <Pencil className="size-5" aria-hidden="true" />
               Mover, fecha, categoría…
+            </Menu.Item>
+            <Menu.Item className={opcion} onClick={() => onRenombrar(linea)}>
+              <TextCursorInput className="size-5" aria-hidden="true" />
+              Cambiar nombre
             </Menu.Item>
             {linea.abierto === null && sePuedeAbrir(linea.categoria) && (
               <Menu.Item className={opcion} onClick={() => onAbrir(linea)}>

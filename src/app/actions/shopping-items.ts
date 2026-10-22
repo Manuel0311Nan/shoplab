@@ -9,6 +9,8 @@ import {
   addItemRequestSchema,
   type CantidadDto,
   cantidadSchema,
+  type ProductoEditado,
+  productoEditadoSchema,
   type ShoppingItemResponse,
 } from "@/contracts/shopping";
 import { type CategoriaDto, categoriaSchema } from "@/contracts/categoria";
@@ -142,6 +144,30 @@ export async function updateItemCategoryAction(
   if (!result.ok) return result;
 
   // Todas las listas: la general enseña los productos de cada una.
+  revalidatePath("/listas/[listId]", "page");
+  return ok(toShoppingItemResponse(result.value));
+}
+
+/** Renombrar un ítem (o vincularlo a otro producto de la lista base): solo este ítem. */
+export async function renombrarItemAction(
+  listId: string,
+  itemId: string,
+  producto: ProductoEditado,
+): Promise<Result<ShoppingItemResponse>> {
+  const auth = await getAuthContext();
+  if (!auth.ok) return auth;
+
+  const ids = itemIdsSchema.safeParse({ listId, itemId });
+  const body = productoEditadoSchema.safeParse(producto);
+  if (!ids.success || !body.success) return datosNoValidos();
+
+  const result = await actualizarProducto(auth.value, {
+    ...ids.data,
+    producto: body.data,
+    usuarioId: auth.value.userId,
+  });
+  if (!result.ok) return result;
+
   revalidatePath("/listas/[listId]", "page");
   return ok(toShoppingItemResponse(result.value));
 }

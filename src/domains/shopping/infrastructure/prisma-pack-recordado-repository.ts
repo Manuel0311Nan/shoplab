@@ -20,6 +20,10 @@ export class PrismaPackRecordadoRepository
     });
   }
 
+  async borrar(nombreNormalizado: string): Promise<void> {
+    await this.db.packRecordado.deleteMany({ where: { nombreNormalizado } });
+  }
+
   async guardar(pack: PackRecordado): Promise<void> {
     const { nombreNormalizado, ...datos } = pack;
     await this.db.packRecordado.upsert({

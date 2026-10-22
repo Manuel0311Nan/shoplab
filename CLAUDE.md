@@ -186,7 +186,18 @@ hay en casa: cantidad, caducidad, ubicación).
   3): lista y despensa guardan el nombre escrito + `productoBaseId`
   opcional; `ResolverProductoQuery` vincula (elegido, nombre o sinónimo de
   la lista base) y decide la categoría (memoria del hogar, lista base u
-  «otros»). Se descarga entero y se filtra en el cliente
+  «otros»). Se descarga entero y se filtra en el cliente.
+  Editar nombres: un ítem o una línea se renombra con `producto` en su PATCH
+  (el catálogo vincula y decide la categoría). «Mis productos» (`/productos`,
+  `app/_lib/catalog/mis-productos.ts`) muestra el texto libre del hogar y
+  estandariza en todo el hogar: `EstandarizarProductoCommand` (memoria; al
+  unir suma usos, al vincular a la lista base olvida el texto libre),
+  `RenombrarEnListasCommand` (listas activas), `RenombrarEnDespensaCommand`
+  (despensa, junta líneas iguales y mueve la ubicación recordada) y
+  `EditarPackCommand`. No es una transacción entre contextos: el orden es
+  memoria → listas → despensa → pack y se puede repetir sin daño. Los posibles
+  duplicados salen de `claveParecida` (sin plurales, tildes, palabras vacías
+  ni orden)
 - **Categorías**: las 15 de la lista base + «otros», en el kernel y en el
   orden del súper (`compararCategorias`). Cada línea de lista y despensa
   guarda la suya y se puede cambiar; cambiarla la recuerda el hogar

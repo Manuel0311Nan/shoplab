@@ -51,14 +51,31 @@ export async function anadirProducto(
   return result;
 }
 
-/** PATCH de un ítem; si cambia la categoría, el hogar la recuerda para la próxima vez. */
+/**
+ * PATCH de un ítem; si cambia la categoría, el hogar la recuerda para la próxima vez.
+ * Al renombrar, el catálogo vincula el nombre nuevo y, si no se eligió categoría, la
+ * decide; el texto libre nuevo se apunta en la memoria del hogar.
+ */
 export async function actualizarProducto(
   auth: AuthContext,
   input: UpdateItemInput,
 ): Promise<Result<ShoppingItemSnapshot>> {
-  const result = await shoppingModule(auth).updateItem.execute(input);
+  let datos = input;
+  if (input.producto !== undefined) {
+    const resuelto = await catalogHogarModule(auth).resolverProducto.execute(input.producto);
+    if (resuelto.ok) {
+      datos = {
+        ...input,
+        producto: { nombre: input.producto.nombre, productoBaseId: resuelto.value.productoBaseId },
+        categoria: input.categoria ?? resuelto.value.categoria,
+      };
+    }
+  }
+  const result = await shoppingModule(auth).updateItem.execute(datos);
   if (result.ok && input.categoria !== undefined) {
     await recordar(auth, result.value, "categoria");
+  } else if (result.ok && input.producto !== undefined && result.value.productoBaseId === null) {
+    await recordar(auth, result.value, "uso");
   }
   return result;
 }

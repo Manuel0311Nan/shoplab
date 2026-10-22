@@ -119,6 +119,7 @@ export async function actualizarLineaAction(
     ...(body.data.categoria === undefined ? {} : { categoria: body.data.categoria }),
     ...(body.data.cantidad === undefined ? {} : { cantidad: body.data.cantidad }),
     ...(body.data.abiertoEl === undefined ? {} : { abiertoEl: body.data.abiertoEl }),
+    ...(body.data.producto === undefined ? {} : { producto: body.data.producto }),
   });
   if (!result.ok) return result;
   revalidar();

@@ -116,10 +116,9 @@ export class InventoryItem {
     contexto: ContextoMovimiento,
     ahora: Date,
   ): Result<{ item: InventoryItem; movimiento: MovimientoSnapshot }> {
-    const nombre = input.nombre.trim().replace(/\s+/g, " ");
-    if (nombre.length === 0 || nombre.length > MAX_NOMBRE_PRODUCTO) {
-      return err(PantryErrors.nombreNoValido(MAX_NOMBRE_PRODUCTO));
-    }
+    const limpio = nombreDeProducto(input.nombre);
+    if (!limpio.ok) return limpio;
+    const nombre = limpio.value;
     const item = new InventoryItem({
       id: input.id,
       nombre,
@@ -315,6 +314,20 @@ export class InventoryItem {
     this.state = { ...this.state, categoria, updatedAt: ahora };
   }
 
+  /** Otro nombre (y su vínculo con la lista base): corregir o estandarizar. */
+  renombrar(nombre: string, productoBaseId: string | null, ahora: Date): Result<void> {
+    const limpio = nombreDeProducto(nombre);
+    if (!limpio.ok) return limpio;
+    this.state = {
+      ...this.state,
+      nombre: limpio.value,
+      nombreNormalizado: normalizarNombre(limpio.value),
+      productoBaseId,
+      updatedAt: ahora,
+    };
+    return ok(undefined);
+  }
+
   /**
    * D8: queda poco cuando, tras gastar, queda 1 ud. o, en g, kg, ml o l, el 20 % o menos
    * de lo que entró por última vez. Algo recién comprado nunca "queda poco", aunque sea
@@ -350,4 +363,13 @@ export class InventoryItem {
       createdAt: ahora,
     };
   }
+}
+
+/** Nombre de un producto de la despensa: espacios simples, ni vacío ni demasiado largo. */
+export function nombreDeProducto(nombre: string): Result<string> {
+  const limpio = nombre.trim().replace(/\s+/g, " ");
+  if (limpio.length === 0 || limpio.length > MAX_NOMBRE_PRODUCTO) {
+    return err(PantryErrors.nombreNoValido(MAX_NOMBRE_PRODUCTO));
+  }
+  return ok(limpio);
 }

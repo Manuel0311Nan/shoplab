@@ -7,8 +7,10 @@ import {
   removeItemAction,
   setItemPurchasedAction,
   updateItemCategoryAction,
+  renombrarItemAction,
   updateItemQuantityAction,
 } from "@/app/actions/shopping-items";
+import { estandarizarProductoAction } from "@/app/actions/productos";
 import { actualizarListaAction, finishShoppingAction } from "@/app/actions/shopping-lists";
 import type { CategoriaDto } from "@/contracts/categoria";
 import type { PacksRecordados } from "@/contracts/memoria";
@@ -20,6 +22,8 @@ import type {
   ShoppingListResponse,
 } from "@/contracts/shopping";
 import { newId } from "@/shared/kernel/ids";
+import { normalizarNombre } from "@/shared/kernel/texto";
+import { EditarNombreDialog, type NombreEditado } from "../../../_components/editar-nombre-dialog";
 import type { Result } from "@/shared/kernel/result";
 import { Button } from "@/shared/ui/button";
 import { ElegirListaDialog } from "../../../_components/elegir-lista-dialog";
@@ -52,6 +56,7 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
   const [orden, setOrden] = useOrdenLista();
   const [paraDespensa, setParaDespensa] = useState<ShoppingItemResponse[] | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [aEditar, setAEditar] = useState<ShoppingItemResponse | null>(null);
 
   function ejecutar(accion: AccionLista | null, llamada: () => Promise<Result<unknown>>) {
     setError(null);
@@ -147,6 +152,35 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
     );
   const quitar = (itemId: string) =>
     ejecutar({ tipo: "quitar", itemId }, () => removeItemAction(listaDe(itemId), itemId));
+  /** Solo este ítem, o en todo el hogar (todas las listas, la despensa y Mis productos). */
+  function renombrar(item: ShoppingItemResponse, cambio: NombreEditado) {
+    setAEditar(null);
+    const accion: AccionLista = {
+      tipo: "renombrar",
+      itemId: item.id,
+      nombre: cambio.nombre,
+      productoBaseId: cambio.productoBaseId,
+    };
+    ejecutar(accion, async () => {
+      if (!cambio.todoElHogar) {
+        return renombrarItemAction(listaDe(item.id), item.id, {
+          nombre: cambio.nombre,
+          productoBaseId: cambio.productoBaseId,
+        });
+      }
+      const r = await estandarizarProductoAction({
+        desde: normalizarNombre(item.nombre),
+        nombre: cambio.nombre,
+        productoBaseId: cambio.productoBaseId,
+      });
+      if (r.ok) {
+        setAviso(
+          `Cambiado en todo el hogar: ${r.value.enListas} en listas y ${r.value.enDespensa} en la despensa.`,
+        );
+      }
+      return r;
+    });
+  }
   /** D6: al terminar, lo que estaba en el carro se ofrece para guardarlo en la despensa. */
   function terminar(modo: ModoTerminarCompraDto) {
     const comprados = items.filter((item) => item.compradoAt !== null);
@@ -252,6 +286,7 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
         onCantidad={cambiarCantidad}
         onCategoria={cambiarCategoria}
         onQuitar={quitar}
+        onEditar={setAEditar}
         agrupar={orden === "categoria"}
         soloLectura={soloLectura}
         generalId={list.general ? list.id : null}
@@ -264,6 +299,7 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
         onCantidad={cambiarCantidad}
         onCategoria={cambiarCategoria}
         onQuitar={quitar}
+        onEditar={setAEditar}
         soloLectura={soloLectura}
         generalId={list.general ? list.id : null}
       />
@@ -287,6 +323,12 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
         </button>
       )}
 
+      <EditarNombreDialog
+        producto={aEditar}
+        soloAqui="Solo en esta lista"
+        onGuardar={(cambio) => aEditar && renombrar(aEditar, cambio)}
+        onCerrar={() => setAEditar(null)}
+      />
       <GuardarEnDespensaSheet
         listaId={list.id}
         productos={paraDespensa}

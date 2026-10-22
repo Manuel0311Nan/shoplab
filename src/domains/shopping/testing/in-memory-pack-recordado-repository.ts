@@ -18,6 +18,10 @@ export class InMemoryPackRecordadoRepository implements PackRecordadoRepository 
     );
   }
 
+  async borrar(nombreNormalizado: string): Promise<void> {
+    this.store.delete(nombreNormalizado);
+  }
+
   async guardar(pack: PackRecordado): Promise<void> {
     this.store.set(pack.nombreNormalizado, pack);
   }

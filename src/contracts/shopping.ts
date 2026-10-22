@@ -124,17 +124,28 @@ export const addItemRequestSchema = z.object({
   cantidadFinal: cantidadSchema.optional(),
 });
 
+/** Renombrar un ítem o una línea de la despensa. */
+export const productoEditadoSchema = z.object({
+  nombre: z.string().trim().min(1).max(80),
+  productoBaseId: z.uuid().nullable(),
+});
+
 export const updateItemRequestSchema = z
   .object({
     comprado: z.boolean().optional(),
     cantidad: cantidadSchema.optional(),
     /** Cambiarla también la guarda en la memoria del hogar. */
     categoria: categoriaSchema.optional(),
+    /** Renombrar: el nombre nuevo y, si se eligió en el autocompletado, su producto base. */
+    producto: productoEditadoSchema.optional(),
   })
   .refine(
     (body) =>
-      body.comprado !== undefined || body.cantidad !== undefined || body.categoria !== undefined,
-    { message: "Indica comprado, cantidad o categoría" },
+      body.comprado !== undefined ||
+      body.cantidad !== undefined ||
+      body.categoria !== undefined ||
+      body.producto !== undefined,
+    { message: "Indica comprado, cantidad, categoría o producto" },
   );
 
 export const modoTerminarCompraSchema = z.enum(["vaciar", "conservarPendientes"]);
@@ -147,6 +158,7 @@ export type CantidadDto = z.infer<typeof cantidadSchema>;
 export type ShoppingItemResponse = z.infer<typeof shoppingItemSchema>;
 export type ShoppingListResponse = z.infer<typeof shoppingListResponseSchema>;
 export type AddItemRequest = z.input<typeof addItemRequestSchema>;
+export type ProductoEditado = z.input<typeof productoEditadoSchema>;
 export type UpdateItemRequest = z.input<typeof updateItemRequestSchema>;
 export type ModoTerminarCompraDto = z.infer<typeof modoTerminarCompraSchema>;
 export type FinishShoppingRequest = z.input<typeof finishShoppingRequestSchema>;

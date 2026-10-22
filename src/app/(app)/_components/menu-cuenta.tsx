@@ -1,12 +1,13 @@
 "use client";
-import { LogOut } from "lucide-react";
+import { LogOut, Tags } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { authClient } from "@/app/_lib/auth/auth-client";
 
 type Props = { nombre: string; email: string };
 
-/** Botón de cuenta (44 px) con un panel para cerrar sesión. Se cierra con Escape o al pulsar fuera. */
+/** Botón de cuenta (44 px) con un panel: Mis productos y cerrar sesión. Se cierra con Escape o al pulsar fuera. */
 export function MenuCuenta({ nombre, email }: Props) {
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
@@ -60,6 +61,14 @@ export function MenuCuenta({ nombre, email }: Props) {
             <p className="truncate font-semibold">{nombre}</p>
             <p className="truncate text-sm text-muted-foreground">{email}</p>
           </div>
+          <Link
+            href="/productos"
+            onClick={() => setAbierto(false)}
+            className="flex h-11 items-center gap-2 rounded-lg px-3 font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <Tags className="size-5" aria-hidden="true" />
+            Mis productos
+          </Link>
           <button
             type="button"
             onClick={cerrarSesion}

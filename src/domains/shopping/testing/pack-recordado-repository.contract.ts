@@ -42,6 +42,15 @@ export function packRecordadoRepositoryContract(
       });
     });
 
+    it("borrar_LoQuitaYSiNoEstaNoFalla", async () => {
+      const repo = await crear([YOGUR]);
+
+      await repo.borrar("yogur natural");
+      await repo.borrar("nada");
+
+      expect(await repo.listar()).toEqual([]);
+    });
+
     it("listar_TodosPorNombre", async () => {
       const repo = await crear([
         YOGUR,

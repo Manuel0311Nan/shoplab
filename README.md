@@ -32,6 +32,10 @@ consumirán otros clientes, como una futura app móvil (proyecto aparte).
   que se acaba vuelve a la lista con un toque. Los paquetes abiertos avisan en
   verde, amarillo o rojo según los días que llevan abiertos, para revisar si
   siguen buenos.
+- **Mis productos**: lo que has escrito a mano, para corregir nombres, unir
+  duplicados («Yogures proteina» y «Yogur proteína») y fijar categoría, unidad
+  y pack; el cambio llega a todas tus listas y a la despensa. También se puede
+  renombrar un producto desde su tarjeta en la lista o en la despensa.
 - **Categorías**: cada producto tiene la suya; la lista se agrupa en el
   orden del súper y la despensa por ubicación o por categoría. El hogar
   recuerda cómo clasifica lo que escribe a mano.

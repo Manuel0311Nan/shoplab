@@ -133,6 +133,9 @@ export function pantryRepositoryContract(nombre: string, crear: CrearRepositorio
         arroz: NEVERA_ID,
       });
 
+      await repo.guardar({ olvidar: ["arroz"] });
+      expect([...(await repo.ubicacionesRecordadas()).keys()]).toEqual(["macarrones"]);
+
       await repo.guardar({ reubicarRecordadas: { desde: NEVERA_ID, hacia: null } });
       expect((await repo.ubicacionesRecordadas()).size).toBe(0);
     });

@@ -3,6 +3,8 @@ import { AddItemCommand } from "@/domains/shopping/application/commands/add-item
 import { CreateShoppingListCommand } from "@/domains/shopping/application/commands/create-shopping-list.command";
 import { DeleteShoppingListCommand } from "@/domains/shopping/application/commands/delete-shopping-list.command";
 import { FinishShoppingCommand } from "@/domains/shopping/application/commands/finish-shopping.command";
+import { EditarPackCommand } from "@/domains/shopping/application/commands/editar-pack.command";
+import { RenombrarEnListasCommand } from "@/domains/shopping/application/commands/renombrar-en-listas.command";
 import { RecordarPackCommand } from "@/domains/shopping/application/commands/recordar-pack.command";
 import { PurgeExpiredListsCommand } from "@/domains/shopping/application/commands/purge-expired-lists.command";
 import { RemoveItemCommand } from "@/domains/shopping/application/commands/remove-item.command";
@@ -31,6 +33,8 @@ export function shoppingModule(auth: AuthContext) {
     removeItem: new RemoveItemCommand(lists, systemClock),
     finishShopping: new FinishShoppingCommand(lists, systemClock),
     recordarPack: new RecordarPackCommand(packs),
+    editarPack: new EditarPackCommand(packs),
+    renombrarEnListas: new RenombrarEnListasCommand(lists, systemClock),
     packsRecordados: new ListPacksRecordadosQuery(packs),
   };
 }

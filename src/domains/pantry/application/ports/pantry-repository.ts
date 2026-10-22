@@ -12,6 +12,8 @@ export interface CambiosDespensa {
    * movido sus productos) o, con null, se olvida y se vuelve a proponer por categoría.
    */
   readonly reubicarRecordadas?: { readonly desde: string; readonly hacia: string | null };
+  /** Memoria del hogar: deja de recordar dónde va cada uno de estos nombres normalizados. */
+  readonly olvidar?: readonly string[];
 }
 
 /**

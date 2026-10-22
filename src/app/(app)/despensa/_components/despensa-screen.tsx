@@ -20,9 +20,12 @@ import type {
   PantryResponse,
   UpdateStockRequest,
 } from "@/contracts/pantry";
+import { estandarizarProductoAction } from "@/app/actions/productos";
 import { newId } from "@/shared/kernel/ids";
+import { normalizarNombre } from "@/shared/kernel/texto";
 import { NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
 import { cn } from "@/shared/lib/utils";
+import { EditarNombreDialog, type NombreEditado } from "../../_components/editar-nombre-dialog";
 import { AbrirDialog } from "./abrir-dialog";
 import {
   AnadirAListaDialog,
@@ -65,6 +68,7 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
   const [aviso, setAviso] = useState<string | null>(null);
   const [aGastar, setAGastar] = useState<LineaDespensaResponse | null>(null);
   const [aEditar, setAEditar] = useState<LineaDespensaResponse | null>(null);
+  const [aRenombrar, setARenombrar] = useState<LineaDespensaResponse | null>(null);
   const [paraLista, setParaLista] = useState<ProductoParaLista | null>(null);
   const [nuevo, setNuevo] = useState(false);
   const [aAbrir, setAAbrir] = useState<LineaDespensaResponse | null>(null);
@@ -123,6 +127,31 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
     hacer(async () => {
       const r = await actualizarLineaAction(linea.id, cambios);
       if (!r.ok) setError(r.error.message);
+    });
+  }
+
+  /** Solo esta línea, o en todo el hogar (listas, despensa y Mis productos). */
+  function renombrar(linea: LineaDespensaResponse, cambio: NombreEditado) {
+    setARenombrar(null);
+    hacer(async () => {
+      if (!cambio.todoElHogar) {
+        const r = await actualizarLineaAction(linea.id, {
+          producto: { nombre: cambio.nombre, productoBaseId: cambio.productoBaseId },
+        });
+        if (!r.ok) setError(r.error.message);
+        return;
+      }
+      const r = await estandarizarProductoAction({
+        desde: normalizarNombre(linea.nombre),
+        nombre: cambio.nombre,
+        productoBaseId: cambio.productoBaseId,
+      });
+      if (!r.ok) setError(r.error.message);
+      else {
+        setAviso(
+          `Cambiado en todo el hogar: ${r.value.enDespensa} en la despensa y ${r.value.enListas} en listas.`,
+        );
+      }
     });
   }
 
@@ -293,6 +322,7 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
                         onQuitar={quitar}
                         onAbrir={setAAbrir}
                         onCerrarAbierto={cerrarAbierto}
+                        onRenombrar={setARenombrar}
                       />
                     ))}
                   </ul>
@@ -319,6 +349,12 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
         hoy={despensa.hoy}
         onGuardar={editar}
         onCerrar={() => setAEditar(null)}
+      />
+      <EditarNombreDialog
+        producto={aRenombrar}
+        soloAqui="Solo esta línea de la despensa"
+        onGuardar={(cambio) => aRenombrar && renombrar(aRenombrar, cambio)}
+        onCerrar={() => setARenombrar(null)}
       />
       <AbrirDialog
         linea={aAbrir}

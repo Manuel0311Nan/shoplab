@@ -57,6 +57,7 @@ export class InMemoryPantryRepository implements PantryRepository {
     for (const l of cambios.lineas ?? []) this.lineas.set(l.id, l.toSnapshot());
     for (const m of cambios.movimientos ?? []) this.movimientos.set(m.id, m);
     for (const r of cambios.recordar ?? []) this.recordadas.set(r.nombreNormalizado, r.ubicacionId);
+    for (const nombre of cambios.olvidar ?? []) this.recordadas.delete(nombre);
     const cambio = cambios.reubicarRecordadas;
     if (cambio !== undefined) {
       for (const [nombre, ubicacionId] of this.recordadas) {

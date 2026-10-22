@@ -7,4 +7,5 @@ export interface PackRecordadoRepository {
   listar(): Promise<PackRecordado[]>;
   /** Crea o reemplaza el de ese nombre. */
   guardar(pack: PackRecordado): Promise<void>;
+  borrar(nombreNormalizado: string): Promise<void>;
 }

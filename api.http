@@ -280,6 +280,31 @@ Authorization: Bearer {{token}}
 GET {{base}}/catalog/household-products
 Authorization: Bearer {{token}}
 
+### Mis productos: lo escrito a mano, con su pack y posibles duplicados
+GET {{base}}/catalog/my-products
+Authorization: Bearer {{token}}
+
+### Estandarizar: renombrar o unir en todo el hogar (memoria, listas activas y despensa)
+POST {{base}}/catalog/my-products/standardize
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "desde": "yogures proteina natural", "nombre": "Yogur proteína natural", "categoria": "lacteos_huevos", "unidadesPorPack": 4 }
+
+### Olvidar: deja de sugerirse (listas y despensa no cambian)
+POST {{base}}/catalog/my-products/forget
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nombreNormalizado": "yogures proteina natural" }
+
+### Renombrar solo un ítem (o vincularlo a un producto base)
+PATCH {{base}}/lists/{{lista}}/items/{{item}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "producto": { "nombre": "Yogur proteína natural", "productoBaseId": null } }
+
 # ─── Recetas (vista 4) ───────────────────────────────────────
 # Pega aquí un id de receta de "Sugerencias"
 @receta = PEGA-AQUI-EL-ID

@@ -7,6 +7,7 @@ import {
 } from "@/domains/pantry/application/commands/open-stock.command";
 import type { AvisosAbierto } from "@/domains/pantry/application/ports/avisos-abierto";
 import { RemoveStockCommand } from "@/domains/pantry/application/commands/remove-stock.command";
+import { RenombrarEnDespensaCommand } from "@/domains/pantry/application/commands/renombrar-en-despensa.command";
 import { StoreShoppingCommand } from "@/domains/pantry/application/commands/store-shopping.command";
 import {
   CreateUbicacionCommand,
@@ -42,6 +43,7 @@ export function pantryModule(
       deps.avisosAbierto ?? avisosPorCategoria,
     ),
     updateStock: new UpdateStockCommand(despensa, systemClock),
+    renombrarEnDespensa: new RenombrarEnDespensaCommand(despensa, systemClock),
     removeStock: new RemoveStockCommand(despensa, systemClock),
     createUbicacion: new CreateUbicacionCommand(despensa, systemClock),
     updateUbicacion: new UpdateUbicacionCommand(despensa, systemClock),

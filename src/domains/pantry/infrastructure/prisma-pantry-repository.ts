@@ -111,6 +111,13 @@ export class PrismaPantryRepository extends TenantRepository implements PantryRe
         }),
       ),
       ...reubicar(this.db, cambios.reubicarRecordadas),
+      ...((cambios.olvidar ?? []).length === 0
+        ? []
+        : [
+            this.db.ubicacionRecordada.deleteMany({
+              where: { nombreNormalizado: { in: [...(cambios.olvidar ?? [])] } },
+            }),
+          ]),
     ]);
   }
 }

@@ -42,11 +42,9 @@ export class ShoppingItem {
   private constructor(private state: ShoppingItemSnapshot) {}
 
   static create(input: NewShoppingItem, ahora: Date): Result<ShoppingItem> {
-    const nombre = input.nombre.trim();
-
-    if (nombre.length === 0 || nombre.length > NOMBRE_MAX) {
-      return err(ShoppingErrors.nombreNoValido(NOMBRE_MAX));
-    }
+    const limpio = nombreDeItem(input.nombre);
+    if (!limpio.ok) return limpio;
+    const nombre = limpio.value;
 
     const nota = input.nota?.trim() || null;
 
@@ -133,6 +131,13 @@ export class ShoppingItem {
       updatedAt: ahora,
     };
   }
+  /** Otro nombre (y su vínculo con la lista base): para corregir o estandarizar. */
+  renombrar(nombre: string, productoBaseId: string | null, ahora: Date): Result<void> {
+    const limpio = nombreDeItem(nombre);
+    if (!limpio.ok) return limpio;
+    this.state = { ...this.state, nombre: limpio.value, productoBaseId, updatedAt: ahora };
+    return ok(undefined);
+  }
   cambiarCategoria(categoria: Categoria, ahora: Date): void {
     if (categoria === this.state.categoria) return;
     this.state = { ...this.state, categoria, updatedAt: ahora };
@@ -143,4 +148,13 @@ export class ShoppingItem {
   toSnapshot(): ShoppingItemSnapshot {
     return this.state;
   }
+}
+
+/** El nombre de un ítem, sin espacios sobrantes: ni vacío ni más largo de NOMBRE_MAX. */
+export function nombreDeItem(nombre: string): Result<string> {
+  const limpio = nombre.trim();
+  if (limpio.length === 0 || limpio.length > NOMBRE_MAX) {
+    return err(ShoppingErrors.nombreNoValido(NOMBRE_MAX));
+  }
+  return ok(limpio);
 }

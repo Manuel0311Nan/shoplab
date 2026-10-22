@@ -1,4 +1,4 @@
-import { Check, Layers, Undo2, X } from "lucide-react";
+import { Check, Layers, Pencil, Undo2, X } from "lucide-react";
 import type { CategoriaDto } from "@/contracts/categoria";
 import type { CantidadDto, ShoppingItemResponse } from "@/contracts/shopping";
 import { cn } from "@/shared/lib/utils";
@@ -12,6 +12,8 @@ type Props = {
   onCantidad: (cantidad: CantidadDto) => void;
   onCategoria: (categoria: CategoriaDto) => void;
   onQuitar: () => void;
+  /** Corregir el nombre (o estandarizarlo en todo el hogar). */
+  onEditar?: () => void;
   soloLectura?: boolean;
   /** En la lista general: de qué lista viene (null si es de la propia general). */
   origen?: string | null;
@@ -28,6 +30,7 @@ export function ShoppingItemRow({
   onCantidad,
   onCategoria,
   onQuitar,
+  onEditar,
   soloLectura = false,
   origen = null,
 }: Props) {
@@ -47,7 +50,22 @@ export function ShoppingItemRow({
               comprado && "text-muted-foreground line-through",
             )}
           >
-            {item.nombre}
+            {soloLectura || onEditar === undefined ? (
+              item.nombre
+            ) : (
+              <button
+                type="button"
+                onClick={onEditar}
+                className="-mx-1 rounded-md px-1 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+              >
+                {item.nombre}
+                <Pencil
+                  className="ml-1.5 inline size-4 align-[-2px] text-muted-foreground"
+                  aria-hidden="true"
+                />
+                <span className="sr-only">: editar</span>
+              </button>
+            )}
           </h3>
           <div className="flex flex-wrap items-center gap-1.5">
             <SelectorCategoria

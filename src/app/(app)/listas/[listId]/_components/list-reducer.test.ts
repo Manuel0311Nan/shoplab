@@ -18,6 +18,26 @@ describe("aplicarAccion", () => {
     const result = aplicarAccion([leche], { tipo: "comprado", itemId: leche.id, comprado: true });
     expect(result[0]?.compradoAt).not.toBeNull();
   });
+  it("aplicarAccion_Renombrar_CambiaNombreYVinculo", () => {
+    const result = aplicarAccion([leche], {
+      tipo: "renombrar",
+      itemId: leche.id,
+      nombre: "Leche entera",
+      productoBaseId: "0199c000-0000-7000-8000-0000000000cc",
+    });
+    expect(result[0]).toMatchObject({
+      nombre: "Leche entera",
+      productoBaseId: "0199c000-0000-7000-8000-0000000000cc",
+    });
+    expect(
+      aplicarAccion([leche], {
+        tipo: "renombrar",
+        itemId: "otro",
+        nombre: "X",
+        productoBaseId: null,
+      }),
+    ).toEqual([leche]);
+  });
   it("aplicarAccion_Quitar_EliminaElItem", () => {
     const result = aplicarAccion([leche], { tipo: "quitar", itemId: leche.id });
     expect(result).toHaveLength(0);

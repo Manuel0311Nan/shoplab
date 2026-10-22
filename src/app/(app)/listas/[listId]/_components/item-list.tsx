@@ -13,6 +13,7 @@ type Props = {
   onCantidad: (itemId: string, cantidad: CantidadDto) => void;
   onCategoria: (itemId: string, categoria: CategoriaDto) => void;
   onQuitar: (itemId: string) => void;
+  onEditar?: (item: ShoppingItemResponse) => void;
   /** Agrupar por categoría, en el orden del súper. */
   agrupar?: boolean;
   /** Lista archivada: se ve, pero no se puede cambiar. */
@@ -29,6 +30,7 @@ export function ItemList({
   onCantidad,
   onCategoria,
   onQuitar,
+  onEditar,
   agrupar = false,
   soloLectura = false,
   generalId = null,
@@ -42,6 +44,7 @@ export function ItemList({
       onCantidad={(cantidad) => onCantidad(item.id, cantidad)}
       onCategoria={(categoria) => onCategoria(item.id, categoria)}
       onQuitar={() => onQuitar(item.id)}
+      {...(onEditar === undefined ? {} : { onEditar: () => onEditar(item) })}
       soloLectura={soloLectura}
       origen={
         generalId !== null && item.listaId !== undefined && item.listaId !== generalId

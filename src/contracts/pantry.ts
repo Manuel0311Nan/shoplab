@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { categoriaSchema } from "./categoria";
-import { cantidadSchema } from "./shopping";
+import { cantidadSchema, productoEditadoSchema } from "./shopping";
 
 /** Un día sin hora: AAAA-MM-DD. El dominio comprueba que existe (no 30 de febrero). */
 export const diaSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Usa el formato AAAA-MM-DD");
@@ -95,6 +95,8 @@ export const updateStockRequestSchema = z
     cantidad: cantidadSchema.optional(),
     /** Solo en una línea abierta: corrige el día en que se abrió, o null para cerrarla. */
     abiertoEl: diaSchema.nullable().optional(),
+    /** Renombrar: el nombre nuevo y, si se eligió en el autocompletado, su producto base. */
+    producto: productoEditadoSchema.optional(),
   })
   .refine(
     (b) =>
@@ -102,6 +104,7 @@ export const updateStockRequestSchema = z
       b.caducaEl !== undefined ||
       b.categoria !== undefined ||
       b.cantidad !== undefined ||
+      b.producto !== undefined ||
       b.abiertoEl !== undefined,
     { message: "Indica al menos un cambio" },
   );

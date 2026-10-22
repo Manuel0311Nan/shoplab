@@ -81,13 +81,30 @@ export async function guardarCompra(
   return pantryModule(auth).storeShopping.execute({ ...input, productos });
 }
 
-/** PATCH; si cambia la categoría, el hogar la recuerda. */
+/**
+ * PATCH; si cambia la categoría, el hogar la recuerda. Al renombrar, el catálogo vincula
+ * el nombre nuevo y decide la categoría si no se eligió; el texto libre se recuerda.
+ */
 export async function actualizarEnDespensa(
   auth: AuthContext,
   input: UpdateStockInput,
 ): Promise<Result<InventoryItemSnapshot>> {
-  const result = await pantryModule(auth).updateStock.execute(input);
+  let datos = input;
+  if (input.producto !== undefined) {
+    const resuelto = await catalogHogarModule(auth).resolverProducto.execute(input.producto);
+    if (resuelto.ok) {
+      datos = {
+        ...input,
+        producto: { nombre: input.producto.nombre, productoBaseId: resuelto.value.productoBaseId },
+        categoria: input.categoria ?? resuelto.value.categoria,
+      };
+    }
+  }
+  const result = await pantryModule(auth).updateStock.execute(datos);
   if (result.ok && input.categoria !== undefined) await recordar(auth, result.value, "categoria");
+  else if (result.ok && input.producto !== undefined && result.value.productoBaseId === null) {
+    await recordar(auth, result.value, "uso");
+  }
   return result;
 }
 

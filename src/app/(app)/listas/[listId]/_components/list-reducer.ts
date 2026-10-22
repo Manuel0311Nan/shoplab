@@ -10,6 +10,12 @@ export type AccionLista =
   | { readonly tipo: "cantidad"; readonly itemId: string; readonly cantidad: CantidadDto }
   | { readonly tipo: "categoria"; readonly itemId: string; readonly categoria: CategoriaDto }
   | { readonly tipo: "quitar"; readonly itemId: string }
+  | {
+      readonly tipo: "renombrar";
+      readonly itemId: string;
+      readonly nombre: string;
+      readonly productoBaseId: string | null;
+    }
   | { readonly tipo: "terminar"; readonly modo: ModoTerminarCompraDto };
 export function aplicarAccion(
   items: ShoppingItemResponse[],
@@ -34,6 +40,12 @@ export function aplicarAccion(
       );
     case "quitar":
       return items.filter((item) => item.id !== accion.itemId);
+    case "renombrar":
+      return items.map((item) =>
+        item.id === accion.itemId
+          ? { ...item, nombre: accion.nombre, productoBaseId: accion.productoBaseId }
+          : item,
+      );
     case "terminar":
       return accion.modo === "vaciar" ? [] : items.filter((item) => item.compradoAt === null);
   }
