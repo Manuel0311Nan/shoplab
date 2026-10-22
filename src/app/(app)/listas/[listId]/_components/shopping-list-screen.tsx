@@ -35,6 +35,8 @@ import { FinishShoppingButton } from "./finish-shopping-button";
 import { GuardarEnDespensaSheet } from "./guardar-en-despensa-sheet";
 import { ItemList } from "./item-list";
 import { SelectorOrden, useOrdenLista } from "./orden-lista";
+import { SelectorVista, useVistaLista } from "./vista-lista";
+import { VistaRapida } from "./vista-rapida";
 import { type AccionLista, aplicarAccion } from "./list-reducer";
 
 type Props = {
@@ -54,6 +56,7 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
   const [limite, setLimite] = useState<LimiteDeListasDetails | null>(null);
   const soloLectura = list.archivada;
   const [orden, setOrden] = useOrdenLista();
+  const [vista, setVista] = useVistaLista();
   const [paraDespensa, setParaDespensa] = useState<ShoppingItemResponse[] | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [aEditar, setAEditar] = useState<ShoppingItemResponse | null>(null);
@@ -276,33 +279,52 @@ export function ShoppingListScreen({ list, packs = {} }: Props) {
         </p>
       )}
 
-      {pendientes.length > 1 && <SelectorOrden orden={orden} onCambiar={setOrden} />}
+      {items.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <SelectorVista vista={vista} onCambiar={setVista} />
+          {pendientes.length > 1 && <SelectorOrden orden={orden} onCambiar={setOrden} />}
+        </div>
+      )}
 
-      <ItemList
-        titulo="Por comprar"
-        vacio="No queda nada por comprar."
-        items={pendientes}
-        onToggle={marcar}
-        onCantidad={cambiarCantidad}
-        onCategoria={cambiarCategoria}
-        onQuitar={quitar}
-        onEditar={setAEditar}
-        agrupar={orden === "categoria"}
-        soloLectura={soloLectura}
-        generalId={list.general ? list.id : null}
-      />
-      <ItemList
-        titulo="En el carro"
-        vacio="Todavía no has cogido nada."
-        items={enElCarro}
-        onToggle={marcar}
-        onCantidad={cambiarCantidad}
-        onCategoria={cambiarCategoria}
-        onQuitar={quitar}
-        onEditar={setAEditar}
-        soloLectura={soloLectura}
-        generalId={list.general ? list.id : null}
-      />
+      {vista === "rapida" ? (
+        <VistaRapida
+          pendientes={pendientes}
+          enElCarro={enElCarro}
+          agrupar={orden === "categoria"}
+          soloLectura={soloLectura}
+          onToggle={marcar}
+          onCantidad={cambiarCantidad}
+          onQuitar={quitar}
+        />
+      ) : (
+        <>
+          <ItemList
+            titulo="Por comprar"
+            vacio="No queda nada por comprar."
+            items={pendientes}
+            onToggle={marcar}
+            onCantidad={cambiarCantidad}
+            onCategoria={cambiarCategoria}
+            onQuitar={quitar}
+            onEditar={setAEditar}
+            agrupar={orden === "categoria"}
+            soloLectura={soloLectura}
+            generalId={list.general ? list.id : null}
+          />
+          <ItemList
+            titulo="En el carro"
+            vacio="Todavía no has cogido nada."
+            items={enElCarro}
+            onToggle={marcar}
+            onCantidad={cambiarCantidad}
+            onCategoria={cambiarCategoria}
+            onQuitar={quitar}
+            onEditar={setAEditar}
+            soloLectura={soloLectura}
+            generalId={list.general ? list.id : null}
+          />
+        </>
+      )}
 
       {!soloLectura && enElCarro.length > 0 && (
         <FinishShoppingButton

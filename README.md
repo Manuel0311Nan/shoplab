@@ -32,6 +32,10 @@ consumirán otros clientes, como una futura app móvil (proyecto aparte).
   que se acaba vuelve a la lista con un toque. Los paquetes abiertos avisan en
   verde, amarillo o rojo según los días que llevan abiertos, para revisar si
   siguen buenos.
+- **Vista rápida de la lista**: una cuadrícula con solo el producto para comprar
+  deprisa: un toque lo pasa al carro, la cantidad va en la esquina y mantener
+  pulsado deja cambiarla o quitarlo. La vista de lista sigue para una compra
+  con calma; cada dispositivo recuerda la elegida.
 - **Gastar con un toque**: «−1» resta una unidad al momento (mantén pulsado
   para gastar varias o tirar); en g, kg, ml o l, atajos de ¼, ½ y todo. Un
   aviso abajo permite deshacer y, si se acaba, añadirlo a la lista.

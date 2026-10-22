@@ -395,6 +395,9 @@ Recetas escritas para Migas: no copiar textos de webs ni de libros.
   productos recordados): se lee y escribe en `try/catch` y se sigue.
 - No revalidar `/listas/${id}`: con la lista general hay que revalidar
   `revalidatePath("/listas/[listId]", "page")`.
+- No duplicar la lógica de la lista en la vista rápida (`vista-rapida.tsx`): usa
+  las mismas acciones (`marcar`, `cambiarCantidad`, `quitar`); el toque largo va
+  por `usePulsacionLarga`, que ignora el scroll.
 - No pedir confirmación para gastar: «−1» (en unidades) y los atajos ¼ · ½ · todo
   se aplican al momento; el aviso flotante ofrece «Deshacer»
   (`DeshacerConsumoCommand`, ajuste con margen de `MINUTOS_PARA_DESHACER`) y,
