@@ -395,6 +395,11 @@ Recetas escritas para Migas: no copiar textos de webs ni de libros.
   productos recordados): se lee y escribe en `try/catch` y se sigue.
 - No revalidar `/listas/${id}`: con la lista general hay que revalidar
   `revalidatePath("/listas/[listId]", "page")`.
+- No pedir confirmación para gastar: «−1» (en unidades) y los atajos ¼ · ½ · todo
+  se aplican al momento; el aviso flotante ofrece «Deshacer»
+  (`DeshacerConsumoCommand`, ajuste con margen de `MINUTOS_PARA_DESHACER`) y,
+  si se acaba o queda poco, «A la lista» con el pack recordado. Nada de diálogos
+  que interrumpan tras gastar.
 - No tratar «abierto» como caducidad ni decir «tíralo»: es un aviso para
   revisar. Los días se cambian en la lista base o en el kernel, no en la UI.
 - No importar un repositorio de otro contexto: orquestador en `app/_lib`.

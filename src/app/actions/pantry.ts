@@ -19,6 +19,8 @@ import {
   type ConsumeStockRequest,
   type ConsumeStockResponse,
   consumeStockRequestSchema,
+  type DeshacerConsumoRequest,
+  deshacerConsumoRequestSchema,
   type LineaDespensaResponse,
   type OpenStockRequest,
   type OpenStockResponse,
@@ -120,6 +122,27 @@ export async function actualizarLineaAction(
     ...(body.data.cantidad === undefined ? {} : { cantidad: body.data.cantidad }),
     ...(body.data.abiertoEl === undefined ? {} : { abiertoEl: body.data.abiertoEl }),
     ...(body.data.producto === undefined ? {} : { producto: body.data.producto }),
+  });
+  if (!result.ok) return result;
+  revalidar();
+  return ok(toLineaDesdeSnapshot(result.value));
+}
+
+/** «Deshacer» tras gastar con un toque: devuelve lo gastado. */
+export async function deshacerConsumoAction(
+  movimientoId: string,
+  input: DeshacerConsumoRequest,
+): Promise<Result<LineaDespensaResponse>> {
+  const auth = await getAuthContext();
+  if (!auth.ok) return auth;
+  const id = idSchema.safeParse(movimientoId);
+  const body = deshacerConsumoRequestSchema.safeParse(input);
+  if (!id.success || !body.success) return datosNoValidos();
+
+  const result = await pantryModule(auth.value).deshacerConsumo.execute({
+    movimientoId: id.data,
+    id: body.data.id,
+    usuarioId: auth.value.userId,
   });
   if (!result.ok) return result;
   revalidar();

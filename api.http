@@ -227,7 +227,14 @@ POST {{base}}/pantry/items/{{linea}}/consume
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
-{ "cantidad": { "valor": 200, "unidad": "g" }, "motivo": "gastado" }
+{ "id": "0199c000-0000-7000-8000-00000000b001", "cantidad": { "valor": 200, "unidad": "g" }, "motivo": "gastado" }
+
+### Deshacer ese gasto (unos minutos de margen): devuelve lo gastado con un ajuste
+POST {{base}}/pantry/movements/0199c000-0000-7000-8000-00000000b001/undo
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "id": "0199c000-0000-7000-8000-00000000b002" }
 
 ### Mover, cambiar la fecha o la categoría (null quita la fecha)
 PATCH {{base}}/pantry/items/{{linea}}

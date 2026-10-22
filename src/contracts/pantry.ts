@@ -138,6 +138,12 @@ export const consumeStockResponseSchema = z.object({
   avisarLista: z.boolean(),
 });
 
+/**
+ * POST /pantry/movements/{id}/undo: «Deshacer» un gasto o desecho recién hecho (unos
+ * minutos de margen). `id` es el del ajuste, generable en el cliente.
+ */
+export const deshacerConsumoRequestSchema = z.object({ id: z.uuid() });
+
 export const createUbicacionRequestSchema = z.object({
   id: z.uuid().optional(),
   nombre: nombreUbicacion,
@@ -169,6 +175,7 @@ export type StoreShoppingRequest = z.input<typeof storeShoppingRequestSchema>;
 export type StoreShoppingResponse = z.infer<typeof storeShoppingResponseSchema>;
 export type UpdateStockRequest = z.input<typeof updateStockRequestSchema>;
 export type ConsumeStockRequest = z.input<typeof consumeStockRequestSchema>;
+export type DeshacerConsumoRequest = z.input<typeof deshacerConsumoRequestSchema>;
 export type OpenStockRequest = z.input<typeof openStockRequestSchema>;
 export type OpenStockResponse = z.infer<typeof openStockResponseSchema>;
 export type ColorAbiertoDto = z.infer<typeof colorAbiertoSchema>;

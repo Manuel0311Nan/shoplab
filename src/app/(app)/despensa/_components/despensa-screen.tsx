@@ -3,12 +3,13 @@ import { AlertTriangle, Plus, Settings2 } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useOptimistic, useState, useTransition } from "react";
+import { useCallback, useOptimistic, useState, useTransition } from "react";
 import {
   abrirLineaAction,
   actualizarLineaAction,
   anadirADespensaAction,
   anadirALaListaAction,
+  deshacerConsumoAction,
   consumirAction,
   quitarLineaAction,
 } from "@/app/actions/pantry";
@@ -25,7 +26,10 @@ import { newId } from "@/shared/kernel/ids";
 import { normalizarNombre } from "@/shared/kernel/texto";
 import { NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
 import { cn } from "@/shared/lib/utils";
+import { type Aviso, AvisoFlotante } from "../../_components/aviso-flotante";
+import { propuestaDeUnidad } from "../../_components/cantidad-pack";
 import { EditarNombreDialog, type NombreEditado } from "../../_components/editar-nombre-dialog";
+import { formatCantidad } from "../../listas/[listId]/_components/format-cantidad";
 import { AbrirDialog } from "./abrir-dialog";
 import {
   AnadirAListaDialog,
@@ -66,6 +70,8 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
   const [ocupado, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [flotante, setFlotante] = useState<Aviso | null>(null);
+  const cerrarFlotante = useCallback(() => setFlotante(null), []);
   const [aGastar, setAGastar] = useState<LineaDespensaResponse | null>(null);
   const [aEditar, setAEditar] = useState<LineaDespensaResponse | null>(null);
   const [aRenombrar, setARenombrar] = useState<LineaDespensaResponse | null>(null);
@@ -98,12 +104,18 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
     motivo,
   });
 
+  /**
+   * Gastar o tirar. Sin preguntar antes: el aviso de abajo ofrece «Deshacer» y, si se ha
+   * acabado o queda poco, «Añadir a la lista» (no interrumpe con un diálogo).
+   */
   function consumir(
     linea: LineaDespensaResponse,
     valor: number | undefined,
     motivo: MotivoConsumoDto,
   ) {
     setAGastar(null);
+    const movimientoId = newId();
+    vibrar();
     hacer(async () => {
       aplicarOptimista({
         tipo: "consumir",
@@ -111,13 +123,70 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
         ...(valor === undefined ? {} : { valor }),
       });
       const r = await consumirAction(linea.id, {
-        id: newId(),
+        id: movimientoId,
         motivo,
         ...(valor === undefined ? {} : { cantidad: { valor, unidad: linea.cantidad.unidad } }),
       });
+      if (!r.ok) {
+        setError(r.error.message);
+        return;
+      }
+      const cuanto = formatCantidad(
+        valor === undefined ? linea.cantidad : { valor, unidad: linea.cantidad.unidad },
+      );
+      const hecho = motivo === "tirado" ? "Tirado" : "Gastado";
+      const estado = r.value.linea.agotada
+        ? " Se ha acabado."
+        : r.value.avisarLista
+          ? " Queda poco."
+          : "";
+      setFlotante({
+        id: movimientoId,
+        texto: `${hecho}: ${cuanto} de ${linea.nombre}.${estado}`,
+        acciones: [
+          ...(r.value.avisarLista
+            ? [{ etiqueta: "A la lista", onClick: () => anadirRapido(linea) }]
+            : []),
+          { etiqueta: "Deshacer", onClick: () => deshacer(movimientoId, linea) },
+        ],
+      });
+    });
+  }
+
+  /** «−1»: un toque, 1 ud. gastada (o la última). */
+  function gastarUno(linea: LineaDespensaResponse) {
+    consumir(linea, linea.cantidad.valor > 1 ? 1 : undefined, "gastado");
+  }
+
+  function deshacer(movimientoId: string, linea: LineaDespensaResponse) {
+    hacer(async () => {
+      aplicarOptimista({ tipo: "reponer", linea });
+      const r = await deshacerConsumoAction(movimientoId, { id: newId() });
       if (!r.ok) setError(r.error.message);
-      else if (r.value.avisarLista) {
-        setParaLista(productoDe(linea, r.value.linea.agotada ? "acabado" : "poco"));
+    });
+  }
+
+  /** Desde el aviso: a la lista con un toque, con el pack que recuerda el hogar. */
+  function anadirRapido(linea: LineaDespensaResponse) {
+    const propuesta = propuestaDeUnidad(packs, linea.nombre, linea.cantidad.unidad);
+    const n = Number(propuesta.porPack);
+    const cantidad: CantidadParaLista =
+      propuesta.unidad === "pack"
+        ? { cantidad: { valor: n, unidad: "unidad" }, unidadesPorPack: n }
+        : { cantidad: { valor: 1, unidad: linea.cantidad.unidad }, unidadesPorPack: null };
+    hacer(async () => {
+      const r = await anadirALaListaAction({
+        ...productoDe(linea, "acabado"),
+        ...cantidad,
+      });
+      if (!r.ok) setError(r.error.message);
+      else {
+        setFlotante({
+          id: newId(),
+          texto: r.value.yaEstaba
+            ? `${linea.nombre} ya estaba en «${r.value.listaNombre}».`
+            : `${linea.nombre} añadido a «${r.value.listaNombre}».`,
+        });
       }
     });
   }
@@ -317,6 +386,7 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
                               : null
                         }
                         onGastar={setAGastar}
+                        onGastarUno={gastarUno}
                         onEditar={setAEditar}
                         onAnadirALista={(l) => setParaLista(productoDe(l, "manual"))}
                         onQuitar={quitar}
@@ -343,6 +413,7 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
       </button>
 
       <ConsumirDialog linea={aGastar} onConsumir={consumir} onCerrar={() => setAGastar(null)} />
+      <AvisoFlotante aviso={flotante} onCerrar={cerrarFlotante} />
       <EditarLineaDialog
         linea={aEditar}
         ubicaciones={despensa.ubicaciones}
@@ -380,4 +451,13 @@ export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }
       />
     </section>
   );
+}
+
+/** Una vibración corta al gastar, donde el navegador lo permite (Android). */
+function vibrar() {
+  try {
+    navigator.vibrate?.(15);
+  } catch {
+    // Sin vibración no pasa nada.
+  }
 }

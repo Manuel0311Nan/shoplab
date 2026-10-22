@@ -32,6 +32,9 @@ consumirán otros clientes, como una futura app móvil (proyecto aparte).
   que se acaba vuelve a la lista con un toque. Los paquetes abiertos avisan en
   verde, amarillo o rojo según los días que llevan abiertos, para revisar si
   siguen buenos.
+- **Gastar con un toque**: «−1» resta una unidad al momento (mantén pulsado
+  para gastar varias o tirar); en g, kg, ml o l, atajos de ¼, ½ y todo. Un
+  aviso abajo permite deshacer y, si se acaba, añadirlo a la lista.
 - **Mis productos**: lo que has escrito a mano, para corregir nombres, unir
   duplicados («Yogures proteina» y «Yogur proteína») y fijar categoría, unidad
   y pack; el cambio llega a todas tus listas y a la despensa. También se puede

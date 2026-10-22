@@ -17,6 +17,12 @@ const yogur: LineaDespensaResponse = {
 };
 
 describe("aplicarAccionDespensa", () => {
+  it("reponer_DevuelveLaLineaComoEstabaOLaVuelveAPoner", () => {
+    const gastado = { ...yogur, cantidad: { valor: 5, unidad: "unidad" as const } };
+    expect(aplicarAccionDespensa([gastado], { tipo: "reponer", linea: yogur })).toEqual([yogur]);
+    expect(aplicarAccionDespensa([], { tipo: "reponer", linea: yogur })).toEqual([yogur]);
+  });
+
   it("consumirParte_Resta", () => {
     expect(
       aplicarAccionDespensa([yogur], { tipo: "consumir", lineaId: yogur.id, valor: 2 })[0]?.cantidad

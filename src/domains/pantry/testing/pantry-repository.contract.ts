@@ -109,6 +109,26 @@ export function pantryRepositoryContract(nombre: string, crear: CrearRepositorio
       expect((await repo.findLinea(LINEA_ID))?.ubicacionId).toBe(ARMARIO_ID);
     });
 
+    it("buscarMovimiento_ConSuLineaAunqueEsteDeBaja", async () => {
+      const repo = await crear({ ubicaciones: ubicacionesPorDefecto(), lineas: [] });
+      const l = linea({ cantidad: cantidad(1, "unidad") });
+      await repo.guardar({ lineas: [l] });
+      const r = l.consumir(undefined, "gastado", contexto(40), AHORA);
+      if (!r.ok) throw new Error("debería consumir");
+      await repo.guardar({ lineas: [l], movimientos: [r.value.movimiento] });
+
+      const encontrado = await repo.buscarMovimiento(idN(40));
+
+      expect(encontrado?.movimiento).toMatchObject({
+        id: idN(40),
+        tipo: "consumo",
+        inventoryItemId: LINEA_ID,
+        cantidad: { valor: 1, unidad: "unidad" },
+      });
+      expect(encontrado?.linea.toSnapshot().deletedAt).not.toBeNull();
+      expect(await repo.buscarMovimiento(idN(41))).toBeNull();
+    });
+
     it("memoria_RecordarReubicarYOlvidar", async () => {
       const repo = await crear({ ubicaciones: ubicacionesPorDefecto(), lineas: [] });
       expect((await repo.ubicacionesRecordadas()).size).toBe(0);

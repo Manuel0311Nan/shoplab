@@ -44,6 +44,15 @@ export class InMemoryPantryRepository implements PantryRepository {
     return l === undefined || l.deletedAt !== null ? null : InventoryItem.rehydrate(l);
   }
 
+  async buscarMovimiento(
+    id: string,
+  ): Promise<{ movimiento: MovimientoSnapshot; linea: InventoryItem } | null> {
+    const movimiento = this.movimientos.get(id);
+    const linea = movimiento && this.lineas.get(movimiento.inventoryItemId);
+    if (movimiento === undefined || linea === undefined) return null;
+    return { movimiento, linea: InventoryItem.rehydrate(linea) };
+  }
+
   async existeMovimiento(id: string): Promise<boolean> {
     return this.movimientos.has(id);
   }

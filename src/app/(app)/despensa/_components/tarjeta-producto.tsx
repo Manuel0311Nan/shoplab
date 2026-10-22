@@ -1,6 +1,7 @@
 "use client";
 import { Menu } from "@base-ui/react/menu";
 import {
+  Minus,
   MoreVertical,
   PackageOpen,
   Pencil,
@@ -12,7 +13,7 @@ import {
 import type { ColorAbiertoDto, LineaDespensaResponse } from "@/contracts/pantry";
 import { sePuedeAbrir } from "@/shared/kernel/abierto";
 import { cn } from "@/shared/lib/utils";
-import { Button } from "@/shared/ui/button";
+import { BotonGastar } from "./boton-gastar";
 import { formatDiaYMes } from "../../_components/fechas";
 import { formatCantidad } from "../../listas/[listId]/_components/format-cantidad";
 import { type ProductoDespensa, textoAbierto, textoCaducidad } from "./vista-despensa";
@@ -21,7 +22,10 @@ type Props = {
   producto: ProductoDespensa;
   /** Por categoría se muestra la ubicación; por ubicación, la categoría ya está en el título. */
   detalle: string | null;
+  /** Abre el diálogo: gastar varias, en g/kg/l, o tirar. */
   onGastar: (linea: LineaDespensaResponse) => void;
+  /** Un toque: 1 ud. gastada (con «Deshacer»). */
+  onGastarUno: (linea: LineaDespensaResponse) => void;
   onEditar: (linea: LineaDespensaResponse) => void;
   onAnadirALista: (linea: LineaDespensaResponse) => void;
   onQuitar: (linea: LineaDespensaResponse) => void;
@@ -89,7 +93,8 @@ function MenuLinea({
   onAbrir,
   onCerrarAbierto,
   onRenombrar,
-}: Omit<Props, "producto" | "detalle" | "onGastar"> & { linea: LineaDespensaResponse }) {
+  onGastar,
+}: Omit<Props, "producto" | "detalle" | "onGastarUno"> & { linea: LineaDespensaResponse }) {
   return (
     <Menu.Root>
       <Menu.Trigger
@@ -101,6 +106,10 @@ function MenuLinea({
       <Menu.Portal>
         <Menu.Positioner align="end" sideOffset={4} className="z-50">
           <Menu.Popup className="flex w-60 flex-col gap-1 rounded-xl bg-popover p-2 text-popover-foreground shadow-lg outline-none">
+            <Menu.Item className={opcion} onClick={() => onGastar(linea)}>
+              <Minus className="size-5" aria-hidden="true" />
+              Gastar o tirar…
+            </Menu.Item>
             <Menu.Item className={opcion} onClick={() => onEditar(linea)}>
               <Pencil className="size-5" aria-hidden="true" />
               Mover, fecha, categoría…
@@ -137,7 +146,7 @@ function MenuLinea({
 }
 
 /** Un producto: con fechas distintas, una fila por lote; si no, una sola. */
-export function TarjetaProducto({ producto, detalle, onGastar, ...acciones }: Props) {
+export function TarjetaProducto({ producto, detalle, onGastarUno, ...acciones }: Props) {
   const varias = producto.lineas.length > 1;
   const principal = producto.principal;
 
@@ -147,7 +156,13 @@ export function TarjetaProducto({ producto, detalle, onGastar, ...acciones }: Pr
         <div className="flex min-w-0 flex-1 flex-col gap-1 pt-1">
           <h3 className="text-lg leading-6 font-semibold break-words">{producto.nombre}</h3>
           <p className="text-sm text-muted-foreground">
-            {producto.total ? formatCantidad(producto.total) : `${producto.lineas.length} lotes`}
+            {/* La clave reinicia la animación cuando cambia la cantidad (al gastar). */}
+            <span
+              key={producto.total ? formatCantidad(producto.total) : producto.lineas.length}
+              className="inline-block animate-in duration-300 zoom-in-90 fade-in"
+            >
+              {producto.total ? formatCantidad(producto.total) : `${producto.lineas.length} lotes`}
+            </span>
             {detalle ? ` · ${detalle}` : ""}
             {principal.quedaPoco ? " · queda poco" : ""}
           </p>
@@ -160,9 +175,7 @@ export function TarjetaProducto({ producto, detalle, onGastar, ...acciones }: Pr
         </div>
         {!varias && (
           <>
-            <Button onClick={() => onGastar(principal)} className="h-11 px-4 font-semibold">
-              Gastar
-            </Button>
+            <BotonGastar linea={principal} onGastarUno={onGastarUno} onGastar={acciones.onGastar} />
             <MenuLinea linea={principal} {...acciones} />
           </>
         )}
@@ -182,13 +195,12 @@ export function TarjetaProducto({ producto, detalle, onGastar, ...acciones }: Pr
                   <Abierto linea={l} />
                 </div>
               </div>
-              <Button
+              <BotonGastar
+                linea={l}
+                onGastarUno={onGastarUno}
+                onGastar={acciones.onGastar}
                 variant="outline"
-                onClick={() => onGastar(l)}
-                className="h-11 px-3 font-semibold"
-              >
-                Gastar
-              </Button>
+              />
               <MenuLinea linea={l} {...acciones} />
             </li>
           ))}

@@ -229,6 +229,40 @@ export class InventoryItem {
     });
   }
 
+  /**
+   * «Deshacer» un gasto o un desecho recién hecho: devuelve lo gastado con un ajuste.
+   * Si se había acabado, la línea vuelve; si se quitó por otro motivo (se juntó con otra,
+   * se dio de baja), ya no se puede.
+   */
+  deshacerConsumo(
+    consumo: MovimientoSnapshot,
+    contexto: ContextoMovimiento,
+    ahora: Date,
+  ): Result<MovimientoSnapshot> {
+    const esConsumo = consumo.tipo === "consumo" || consumo.tipo === "desecho";
+    if (!esConsumo || consumo.inventoryItemId !== this.state.id) {
+      return err(PantryErrors.noSePuedeDeshacer());
+    }
+    const devuelta = convertirCantidad(consumo.cantidad, this.state.cantidad.unidad);
+    if (devuelta === null) return err(PantryErrors.noSePuedeDeshacer());
+
+    let total: Cantidad;
+    if (this.state.deletedAt !== null) {
+      // Se acabó con este mismo consumo (misma marca de tiempo): vuelve con lo gastado.
+      if (this.state.deletedAt.getTime() !== consumo.createdAt.getTime()) {
+        return err(PantryErrors.noSePuedeDeshacer());
+      }
+      total = devuelta;
+    } else {
+      const suma = sumarCantidades([this.state.cantidad, devuelta], this.state.cantidad.unidad);
+      if (suma === null) return err(PantryErrors.noSePuedeDeshacer());
+      total = suma;
+    }
+    // Sin tocar la referencia de «queda poco»: es la misma compra.
+    this.state = { ...this.state, cantidad: total, deletedAt: null, updatedAt: ahora };
+    return ok(this.movimiento("ajuste", total, contexto, ahora));
+  }
+
   /** Corrección a mano: "eran 3, no 4". Puede cambiar de unidad. */
   ajustar(cantidad: Cantidad, contexto: ContextoMovimiento, ahora: Date): MovimientoSnapshot {
     this.state = { ...this.state, cantidad, cantidadReferencia: cantidad, updatedAt: ahora };

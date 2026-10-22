@@ -3,13 +3,13 @@ import type {
   CambiosDespensa,
   PantryRepository,
 } from "@/domains/pantry/application/ports/pantry-repository";
-import type { InventoryItem } from "@/domains/pantry/domain/inventory-item";
+import type { InventoryItem, MovimientoSnapshot } from "@/domains/pantry/domain/inventory-item";
 import type { Ubicacion } from "@/domains/pantry/domain/ubicacion";
 import { convertirCantidad } from "@/shared/kernel/cantidad";
 import { Dia } from "@/shared/kernel/dia";
 import type { TenantPrismaClient } from "@/shared/kernel/tenant-prisma";
 import { TenantRepository } from "@/shared/kernel/tenant-repository";
-import { lineaToDomain, ubicacionToDomain } from "./pantry.mapper";
+import { lineaToDomain, movimientoToSnapshot, ubicacionToDomain } from "./pantry.mapper";
 
 export class PrismaPantryRepository extends TenantRepository implements PantryRepository {
   async listarUbicaciones(): Promise<Ubicacion[]> {
@@ -31,6 +31,17 @@ export class PrismaPantryRepository extends TenantRepository implements PantryRe
   async findLinea(id: string): Promise<InventoryItem | null> {
     const fila = await this.db.inventoryItem.findFirst({ where: { id, deletedAt: null } });
     return fila === null ? null : lineaToDomain(fila);
+  }
+
+  async buscarMovimiento(
+    id: string,
+  ): Promise<{ movimiento: MovimientoSnapshot; linea: InventoryItem } | null> {
+    const fila = await this.db.movimientoDespensa.findFirst({
+      where: { id },
+      include: { inventoryItem: true },
+    });
+    if (fila === null) return null;
+    return { movimiento: movimientoToSnapshot(fila), linea: lineaToDomain(fila.inventoryItem) };
   }
 
   async existeMovimiento(id: string): Promise<boolean> {

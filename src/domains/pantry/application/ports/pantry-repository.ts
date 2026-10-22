@@ -28,6 +28,10 @@ export interface PantryRepository {
   listarLineas(): Promise<InventoryItem[]>;
   /** Una línea viva. */
   findLinea(id: string): Promise<InventoryItem | null>;
+  /** Un movimiento y su línea (aunque esté dada de baja): para deshacer un gasto. */
+  buscarMovimiento(
+    id: string,
+  ): Promise<{ movimiento: MovimientoSnapshot; linea: InventoryItem } | null>;
   /** Para no repetir un envío: el cliente genera el id de cada movimiento. */
   existeMovimiento(id: string): Promise<boolean>;
   /** Memoria del hogar: nombre normalizado → ubicación (puede estar borrada). */
