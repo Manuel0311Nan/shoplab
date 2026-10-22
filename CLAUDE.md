@@ -32,8 +32,10 @@ API HTTP: todo lo que haga la web debe poder hacerse vía `/api/v1`.
 - **Autenticación:** Better Auth (versión exacta fijada): cookie en la web
   y `Authorization: Bearer` para la app (ver Identity)
 - **Estado:** lectura en Server Components; mutaciones con Server
-  Actions + `useOptimistic` (React 19). TanStack Query solo para polling
-  y revalidación sin acción del usuario. Zustand para estado UI local
+  Actions + `useOptimistic` (React 19). Preferencias de un dispositivo
+  (orden y vista de la lista) en `localStorage` con `try/catch`. Hoy no hay
+  TanStack Query ni Zustand: se añadirían solo para polling o estado de UI
+  que lo justifique
 - **Estilos:** Tailwind CSS v4 + shadcn/ui (alias a `@/shared/ui`)
 - **Formularios:** ricos con React Hook Form + Zod; sencillos (login,
   crear lista) con `<form action>` + `useActionState`
@@ -41,7 +43,8 @@ API HTTP: todo lo que haga la web debe poder hacerse vía `/api/v1`.
   <PENDING: e2e del flujo principal de cada vista>
 - **Linter/formatter:** ESLint + Prettier (con `prettier-plugin-tailwindcss`),
   Husky + lint-staged en pre-commit
-- **Documentación API:** OpenAPI generado desde `src/contracts`
+- **Documentación API:** ejemplos en `api.http`; <PENDING: OpenAPI generado
+  desde `src/contracts`>
 - **Futuro:** microservicio Python para canonicalización de ingredientes
   y NLP/ML, detrás de un puerto (`IngredientCanonicalizer`); hasta
   entonces, implementación local en TypeScript
@@ -65,8 +68,8 @@ src/
     kernel/           → Result, errores, Unidad/Cantidad, auth-context,
                         prisma (singleton), tenant-prisma, tenant-models, TenantRepository
     kernel/           → también Clock, newId() (UUIDv7, válido en cliente) y auth.ts (Better Auth)
+    kernel/           → también Dia, categorías (orden del súper), abierto, emoji
     lib/              → utilidades de UI (cn)
-    sync/             → motor de sincronización (ver Sync)
     ui/               → componentes UI agnósticos de dominio (shadcn)
   app/
     _lib/<contexto>/    → mappers dominio → DTO, compartidos por API, actions y páginas
@@ -76,7 +79,10 @@ src/
     api/_lib/           → apiRoute(), parse, Result → HTTP
     api/v1/.../route.ts → API pública (rutas en inglés: /api/v1/lists)
     actions/            → Server Actions (solo web), delgadas
-    (app)/<ruta>/       → UI (rutas en español: /listas)
+    (app)/<ruta>/       → UI (rutas en español: /listas, /despensa, /recetas, /productos)
+    (app)/_components/  → piezas compartidas entre vistas: autocompletar, aviso-flotante,
+                          pulsacion-larga, cantidad-pack, emoji-producto, selector-emoji,
+                          icono-categoria, editar-nombre-dialog, selector-categoria
       page.tsx          → Server Component: loader → DTO → pantalla
       _data.ts          → loader envuelto en cache(), compartido con generateMetadata
       loading.tsx, error.tsx, not-found.tsx → obligatorios en rutas con datos
@@ -178,7 +184,10 @@ hay en casa: cantidad, caducidad, ubicación).
   apunta cuando el usuario elige sitio (alta, guardar la compra, mover). Se
   propone con `ubicacionParaProducto` (la recordada si sigue viva; si no, por
   categoría), en el servidor y en los formularios. Al borrar una ubicación lo
-  recordado pasa al destino de sus productos o, si estaba vacía, se olvida
+  recordado pasa al destino de sus productos o, si estaba vacía, se olvida.
+  Gastar: «−1» y los atajos ¼ · ½ · todo consumen sin confirmar; el movimiento
+  lleva un id del cliente y `DeshacerConsumoCommand` lo revierte con un ajuste
+  (margen `MINUTOS_PARA_DESHACER`; si la línea se agotó con ese consumo, vuelve)
 - **Catalog (hoy)**: `ProductoBase`, la lista base global (328 productos
   y sus sinónimos en `lista-base.data.ts`, cargados por `prisma db seed`
   sin transacción larga e ids UUID v5), y `ProductoRecordado`, la memoria
@@ -197,7 +206,8 @@ hay en casa: cantidad, caducidad, ubicación).
   `EditarPackCommand`. No es una transacción entre contextos: el orden es
   memoria → listas → despensa → pack y se puede repetir sin daño. Los posibles
   duplicados salen de `claveParecida` (sin plurales, tildes, palabras vacías
-  ni orden)
+  ni orden). Emojis: `emojiPorDefecto` (kernel, por palabras del nombre) y,
+  encima, el que elige el hogar (`EmojiProducto`, `CambiarEmojiCommand`)
 - **Categorías**: las 15 de la lista base + «otros», en el kernel y en el
   orden del súper (`compararCategorias`). Cada línea de lista y despensa
   guarda la suya y se puede cambiar; cambiarla la recuerda el hogar
@@ -239,10 +249,10 @@ hay en casa: cantidad, caducidad, ubicación).
   editar raciones, lo que no llega sale como «poco»/«falta». g↔kg y ml↔l se
   convierten; si una línea no se puede medir (ud. frente a g), cuenta como
   que hay. `calcularIngrediente` es pura y la usa también la pantalla
-- **Suggestions** (core): motor de puntuación de recetas según despensa,
-  caducidades próximas y preferencias. Detalle en
-  `src/domains/suggestions/README.md`
-- **Households**: hogar, miembros, invitaciones (tenant). El hogar se crea
+- **Suggestions** (core): <PENDING: no existe todavía. Motor de puntuación
+  de recetas según despensa, caducidades y preferencias; hoy el orden lo da
+  `compararEvaluaciones` de Recipes>
+- **Households**: hogar y miembros (tenant); invitaciones <PENDING: vista 6>. El hogar se crea
   después del registro, en `/bienvenida` (`CreateHouseholdCommand`, id
   generado en el cliente para que un doble envío no cree dos). La primera
   lista y las ubicaciones se crean en `app/_lib/households/alta-hogar.ts`,
@@ -318,7 +328,9 @@ con hogar activo en el `AuthContext`>
 
 ## Sync
 
-Los clientes offline-first envían una cola de mutaciones. El backend:
+<PENDING: no implementado todavía; es el plan para la app móvil sin
+conexión.> Los clientes offline-first enviarán una cola de mutaciones. El
+backend:
 
 - Toda entidad sincronizable tiene `updatedAt` (lo pone el servidor) y
   `deletedAt` (soft delete; los borrados viajan como tombstones). Hoy cada
@@ -462,8 +474,9 @@ Recetas escritas para Migas: no copiar textos de webs ni de libros.
 Variables (referencia, nunca valores reales): `DATABASE_URL` (pooled, la
 app) y `DATABASE_URL_UNPOOLED` (directa, CLI de Prisma vía
 `prisma.config.ts`), nombres de la integración Neon ↔ Vercel;
-`AUTH_SECRET`, `AUTH_URL`, credenciales del proveedor de email, secretos
-de firma de tokens de la API.
+`BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `CRON_SECRET`; `TEST_DATABASE_URL`(+
+`_UNPOOLED`) solo para tests; `ANTHROPIC_API_KEY` solo en local para generar
+recetas. Credenciales del proveedor de email <PENDING>.
 
 <PENDING, OBLIGATORIO ANTES DE DESPLEGAR: local trabaja contra la rama
 `main` de Neon y el seed crea `dev@migas.local` con contraseña conocida.
@@ -471,8 +484,12 @@ de firma de tokens de la API.
 del seed>
 
 - Migraciones: `migrate dev` solo en local; producción con
-  `migrate deploy` en el despliegue <PENDING: script en el build de Vercel>.
-  En Prisma 7, `generate` y `db seed` se ejecutan siempre a mano.
+  `migrate deploy` a mano tras mergear <PENDING: script en el build de Vercel>.
+  En Prisma 7, `generate` y `db seed` se ejecutan siempre a mano. El seed crea
+  el usuario de prueba con su hogar, la lista general y las ubicaciones.
+- Sin acceso a los binarios de Prisma (sandbox): `prisma format` y `generate`
+  funcionan con `PRISMA_SCHEMA_ENGINE_BINARY=/bin/true` y
+  `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1` (solo usan WASM); migrar no.
 - CI: necesita `DATABASE_URL`/`DATABASE_URL_UNPOOLED` falsas porque
   `prisma generate` (postinstall) carga `prisma.config.ts`.
 
@@ -483,10 +500,16 @@ del seed>
 3. Mis listas (`/listas`): hecha.
 4. Despensa (`/despensa`) y categorías en la lista: hecha. Plan y
    decisiones D1–D9 en el documento «Migas · Plan de la vista Despensa».
-5. Recetas (`/recetas`, `/recetas/[recetaId]`): hecha en `feat/recetas`
-   (producto mínimo: sugerencias con lo que hay, raciones ajustables y lo
-   que falta a la lista). Pendiente: migración `recetas` y seed en
-   producción; descontar ingredientes al cocinar (`RecipeCooked`).
+5. Recetas (`/recetas`, `/recetas/[recetaId]`): hecha (producto mínimo:
+   sugerencias con lo que hay, raciones ajustables y lo que falta a la
+   lista). Pendiente: descontar ingredientes al cocinar (`RecipeCooked`).
+6. Mejoras de la primera versión, hechas: paquetes abiertos; lista general,
+   packs y tarjetas de lista como las de despensa; memorias del hogar (pack
+   y ubicación); editar nombres y Mis productos (`/productos`); gastar con un
+   toque y deshacer; vista rápida de la lista; emojis por producto.
+   Planeado aparte: recetas del hogar con moderación
+   (`docs/migas-plan-recetas-del-hogar.pdf`), subcategorías del hogar,
+   valor nutricional y variantes (producto · sabor) en el catálogo.
 
 - Home pública (`/`, `(marketing)`): hecha. Textos del «Plan de marketing —
   Migas»; capturas reales en `(marketing)/_img` (rehacerlas si cambian las

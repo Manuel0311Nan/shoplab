@@ -10,6 +10,8 @@ import {
   DEV_PASSWORD,
   DEV_USER_ID,
 } from "../src/shared/kernel/dev-identity";
+import { UBICACIONES_POR_DEFECTO } from "../src/domains/pantry/domain/ubicacion";
+import { newId } from "../src/shared/kernel/ids";
 import { sembrarListaBase } from "./seed-lista-base";
 import { sembrarRecetas } from "./seed-recetas";
 
@@ -71,6 +73,20 @@ async function main() {
   ) {
     await prisma.shoppingList.create({
       data: { hogarId: DEV_HOGAR_ID, nombre: "Lista general", general: true },
+    });
+  }
+
+  // Nevera, Congelador y Armario, como en el alta de un hogar (sin ellas no se puede
+  // guardar nada en la despensa).
+  if ((await prisma.ubicacion.count({ where: { hogarId: DEV_HOGAR_ID, deletedAt: null } })) === 0) {
+    await prisma.ubicacion.createMany({
+      data: UBICACIONES_POR_DEFECTO.map((u, i) => ({
+        id: newId(),
+        hogarId: DEV_HOGAR_ID,
+        nombre: u.nombre,
+        tipo: u.tipo,
+        orden: i + 1,
+      })),
     });
   }
 
