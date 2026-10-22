@@ -18,6 +18,13 @@ Content-Type: application/json
 
 { "nombre": "Leche", "cantidad": { "valor": 2, "unidad": "l" } }
 
+### Añadir un pack (2 packs de 4 yogures = 8 ud.)
+POST {{base}}/lists/{{lista}}/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nombre": "Yogur natural", "cantidad": { "valor": 8, "unidad": "unidad" }, "unidadesPorPack": 4 }
+
 ### Marcar como comprado
 PATCH {{base}}/lists/{{lista}}/items/{{item}}
 Authorization: Bearer {{token}}

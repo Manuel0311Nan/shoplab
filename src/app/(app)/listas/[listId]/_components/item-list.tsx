@@ -17,6 +17,8 @@ type Props = {
   agrupar?: boolean;
   /** Lista archivada: se ve, pero no se puede cambiar. */
   soloLectura?: boolean;
+  /** En la lista general: el id de la general (los ítems de otras listas llevan su nombre). */
+  generalId?: string | null;
 };
 
 export function ItemList({
@@ -29,6 +31,7 @@ export function ItemList({
   onQuitar,
   agrupar = false,
   soloLectura = false,
+  generalId = null,
 }: Props) {
   const tituloId = useId();
   const fila = (item: ShoppingItemResponse) => (
@@ -40,9 +43,14 @@ export function ItemList({
       onCategoria={(categoria) => onCategoria(item.id, categoria)}
       onQuitar={() => onQuitar(item.id)}
       soloLectura={soloLectura}
+      origen={
+        generalId !== null && item.listaId !== undefined && item.listaId !== generalId
+          ? (item.listaNombre ?? null)
+          : null
+      }
     />
   );
-  const rejilla = "grid grid-cols-2 gap-4 sm:grid-cols-3";
+  const rejilla = "flex flex-col gap-2";
 
   return (
     <section aria-labelledby={tituloId} className="flex flex-col gap-3">

@@ -15,6 +15,7 @@ export const POST = apiRoute(
       cantidad: body.cantidad,
       nota: body.nota ?? null,
       productoBaseId: body.productoBaseId ?? null,
+      unidadesPorPack: body.unidadesPorPack ?? null,
       ...(body.categoria === undefined ? {} : { categoria: body.categoria }),
       ...(body.duplicado === undefined ? {} : { duplicado: body.duplicado }),
       ...(body.unidadFinal === undefined ? {} : { unidadFinal: body.unidadFinal }),

@@ -8,6 +8,18 @@ export interface DetalleDuplicado {
   readonly comprado: boolean;
 }
 export const ShoppingErrors = {
+  packNoValido: (min: number, max: number) =>
+    validationError(
+      "PACK_NO_VALIDO",
+      `Un pack tiene entre ${min} y ${max} unidades, y la cantidad va en unidades`,
+    ),
+
+  listaGeneral: () =>
+    conflictError(
+      "LISTA_GENERAL",
+      "La lista general reúne todas tus listas: no se puede archivar ni borrar",
+    ),
+
   listaNoEncontrada: () => notFoundError("LISTA_NO_ENCONTRADA", "La lista no existe"),
 
   itemNoEncontrado: () => notFoundError("ITEM_NO_ENCONTRADO", "Ese producto no está en la lista"),

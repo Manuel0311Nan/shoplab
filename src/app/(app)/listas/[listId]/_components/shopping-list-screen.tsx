@@ -75,6 +75,7 @@ export function ShoppingListScreen({ list }: Props) {
             id,
             nombre: values.nombre,
             cantidad: values.cantidad,
+            unidadesPorPack: values.unidadesPorPack ?? null,
             nota: values.nota ?? null,
             ingredientId: null,
             productoBaseId: values.productoBaseId ?? null,
@@ -82,6 +83,8 @@ export function ShoppingListScreen({ list }: Props) {
             categoria: values.categoria ?? "otros",
             compradoAt: null,
             updatedAt: new Date().toISOString(),
+            listaId: list.id,
+            listaNombre: list.nombre,
           },
         });
       }
@@ -123,20 +126,22 @@ export function ShoppingListScreen({ list }: Props) {
     });
   }
 
+  // En la general cada ítem pertenece a su lista: los cambios van allí.
+  const listaDe = (itemId: string) => items.find((i) => i.id === itemId)?.listaId ?? list.id;
   const marcar = (itemId: string, comprado: boolean) =>
     ejecutar({ tipo: "comprado", itemId, comprado }, () =>
-      setItemPurchasedAction(list.id, itemId, comprado),
+      setItemPurchasedAction(listaDe(itemId), itemId, comprado),
     );
   const cambiarCantidad = (itemId: string, cantidad: CantidadDto) =>
     ejecutar({ tipo: "cantidad", itemId, cantidad }, () =>
-      updateItemQuantityAction(list.id, itemId, cantidad),
+      updateItemQuantityAction(listaDe(itemId), itemId, cantidad),
     );
   const cambiarCategoria = (itemId: string, categoria: CategoriaDto) =>
     ejecutar({ tipo: "categoria", itemId, categoria }, () =>
-      updateItemCategoryAction(list.id, itemId, categoria),
+      updateItemCategoryAction(listaDe(itemId), itemId, categoria),
     );
   const quitar = (itemId: string) =>
-    ejecutar({ tipo: "quitar", itemId }, () => removeItemAction(list.id, itemId));
+    ejecutar({ tipo: "quitar", itemId }, () => removeItemAction(listaDe(itemId), itemId));
   /** D6: al terminar, lo que estaba en el carro se ofrece para guardarlo en la despensa. */
   function terminar(modo: ModoTerminarCompraDto) {
     const comprados = items.filter((item) => item.compradoAt !== null);
@@ -172,6 +177,12 @@ export function ShoppingListScreen({ list }: Props) {
         </Link>
         {/* El título ocupa todo el ancho y salta de línea si no cabe: nunca se corta. */}
         <h1 className="text-[28px] leading-9 font-bold text-balance break-words">{list.nombre}</h1>
+        {list.general && (
+          <p className="text-sm text-muted-foreground">
+            Reúne lo que añades aquí y lo de todas tus listas. Cambiar o quitar un producto aquí lo
+            cambia también en su lista.
+          </p>
+        )}
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <p className="text-muted-foreground" aria-live="polite">
             {isPending ? "Guardando…" : `${enElCarro.length} de ${items.length} en el carro`}
@@ -238,6 +249,7 @@ export function ShoppingListScreen({ list }: Props) {
         onQuitar={quitar}
         agrupar={orden === "categoria"}
         soloLectura={soloLectura}
+        generalId={list.general ? list.id : null}
       />
       <ItemList
         titulo="En el carro"
@@ -248,10 +260,15 @@ export function ShoppingListScreen({ list }: Props) {
         onCategoria={cambiarCategoria}
         onQuitar={quitar}
         soloLectura={soloLectura}
+        generalId={list.general ? list.id : null}
       />
 
       {!soloLectura && enElCarro.length > 0 && (
-        <FinishShoppingButton pendientes={pendientes.length} onTerminar={terminar} />
+        <FinishShoppingButton
+          // En la general lo pendiente es de cada lista: nunca se vacía, solo sale lo comprado.
+          pendientes={list.general ? 0 : pendientes.length}
+          onTerminar={terminar}
+        />
       )}
 
       {!soloLectura && (

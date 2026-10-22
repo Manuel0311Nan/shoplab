@@ -197,7 +197,17 @@ hay en casa: cantidad, caducidad, ubicación).
   Un ítem tiene `nombre` libre + `productoBaseId` y categoría (ver Catalog),
   cantidad obligatoria (la UI propone 1 ud.) y
   `compradoAt` en lugar de booleano. Comprado y cantidad se cambian con
-  un único `UpdateItemCommand` (PATCH atómico)
+  un único `UpdateItemCommand` (PATCH atómico).
+  Lista general (`ShoppingList.general`): una por hogar, la crea el alta
+  del hogar (y la migración para los existentes). Va primero, no se archiva
+  ni se borra (`LISTA_GENERAL`) y no cuenta para el límite de 15. Su vista
+  (`vistaGeneral`) junta sus ítems con los de todas las activas; cada ítem
+  lleva `listaId`/`listaNombre` y las acciones van a la lista de origen, así
+  que cambiar o quitar en una se ve en la otra. Lo añadido en la general solo
+  vive ahí. Terminar compra en la general termina todas («conservarPendientes»).
+  Packs: se guardan en unidades con `unidadesPorPack` (2..100, solo con
+  unidad «unidad»); el stepper sube de pack en pack y si la cantidad deja de
+  ser un número entero de packs se quita el pack
 - **Recipes** (vista 4): biblioteca global de solo lectura (`Receta`,
   `RecetaIngrediente`). Cada ingrediente nombra productos de la lista base
   que lo cubren (alternativas, el primero es el que se compra), cantidad
@@ -361,6 +371,9 @@ Recetas escritas para Migas: no copiar textos de webs ni de libros.
 - No guardar caducidades como instante: son `Dia` (`@db.Date`), y «hoy» se
   calcula con `hoyEn(ZONA_HOGAR, clock)` en el servidor.
 - No cambiar la cantidad de una línea de despensa sin su movimiento.
+- No guardar «pack» como unidad: son unidades + `unidadesPorPack`.
+- No revalidar `/listas/${id}`: con la lista general hay que revalidar
+  `revalidatePath("/listas/[listId]", "page")`.
 - No tratar «abierto» como caducidad ni decir «tíralo»: es un aviso para
   revisar. Los días se cambian en la lista base o en el kernel, no en la UI.
 - No importar un repositorio de otro contexto: orquestador en `app/_lib`.

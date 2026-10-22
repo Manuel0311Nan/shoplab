@@ -34,7 +34,10 @@ export class UpdateShoppingListCommand {
       if (!renombrada.ok) return renombrada;
     }
 
-    if (input.archivada === true) list.archivar(ahora);
+    if (input.archivada === true) {
+      if (list.esGeneral) return err(ShoppingErrors.listaGeneral());
+      list.archivar(ahora);
+    }
 
     if (input.archivada === false && list.estaArchivada) {
       const otra = await hacerSitio(this.lists, input.archivarListaId, ahora);

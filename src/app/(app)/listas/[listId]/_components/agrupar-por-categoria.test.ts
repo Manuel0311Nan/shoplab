@@ -6,6 +6,7 @@ const item = (id: string, categoria: ShoppingItemResponse["categoria"]): Shoppin
   id,
   nombre: id,
   cantidad: { valor: 1, unidad: "unidad" },
+  unidadesPorPack: null,
   nota: null,
   ingredientId: null,
   productoBaseId: null,

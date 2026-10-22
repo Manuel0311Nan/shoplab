@@ -15,6 +15,7 @@ const SELECT_LISTA = {
   id: true,
   nombre: true,
   archivadaAt: true,
+  general: true,
   createdAt: true,
   updatedAt: true,
   deletedAt: true,
@@ -45,10 +46,19 @@ export class PrismaShoppingListRepository
   async listarActivas(): Promise<ResumenLista[]> {
     const filas = await this.db.shoppingList.findMany({
       where: { deletedAt: null, archivadaAt: null },
-      orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+      orderBy: [{ general: "desc" }, { updatedAt: "desc" }, { id: "desc" }],
       select: SELECT_LISTA,
     });
     return this.resumir(filas);
+  }
+
+  async listarActivasConItems(): Promise<ShoppingList[]> {
+    const filas = await this.db.shoppingList.findMany({
+      where: { deletedAt: null, archivadaAt: null },
+      orderBy: [{ general: "desc" }, { updatedAt: "desc" }, { id: "desc" }],
+      include: { items: { where: { deletedAt: null }, orderBy: { createdAt: "asc" } } },
+    });
+    return filas.map(shoppingListToDomain);
   }
 
   async listarArchivadas(opciones: {
@@ -82,7 +92,9 @@ export class PrismaShoppingListRepository
   }
 
   async contarActivas(): Promise<number> {
-    return this.db.shoppingList.count({ where: { deletedAt: null, archivadaAt: null } });
+    return this.db.shoppingList.count({
+      where: { deletedAt: null, archivadaAt: null, general: false },
+    });
   }
 
   async save(list: ShoppingList): Promise<void> {
@@ -139,6 +151,7 @@ export class PrismaShoppingListRepository
           categoria: item.categoria,
           cantidadValor: item.cantidad.valor,
           cantidadUnidad: item.cantidad.unidad,
+          unidadesPorPack: item.unidadesPorPack,
           nota: item.nota,
           compradoAt: item.compradoAt,
           compradoPorId: item.compradoPorId,

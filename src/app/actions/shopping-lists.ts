@@ -71,7 +71,8 @@ export async function actualizarListaAction(
   if (!result.ok) return result;
 
   revalidatePath("/listas");
-  revalidatePath(`/listas/${id.data}`);
+  // Todas las listas: la general enseña los productos de cada una.
+  revalidatePath("/listas/[listId]", "page");
   return ok({ id: id.data });
 }
 
@@ -126,7 +127,8 @@ export async function finishShoppingAction(
   });
   if (!result.ok) return result;
 
-  revalidatePath(`/listas/${id.data}`);
+  // Todas las listas: la general enseña los productos de cada una.
+  revalidatePath("/listas/[listId]", "page");
   revalidatePath("/listas");
   return ok(toShoppingListResponse(result.value));
 }

@@ -238,7 +238,8 @@ export async function anadirALaListaAction(
   });
   if (!result.ok && result.error.code !== "POSIBLE_DUPLICADO") return result;
 
-  revalidatePath(`/listas/${lista.id}`);
+  // Todas las listas: la general enseña los productos de cada una.
+  revalidatePath("/listas/[listId]", "page");
   revalidatePath("/listas");
   return ok({ listaId: lista.id, listaNombre: lista.nombre, yaEstaba: !result.ok });
 }

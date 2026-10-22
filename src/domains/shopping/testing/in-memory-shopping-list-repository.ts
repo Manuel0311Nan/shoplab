@@ -58,7 +58,16 @@ export class InMemoryShoppingListRepository implements ShoppingListRepository {
   async listarActivas(): Promise<ResumenLista[]> {
     return this.resumenes()
       .filter((l) => l.archivadaAt === null)
-      .sort(porFechaDesc((l) => l.updatedAt));
+      .sort(
+        (a, b) => Number(b.general) - Number(a.general) || porFechaDesc((l) => l.updatedAt)(a, b),
+      );
+  }
+
+  async listarActivasConItems(): Promise<ShoppingList[]> {
+    const listas = await Promise.all(
+      (await this.listarActivas()).map((resumen) => this.findById(resumen.id)),
+    );
+    return listas.filter((l): l is ShoppingList => l !== null);
   }
 
   async listarArchivadas(opciones: {
@@ -79,7 +88,7 @@ export class InMemoryShoppingListRepository implements ShoppingListRepository {
   }
 
   async contarActivas(): Promise<number> {
-    return (await this.listarActivas()).length;
+    return (await this.listarActivas()).filter((l) => !l.general).length;
   }
 
   async save(list: ShoppingList): Promise<void> {

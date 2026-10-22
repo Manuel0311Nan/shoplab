@@ -11,6 +11,8 @@ export interface CreateShoppingListInput {
   readonly nombre: string;
   /** Con 15 activas: la lista que el usuario eligió archivar para hacer sitio. */
   readonly archivarListaId?: string;
+  /** Solo el alta del hogar: la lista general (una por hogar, no cuenta para el límite). */
+  readonly general?: boolean;
 }
 
 /**
@@ -26,8 +28,15 @@ export class CreateShoppingListCommand {
 
   async execute(input: CreateShoppingListInput): Promise<Result<ShoppingListSnapshot>> {
     const ahora = this.clock.now();
-    const list = ShoppingList.create({ id: input.listId ?? newId(), nombre: input.nombre }, ahora);
+    const list = ShoppingList.create(
+      { id: input.listId ?? newId(), nombre: input.nombre, general: input.general ?? false },
+      ahora,
+    );
     if (!list.ok) return list;
+    if (input.general === true) {
+      await this.lists.save(list.value);
+      return ok(list.value.toSnapshot());
+    }
 
     const archivada = await hacerSitio(this.lists, input.archivarListaId, ahora);
     if (!archivada.ok) return archivada;

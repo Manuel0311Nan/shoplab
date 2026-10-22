@@ -10,6 +10,8 @@ export interface ShoppingListSnapshot {
   readonly id: string;
   readonly nombre: string;
   readonly archivadaAt: Date | null;
+  /** La lista general del hogar: reúne sus productos y los de todas las activas. */
+  readonly general: boolean;
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly deletedAt: Date | null;
@@ -55,6 +57,7 @@ export function limiteDeCaducidad(ahora: Date): Date {
 export interface NewShoppingList {
   readonly id: string;
   readonly nombre: string;
+  readonly general?: boolean;
 }
 
 function validarNombre(nombre: string): Result<string> {
@@ -83,6 +86,7 @@ export class ShoppingList {
           id: input.id,
           nombre: nombre.value,
           archivadaAt: null,
+          general: input.general ?? false,
           createdAt: ahora,
           updatedAt: ahora,
           deletedAt: null,
@@ -102,6 +106,10 @@ export class ShoppingList {
 
   get nombre(): string {
     return this.state.nombre;
+  }
+
+  get esGeneral(): boolean {
+    return this.state.general;
   }
 
   get estaArchivada(): boolean {

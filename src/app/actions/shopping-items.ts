@@ -42,6 +42,7 @@ export async function addItemAction(
     cantidad: body.data.cantidad,
     nota: body.data.nota ?? null,
     productoBaseId: body.data.productoBaseId ?? null,
+    unidadesPorPack: body.data.unidadesPorPack ?? null,
     ...(body.data.categoria === undefined ? {} : { categoria: body.data.categoria }),
     ...(body.data.duplicado === undefined ? {} : { duplicado: body.data.duplicado }),
     ...(body.data.unidadFinal === undefined ? {} : { unidadFinal: body.data.unidadFinal }),
@@ -50,7 +51,8 @@ export async function addItemAction(
 
   if (!result.ok) return result;
 
-  revalidatePath(`/listas/${id.data}`);
+  // Todas las listas: la general enseña los productos de cada una.
+  revalidatePath("/listas/[listId]", "page");
   revalidatePath("/listas");
   return ok(toShoppingItemResponse(result.value));
 }
@@ -73,7 +75,8 @@ export async function setItemPurchasedAction(
   });
   if (!result.ok) return result;
 
-  revalidatePath(`/listas/${ids.data.listId}`);
+  // Todas las listas: la general enseña los productos de cada una.
+  revalidatePath("/listas/[listId]", "page");
   revalidatePath("/listas");
   return ok(toShoppingItemResponse(result.value));
 }
@@ -97,7 +100,8 @@ export async function updateItemQuantityAction(
   });
   if (!result.ok) return result;
 
-  revalidatePath(`/listas/${ids.data.listId}`);
+  // Todas las listas: la general enseña los productos de cada una.
+  revalidatePath("/listas/[listId]", "page");
   revalidatePath("/listas");
   return ok(toShoppingItemResponse(result.value));
 }
@@ -112,7 +116,8 @@ export async function removeItemAction(listId: string, itemId: string): Promise<
   const result = await shoppingModule(auth.value).removeItem.execute(ids.data);
   if (!result.ok) return result;
 
-  revalidatePath(`/listas/${ids.data.listId}`);
+  // Todas las listas: la general enseña los productos de cada una.
+  revalidatePath("/listas/[listId]", "page");
   revalidatePath("/listas");
   return ok(undefined);
 }
@@ -136,6 +141,7 @@ export async function updateItemCategoryAction(
   });
   if (!result.ok) return result;
 
-  revalidatePath(`/listas/${ids.data.listId}`);
+  // Todas las listas: la general enseña los productos de cada una.
+  revalidatePath("/listas/[listId]", "page");
   return ok(toShoppingItemResponse(result.value));
 }

@@ -6,7 +6,8 @@ import { shoppingModule } from "@/domains/shopping/infrastructure/shopping-modul
 import type { Identity } from "@/shared/kernel/auth-context";
 import { ok, type Result } from "@/shared/kernel/result";
 
-const NOMBRE_PRIMERA_LISTA = "Lista de la compra";
+/** La primera lista es la general: reúne las que el hogar cree después. */
+const NOMBRE_PRIMERA_LISTA = "Lista general";
 
 /**
  * Alta del hogar + su primera lista. La comparten la Server Action de /bienvenida y
@@ -33,7 +34,7 @@ export async function darDeAltaHogar(
     const lista = await shoppingModule({
       userId: identity.userId,
       hogarId: hogar.value.id,
-    }).createList.execute({ nombre: NOMBRE_PRIMERA_LISTA });
+    }).createList.execute({ nombre: NOMBRE_PRIMERA_LISTA, general: true });
     if (lista.ok) primeraListaId = lista.value.id;
   } catch (error) {
     console.error("[alta-hogar] No se pudo crear la primera lista", error);

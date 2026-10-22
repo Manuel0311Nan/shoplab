@@ -21,7 +21,10 @@ consumirán otros clientes, como una futura app móvil (proyecto aparte).
   cantidad y unidad, marcar como comprado, autocompletado con una lista
   base de 328 productos y aviso de productos repetidos (unir sumando
   g↔kg y ml↔l, o añadir aparte). Las listas archivadas se borran solas
-  a los 15 días. Orden por tienda/pasillo (más adelante).
+  a los 15 días. Una **lista general** reúne todas las listas: lo que
+  cambias o quitas en ella se cambia en su lista, y lo que añades ahí se
+  queda solo en ella. Los productos se pueden añadir por **packs** (p. ej.
+  yogures de 4 en 4). Orden por tienda/pasillo (más adelante).
 - **Despensa**: qué hay en casa, cuánto, en qué ubicación (configurables
   por hogar) y, si se quiere, cuándo caduca, con aviso de lo que caduca esta
   semana. Al terminar la compra se ofrece guardarla en la despensa, y lo

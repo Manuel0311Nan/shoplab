@@ -1,4 +1,4 @@
-import { Check, Undo2, X } from "lucide-react";
+import { Check, Layers, Undo2, X } from "lucide-react";
 import type { CategoriaDto } from "@/contracts/categoria";
 import type { CantidadDto, ShoppingItemResponse } from "@/contracts/shopping";
 import { cn } from "@/shared/lib/utils";
@@ -13,12 +13,15 @@ type Props = {
   onCategoria: (categoria: CategoriaDto) => void;
   onQuitar: () => void;
   soloLectura?: boolean;
+  /** En la lista general: de qué lista viene (null si es de la propia general). */
+  origen?: string | null;
 };
 
-// Hasta que el ítem se vincule a un Ingredient con categoría (vista 3),
-// el círculo del diseño muestra la inicial en lugar de un icono.
-const inicial = (nombre: string) => nombre.trim().charAt(0).toLocaleUpperCase("es-ES");
-
+/**
+ * Un producto de la lista, con el mismo esquema que las tarjetas de la despensa: a lo
+ * ancho, nombre completo (salta de línea, nunca se corta) y la acción principal a la
+ * derecha; debajo, la cantidad.
+ */
 export function ShoppingItemRow({
   item,
   onToggle,
@@ -26,72 +29,74 @@ export function ShoppingItemRow({
   onCategoria,
   onQuitar,
   soloLectura = false,
+  origen = null,
 }: Props) {
   const comprado = item.compradoAt !== null;
   return (
     <li
       className={cn(
-        "flex min-w-0 flex-col rounded-xl p-3 transition-transform active:scale-[0.98] sm:p-4",
+        "flex min-h-32 flex-col gap-3 rounded-xl p-3",
         comprado ? "bg-muted" : "bg-card shadow-card",
       )}
     >
-      <div className="mb-3 flex items-start justify-between">
-        <span
-          aria-hidden="true"
-          className={cn(
-            "flex size-12 items-center justify-center rounded-full font-heading text-xl font-bold",
-            comprado ? "bg-card text-muted-foreground" : "bg-muted text-primary",
-          )}
-        >
-          {inicial(item.nombre)}
-        </span>
-        {!soloLectura && (
-          <Button
-            variant="ghost"
-            size="icon-lg"
-            onClick={onQuitar}
-            aria-label={`Quitar ${item.nombre}`}
-            className="-mt-1.5 -mr-1.5 size-11 rounded-full text-muted-foreground [&_svg:not([class*='size-'])]:size-5"
+      <div className="flex items-start gap-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-1 pt-1">
+          <h3
+            className={cn(
+              "text-lg leading-6 font-semibold break-words",
+              comprado && "text-muted-foreground line-through",
+            )}
           >
-            <X aria-hidden="true" />
-          </Button>
+            {item.nombre}
+          </h3>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <SelectorCategoria
+              categoria={item.categoria}
+              producto={item.nombre}
+              onCambiar={onCategoria}
+              disabled={soloLectura}
+            />
+            {origen !== null && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-accent-foreground">
+                <Layers className="size-3" aria-hidden="true" />
+                {origen}
+              </span>
+            )}
+          </div>
+          {item.nota && <p className="text-xs break-words text-muted-foreground">{item.nota}</p>}
+        </div>
+        {!soloLectura && (
+          <>
+            <Button
+              variant={comprado ? "outline" : "default"}
+              onClick={() => onToggle(!comprado)}
+              className="h-11 shrink-0 px-3 font-semibold"
+            >
+              {comprado ? <Undo2 aria-hidden="true" /> : <Check aria-hidden="true" />}
+              {comprado ? "Devolver" : "Al carro"}
+              <span className="sr-only">: {item.nombre}</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-lg"
+              onClick={onQuitar}
+              aria-label={`Quitar ${item.nombre}`}
+              className="size-11 shrink-0 rounded-full text-muted-foreground [&_svg:not([class*='size-'])]:size-5"
+            >
+              <X aria-hidden="true" />
+            </Button>
+          </>
         )}
       </div>
-      <h3
-        className={cn(
-          "truncate text-lg leading-7 font-semibold",
-          comprado && "text-muted-foreground line-through",
-        )}
-      >
-        {item.nombre}
-      </h3>
-      <SelectorCategoria
-        categoria={item.categoria}
-        producto={item.nombre}
-        onCambiar={onCategoria}
-        disabled={soloLectura}
-        className="self-start"
-      />
-      {item.nota && <p className="truncate text-xs text-muted-foreground">{item.nota}</p>}
-      <div className="mt-3">
+      <div className="w-full max-w-60">
         <QuantityStepper
           nombre={item.nombre}
           cantidad={item.cantidad}
+          unidadesPorPack={item.unidadesPorPack}
           onChange={onCantidad}
           disabled={comprado || soloLectura}
         />
       </div>
-      {!soloLectura && (
-        <Button
-          variant={comprado ? "outline" : "default"}
-          onClick={() => onToggle(!comprado)}
-          className="mt-4 h-11 w-full font-semibold"
-        >
-          {comprado ? <Undo2 aria-hidden="true" /> : <Check aria-hidden="true" />}
-          {comprado ? "Devolver" : "Al carro"}
-          <span className="sr-only">: {item.nombre}</span>
-        </Button>
-      )}
     </li>
   );
 }

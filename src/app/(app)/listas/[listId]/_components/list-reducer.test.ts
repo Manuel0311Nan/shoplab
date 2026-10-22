@@ -5,6 +5,7 @@ const leche: ShoppingItemResponse = {
   id: "0199c000-0000-7000-8000-0000000000aa",
   nombre: "Leche",
   cantidad: { valor: 2, unidad: "l" },
+  unidadesPorPack: null,
   nota: null,
   ingredientId: null,
   productoBaseId: null,
