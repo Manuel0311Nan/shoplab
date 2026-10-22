@@ -8,9 +8,11 @@ import {
   anadirADespensa,
   guardarCompra,
 } from "@/app/_lib/pantry/despensa-con-catalogo";
+import { ubicacionesRecordadas } from "@/app/_lib/memoria-hogar";
 import { anadirProducto } from "@/app/_lib/shopping/productos-con-catalogo";
 import { toLineaDesdeSnapshot, toUbicacionResponse } from "@/app/_lib/pantry/to-response";
 import { categoriaSchema } from "@/contracts/categoria";
+import type { UbicacionesRecordadas } from "@/contracts/memoria";
 import {
   type AddStockRequest,
   addStockRequestSchema,
@@ -188,15 +190,19 @@ export async function guardarCompraAction(
 
 /** Lo que necesita la hoja "Guardar en la despensa": ubicaciones y el día de hoy. */
 export async function ubicacionesAction(): Promise<
-  Result<{ hoy: string; ubicaciones: UbicacionResponse[] }>
+  Result<{ hoy: string; ubicaciones: UbicacionResponse[]; recordadas: UbicacionesRecordadas }>
 > {
   const auth = await getAuthContext();
   if (!auth.ok) return auth;
-  const result = await pantryModule(auth.value).getPantry.execute();
+  const [result, recordadas] = await Promise.all([
+    pantryModule(auth.value).getPantry.execute(),
+    ubicacionesRecordadas(auth.value),
+  ]);
   if (!result.ok) return result;
   return ok({
     hoy: result.value.hoy,
     ubicaciones: result.value.ubicaciones.map(toUbicacionResponse),
+    recordadas,
   });
 }
 
@@ -206,6 +212,9 @@ const anadirALaListaSchema = z.object({
   productoBaseId: z.uuid().nullable(),
   categoria: categoriaSchema,
   unidad: unidadSchema,
+  /** Lo elegido en el diálogo (en unidades si es por packs); sin ella, 1 en su unidad. */
+  cantidad: z.object({ valor: z.number().positive(), unidad: unidadSchema }).optional(),
+  unidadesPorPack: z.number().int().min(2).max(100).nullish(),
 });
 
 /**
@@ -234,7 +243,8 @@ export async function anadirALaListaAction(
     nombre: body.data.nombre,
     productoBaseId: body.data.productoBaseId,
     categoria: body.data.categoria,
-    cantidad: { valor: 1, unidad: body.data.unidad },
+    cantidad: body.data.cantidad ?? { valor: 1, unidad: body.data.unidad },
+    unidadesPorPack: body.data.unidadesPorPack ?? null,
   });
   if (!result.ok && result.error.code !== "POSIBLE_DUPLICADO") return result;
 

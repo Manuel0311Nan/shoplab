@@ -1,10 +1,13 @@
 "use client";
 import { useEffect, useState, useTransition } from "react";
 import { guardarCompraAction, ubicacionesAction } from "@/app/actions/pantry";
+import type { UbicacionesRecordadas } from "@/contracts/memoria";
 import type { UbicacionResponse } from "@/contracts/pantry";
 import type { ShoppingItemResponse } from "@/contracts/shopping";
+import { ubicacionParaProducto } from "@/domains/pantry/domain/ubicacion";
 import { tipoDeUbicacion } from "@/shared/kernel/categoria";
 import { newId } from "@/shared/kernel/ids";
+import { normalizarNombre } from "@/shared/kernel/texto";
 import { Button } from "@/shared/ui/button";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/shared/ui/dialog";
@@ -27,14 +30,24 @@ interface Fila {
   caducaEl: string | null;
 }
 
-function propuesta(ubicaciones: readonly UbicacionResponse[], item: ShoppingItemResponse): string {
-  const tipo = tipoDeUbicacion(item.categoria);
-  const ordenadas = [...ubicaciones].sort((a, b) => a.orden - b.orden);
-  return (ordenadas.find((u) => u.tipo === tipo) ?? ordenadas.at(0))?.id ?? "";
+/** Donde se guardó la última vez o, si no, la de su categoría. */
+function propuesta(
+  ubicaciones: readonly UbicacionResponse[],
+  recordadas: UbicacionesRecordadas,
+  item: ShoppingItemResponse,
+): string {
+  return (
+    ubicacionParaProducto(
+      ubicaciones,
+      recordadas[normalizarNombre(item.nombre)],
+      tipoDeUbicacion(item.categoria),
+    )?.id ?? ""
+  );
 }
 
 /**
- * D6: al terminar la compra, lo comprado llega marcado, con la ubicación propuesta y sin
+ * D6: al terminar la compra, lo comprado llega marcado, con la ubicación propuesta (la
+ * última en la que se guardó o la de su categoría) y sin
  * fecha (D2). Una pulsación en "Guardar" basta; se puede desmarcar lo que no va a la
  * despensa o desplegar las caducidades.
  */
@@ -65,7 +78,7 @@ export function GuardarEnDespensaSheet({ listaId, productos, onCerrar }: Props) 
             id: newId(),
             item,
             marcado: true,
-            ubicacionId: propuesta(r.value.ubicaciones, item),
+            ubicacionId: propuesta(r.value.ubicaciones, r.value.recordadas, item),
             caducaEl: null,
           })),
         );

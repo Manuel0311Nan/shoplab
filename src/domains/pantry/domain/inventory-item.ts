@@ -149,6 +149,9 @@ export class InventoryItem {
   get cantidad(): Cantidad {
     return this.state.cantidad;
   }
+  get nombre(): string {
+    return this.state.nombre;
+  }
   get ubicacionId(): string {
     return this.state.ubicacionId;
   }

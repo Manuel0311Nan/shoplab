@@ -108,5 +108,33 @@ export function pantryRepositoryContract(nombre: string, crear: CrearRepositorio
       expect((await repo.listarUbicaciones()).map((u) => u.id)).not.toContain(NEVERA_ID);
       expect((await repo.findLinea(LINEA_ID))?.ubicacionId).toBe(ARMARIO_ID);
     });
+
+    it("memoria_RecordarReubicarYOlvidar", async () => {
+      const repo = await crear({ ubicaciones: ubicacionesPorDefecto(), lineas: [] });
+      expect((await repo.ubicacionesRecordadas()).size).toBe(0);
+
+      await repo.guardar({
+        recordar: [
+          { nombreNormalizado: "macarrones", ubicacionId: NEVERA_ID },
+          { nombreNormalizado: "arroz", ubicacionId: ARMARIO_ID },
+        ],
+      });
+      await repo.guardar({
+        recordar: [{ nombreNormalizado: "macarrones", ubicacionId: ARMARIO_ID }],
+      });
+      expect(Object.fromEntries(await repo.ubicacionesRecordadas())).toEqual({
+        macarrones: ARMARIO_ID,
+        arroz: ARMARIO_ID,
+      });
+
+      await repo.guardar({ reubicarRecordadas: { desde: ARMARIO_ID, hacia: NEVERA_ID } });
+      expect(Object.fromEntries(await repo.ubicacionesRecordadas())).toEqual({
+        macarrones: NEVERA_ID,
+        arroz: NEVERA_ID,
+      });
+
+      await repo.guardar({ reubicarRecordadas: { desde: NEVERA_ID, hacia: null } });
+      expect((await repo.ubicacionesRecordadas()).size).toBe(0);
+    });
   });
 }

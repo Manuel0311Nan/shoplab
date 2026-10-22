@@ -3,10 +3,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import type { UbicacionesRecordadas } from "@/contracts/memoria";
 import type { AddStockRequest, UbicacionResponse } from "@/contracts/pantry";
 import { addStockRequestSchema } from "@/contracts/pantry";
 import { unidadSchema } from "@/contracts/shopping";
+import { ubicacionParaProducto } from "@/domains/pantry/domain/ubicacion";
 import { tipoDeUbicacion } from "@/shared/kernel/categoria";
+import { normalizarNombre } from "@/shared/kernel/texto";
 import { Button } from "@/shared/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/shared/ui/dialog";
 import { Input } from "@/shared/ui/input";
@@ -22,6 +25,8 @@ type Props = {
   ubicaciones: readonly UbicacionResponse[];
   /** La del chip elegido, si hay uno: lo nuevo va ahí. */
   ubicacionInicial: string | null;
+  /** Memoria del hogar: dónde se guardó cada producto la última vez. */
+  recordadas?: UbicacionesRecordadas;
   hoy: string;
   onAnadir: (valores: AddStockRequest) => void;
   onCerrar: () => void;
@@ -29,11 +34,15 @@ type Props = {
 
 const campo = "h-11 rounded-lg border-transparent bg-muted md:text-base";
 
-/** Botón +: añadir a mano, con autocompletado y la ubicación propuesta por la categoría. */
+/**
+ * Botón +: añadir a mano, con autocompletado. La ubicación propuesta es donde se guardó
+ * ese producto la última vez o, si no, la de su categoría.
+ */
 export function NuevoProductoDialog({
   abierto,
   ubicaciones,
   ubicacionInicial,
+  recordadas = {},
   hoy,
   onAnadir,
   onCerrar,
@@ -93,10 +102,11 @@ export function NuevoProductoDialog({
               setValue("productoBaseId", s.productoBaseId);
               setValue("categoria", s.categoria);
               if (ubicacionInicial === null) {
-                const tipo = tipoDeUbicacion(s.categoria);
-                const propuesta = [...ubicaciones]
-                  .sort((a, b) => a.orden - b.orden)
-                  .find((u) => u.tipo === tipo);
+                const propuesta = ubicacionParaProducto(
+                  ubicaciones,
+                  recordadas[normalizarNombre(s.nombre)],
+                  tipoDeUbicacion(s.categoria),
+                );
                 if (propuesta) setValue("ubicacionId", propuesta.id);
               }
             }}

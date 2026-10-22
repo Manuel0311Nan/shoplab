@@ -7,6 +7,7 @@ import type { InventoryItem } from "@/domains/pantry/domain/inventory-item";
 import type { Ubicacion } from "@/domains/pantry/domain/ubicacion";
 import { convertirCantidad } from "@/shared/kernel/cantidad";
 import { Dia } from "@/shared/kernel/dia";
+import type { TenantPrismaClient } from "@/shared/kernel/tenant-prisma";
 import { TenantRepository } from "@/shared/kernel/tenant-repository";
 import { lineaToDomain, ubicacionToDomain } from "./pantry.mapper";
 
@@ -34,6 +35,13 @@ export class PrismaPantryRepository extends TenantRepository implements PantryRe
 
   async existeMovimiento(id: string): Promise<boolean> {
     return (await this.db.movimientoDespensa.count({ where: { id } })) > 0;
+  }
+
+  async ubicacionesRecordadas(): Promise<ReadonlyMap<string, string>> {
+    const filas = await this.db.ubicacionRecordada.findMany({
+      select: { nombreNormalizado: true, ubicacionId: true },
+    });
+    return new Map(filas.map((f) => [f.nombreNormalizado, f.ubicacionId]));
   }
 
   async guardar(cambios: CambiosDespensa): Promise<void> {
@@ -89,6 +97,28 @@ export class PrismaPantryRepository extends TenantRepository implements PantryRe
           },
         }),
       ),
+      // Después de las ubicaciones: la memoria apunta a ellas.
+      ...(cambios.recordar ?? []).map((r) =>
+        this.db.ubicacionRecordada.upsert({
+          where: {
+            hogarId_nombreNormalizado: {
+              hogarId: this.hogarId,
+              nombreNormalizado: r.nombreNormalizado,
+            },
+          },
+          create: { ...r, hogarId: this.hogarId },
+          update: { ubicacionId: r.ubicacionId },
+        }),
+      ),
+      ...reubicar(this.db, cambios.reubicarRecordadas),
     ]);
   }
+}
+
+function reubicar(db: TenantPrismaClient, cambio: CambiosDespensa["reubicarRecordadas"]) {
+  if (cambio === undefined) return [];
+  const where = { ubicacionId: cambio.desde };
+  return cambio.hacia === null
+    ? [db.ubicacionRecordada.deleteMany({ where })]
+    : [db.ubicacionRecordada.updateMany({ where, data: { ubicacionId: cambio.hacia } })];
 }

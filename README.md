@@ -24,9 +24,10 @@ consumirán otros clientes, como una futura app móvil (proyecto aparte).
   a los 15 días. Una **lista general** reúne todas las listas: lo que
   cambias o quitas en ella se cambia en su lista, y lo que añades ahí se
   queda solo en ella. Los productos se pueden añadir por **packs** (p. ej.
-  yogures de 4 en 4). Orden por tienda/pasillo (más adelante).
+  yogures de 4 en 4); Migas recuerda cómo compras cada producto y te propone
+  el pack la próxima vez. Orden por tienda/pasillo (más adelante).
 - **Despensa**: qué hay en casa, cuánto, en qué ubicación (configurables
-  por hogar) y, si se quiere, cuándo caduca, con aviso de lo que caduca esta
+  por hogar; cada producto se propone donde lo guardaste la última vez) y, si se quiere, cuándo caduca, con aviso de lo que caduca esta
   semana. Al terminar la compra se ofrece guardarla en la despensa, y lo
   que se acaba vuelve a la lista con un toque. Los paquetes abiertos avisan en
   verde, amarillo o rojo según los días que llevan abiertos, para revisar si

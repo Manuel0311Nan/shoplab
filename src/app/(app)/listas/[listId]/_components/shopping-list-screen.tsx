@@ -11,6 +11,7 @@ import {
 } from "@/app/actions/shopping-items";
 import { actualizarListaAction, finishShoppingAction } from "@/app/actions/shopping-lists";
 import type { CategoriaDto } from "@/contracts/categoria";
+import type { PacksRecordados } from "@/contracts/memoria";
 import type {
   CantidadDto,
   LimiteDeListasDetails,
@@ -32,12 +33,16 @@ import { ItemList } from "./item-list";
 import { SelectorOrden, useOrdenLista } from "./orden-lista";
 import { type AccionLista, aplicarAccion } from "./list-reducer";
 
-type Props = { list: ShoppingListResponse };
+type Props = {
+  list: ShoppingListResponse;
+  /** Memoria del hogar: el formulario propone el pack de cada producto. */
+  packs?: PacksRecordados;
+};
 
 /** Alta que espera respuesta del usuario (producto repetido). */
 type AltaPendiente = EstadoDuplicado & { readonly values: NewItemValues; readonly id: string };
 
-export function ShoppingListScreen({ list }: Props) {
+export function ShoppingListScreen({ list, packs = {} }: Props) {
   const [items, aplicarOptimista] = useOptimistic(list.items, aplicarAccion);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -216,7 +221,7 @@ export function ShoppingListScreen({ list }: Props) {
           </Button>
         </div>
       ) : (
-        <AddItemForm onAdd={(values) => enviarAlta(values, newId())} />
+        <AddItemForm packs={packs} onAdd={(values) => enviarAlta(values, newId())} />
       )}
 
       {aviso !== null && (

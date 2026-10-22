@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { packsRecordados } from "@/app/_lib/memoria-hogar";
 import { toShoppingListResponse } from "@/app/_lib/shopping/to-response";
+import { getAuthContext } from "@/shared/kernel/auth-context";
 import { ShoppingListScreen } from "./_components/shopping-list-screen";
 import { loadShoppingList } from "./_data";
 type Props = { params: Promise<{ listId: string }> };
@@ -24,5 +26,8 @@ export default async function ShoppingListPage({ params }: Props) {
     if (result.error.type === "not_found") notFound();
     throw new Error(result.error.message);
   }
-  return <ShoppingListScreen list={toShoppingListResponse(result.value)} />;
+  // Con la lista ya cargada hay sesión: la memoria es una ayuda y nunca falla la página.
+  const auth = await getAuthContext();
+  const packs = auth.ok ? await packsRecordados(auth.value) : {};
+  return <ShoppingListScreen list={toShoppingListResponse(result.value)} packs={packs} />;
 }

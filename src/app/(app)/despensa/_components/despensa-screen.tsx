@@ -12,6 +12,7 @@ import {
   consumirAction,
   quitarLineaAction,
 } from "@/app/actions/pantry";
+import type { PacksRecordados, UbicacionesRecordadas } from "@/contracts/memoria";
 import type {
   AddStockRequest,
   LineaDespensaResponse,
@@ -23,7 +24,11 @@ import { newId } from "@/shared/kernel/ids";
 import { NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
 import { cn } from "@/shared/lib/utils";
 import { AbrirDialog } from "./abrir-dialog";
-import { AnadirAListaDialog, type ProductoParaLista } from "./anadir-a-lista-dialog";
+import {
+  AnadirAListaDialog,
+  type CantidadParaLista,
+  type ProductoParaLista,
+} from "./anadir-a-lista-dialog";
 import { ConsumirDialog } from "./consumir-dialog";
 import { aplicarAccionDespensa } from "./despensa-reducer";
 import { EditarLineaDialog } from "./editar-linea-dialog";
@@ -35,6 +40,9 @@ type Props = {
   despensa: PantryResponse;
   /** Listas activas, para "Añadir a la lista" (la primera es la última modificada). */
   listas: readonly { id: string; nombre: string }[];
+  /** Memoria del hogar: el pack de cada producto y dónde se guardó la última vez. */
+  packs?: PacksRecordados;
+  recordadas?: UbicacionesRecordadas;
 };
 
 const segmento = (activo: boolean) =>
@@ -43,7 +51,7 @@ const segmento = (activo: boolean) =>
     activo ? "bg-card shadow-card" : "text-muted-foreground",
   );
 
-export function DespensaScreen({ despensa, listas }: Props) {
+export function DespensaScreen({ despensa, listas, packs = {}, recordadas = {} }: Props) {
   const router = useRouter();
   const ruta = usePathname();
   const params = useSearchParams();
@@ -151,10 +159,10 @@ export function DespensaScreen({ despensa, listas }: Props) {
     });
   }
 
-  function anadirALista(producto: ProductoParaLista, listaId: string) {
+  function anadirALista(producto: ProductoParaLista, listaId: string, cantidad: CantidadParaLista) {
     setParaLista(null);
     hacer(async () => {
-      const r = await anadirALaListaAction({ ...producto, listaId });
+      const r = await anadirALaListaAction({ ...producto, ...cantidad, listaId });
       if (!r.ok) setError(r.error.message);
       else
         setAviso(
@@ -321,6 +329,7 @@ export function DespensaScreen({ despensa, listas }: Props) {
       <AnadirAListaDialog
         producto={paraLista}
         listas={listas}
+        packs={packs}
         onAnadir={anadirALista}
         onCerrar={() => setParaLista(null)}
       />
@@ -328,6 +337,7 @@ export function DespensaScreen({ despensa, listas }: Props) {
         abierto={nuevo}
         ubicaciones={despensa.ubicaciones}
         ubicacionInicial={ubicacionId}
+        recordadas={recordadas}
         hoy={despensa.hoy}
         onAnadir={anadir}
         onCerrar={() => setNuevo(false)}

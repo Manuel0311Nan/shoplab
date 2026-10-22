@@ -16,6 +16,7 @@ import {
 } from "@/domains/pantry/application/commands/ubicaciones.commands";
 import { UpdateStockCommand } from "@/domains/pantry/application/commands/update-stock.command";
 import { GetPantryQuery } from "@/domains/pantry/application/queries/get-pantry.query";
+import { ListUbicacionesRecordadasQuery } from "@/domains/pantry/application/queries/list-ubicaciones-recordadas.query";
 import type { AuthContext } from "@/shared/kernel/auth-context";
 import { systemClock } from "@/shared/kernel/clock";
 import { PrismaPantryRepository } from "./prisma-pantry-repository";
@@ -31,6 +32,7 @@ export function pantryModule(
   const despensa = new PrismaPantryRepository(auth);
   return {
     getPantry: new GetPantryQuery(despensa, systemClock),
+    ubicacionesRecordadas: new ListUbicacionesRecordadasQuery(despensa),
     addStock: new AddStockCommand(despensa, systemClock),
     storeShopping: new StoreShoppingCommand(despensa, systemClock),
     consumeStock: new ConsumeStockCommand(despensa, systemClock),

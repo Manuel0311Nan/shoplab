@@ -33,13 +33,15 @@ export class StoreShoppingCommand {
   ) {}
 
   async execute(input: StoreShoppingInput): Promise<Result<CompraGuardada>> {
-    const [lineas, ubicaciones] = await Promise.all([
+    const [lineas, ubicaciones, recordadas] = await Promise.all([
       this.despensa.listarLineas(),
       this.despensa.listarUbicaciones(),
+      this.despensa.ubicacionesRecordadas(),
     ]);
     const despensa = new Despensa(
       lineas,
       ubicaciones.map((u) => u.toSnapshot()),
+      recordadas,
     );
     const ahora = this.clock.now();
 
@@ -63,6 +65,7 @@ export class StoreShoppingCommand {
       await this.despensa.guardar({
         lineas: despensa.lineasCambiadas(),
         movimientos: despensa.movimientos,
+        recordar: despensa.ubicacionesARecordar(),
       });
     }
     return ok({

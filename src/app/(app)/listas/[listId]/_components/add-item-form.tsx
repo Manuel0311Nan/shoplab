@@ -3,10 +3,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
-import { addItemRequestSchema, type UnidadDto, unidadSchema } from "@/contracts/shopping";
+import type { PacksRecordados } from "@/contracts/memoria";
+import { addItemRequestSchema } from "@/contracts/shopping";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { CampoProducto } from "../../../_components/autocompletar/campo-producto";
+import {
+  aCantidadDeLista,
+  ETIQUETA_UNIDAD,
+  POR_PACK_INICIAL,
+  propuestaDeUnidad,
+  UNIDADES_ELEGIBLES,
+  type UnidadElegida,
+} from "../../../_components/cantidad-pack";
 
 const formSchema = addItemRequestSchema.pick({
   nombre: true,
@@ -23,27 +32,18 @@ export const NUEVO_PRODUCTO_ID = "nuevo-producto";
 
 const campo = "h-11 rounded-lg border-transparent bg-muted md:text-base";
 
-/** En el selector: las unidades de verdad y «pack» (que se guarda en unidades). */
-type UnidadElegida = UnidadDto | "pack";
-const ETIQUETA_UNIDAD: Record<UnidadElegida, string> = {
-  unidad: "ud.",
-  g: "g",
-  kg: "kg",
-  ml: "ml",
-  l: "l",
-  pack: "pack",
+type Props = {
+  onAdd: (values: NewItemValues) => void;
+  /** Memoria del hogar: al elegir un producto que se compra por packs, se propone el pack. */
+  packs?: PacksRecordados;
 };
-const UNIDADES_ELEGIBLES: readonly UnidadElegida[] = [...unidadSchema.options, "pack"];
-const POR_PACK_INICIAL = 4;
-
-type Props = { onAdd: (values: NewItemValues) => void };
 
 /**
  * Formulario de alta con autocompletado sobre la lista base y la memoria del hogar.
  * Elegir una sugerencia rellena nombre, unidad, categoría y vínculo; si luego se edita
  * el nombre, eso se olvida y lo decide el servidor al guardar.
  */
-export function AddItemForm({ onAdd }: Props) {
+export function AddItemForm({ onAdd, packs = {} }: Props) {
   const {
     register,
     handleSubmit,
@@ -67,27 +67,16 @@ export function AddItemForm({ onAdd }: Props) {
   }
 
   function onSubmit(values: NewItemValues) {
-    if (unidad === "pack") {
-      const n = Number(porPack);
-      if (!Number.isInteger(n) || n < 2 || n > 100) {
-        setErrorPack("Un pack tiene entre 2 y 100 unidades");
-        return;
-      }
-      if (!Number.isInteger(values.cantidad.valor)) {
-        setErrorPack("Indica cuántos packs, sin decimales");
-        return;
-      }
-      onAdd({
-        ...values,
-        cantidad: { valor: values.cantidad.valor * n, unidad: "unidad" },
-        unidadesPorPack: n,
-      });
-    } else {
-      onAdd({ ...values, unidadesPorPack: null });
+    const cantidad = aCantidadDeLista(values.cantidad.valor, unidad, porPack);
+    if (!cantidad.ok) {
+      setErrorPack(cantidad.mensaje);
+      return;
     }
+    onAdd({ ...values, cantidad: cantidad.cantidad, unidadesPorPack: cantidad.unidadesPorPack });
     setErrorPack(null);
     reset();
     setUnidad("unidad");
+    setPorPack(String(POR_PACK_INICIAL));
   }
 
   return (
@@ -103,7 +92,9 @@ export function AddItemForm({ onAdd }: Props) {
         className={campo}
         onElegir={(sugerencia) => {
           setValue("nombre", sugerencia.nombre, { shouldValidate: true });
-          elegirUnidad(sugerencia.unidad);
+          const propuesta = propuestaDeUnidad(packs, sugerencia.nombre, sugerencia.unidad);
+          elegirUnidad(propuesta.unidad);
+          setPorPack(propuesta.porPack);
           setValue("productoBaseId", sugerencia.productoBaseId);
           setValue("categoria", sugerencia.categoria);
         }}

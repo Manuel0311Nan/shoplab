@@ -1,10 +1,17 @@
 import type { InventoryItem, MovimientoSnapshot } from "@/domains/pantry/domain/inventory-item";
-import type { Ubicacion } from "@/domains/pantry/domain/ubicacion";
+import type { Ubicacion, UbicacionRecordada } from "@/domains/pantry/domain/ubicacion";
 
 export interface CambiosDespensa {
   readonly ubicaciones?: readonly Ubicacion[];
   readonly lineas?: readonly InventoryItem[];
   readonly movimientos?: readonly MovimientoSnapshot[];
+  /** Memoria del hogar: crea o reemplaza la ubicación de cada producto. */
+  readonly recordar?: readonly UbicacionRecordada[];
+  /**
+   * Al borrar una ubicación: lo que se recordaba en `desde` pasa a `hacia` (donde se han
+   * movido sus productos) o, con null, se olvida y se vuelve a proponer por categoría.
+   */
+  readonly reubicarRecordadas?: { readonly desde: string; readonly hacia: string | null };
 }
 
 /**
@@ -21,6 +28,8 @@ export interface PantryRepository {
   findLinea(id: string): Promise<InventoryItem | null>;
   /** Para no repetir un envío: el cliente genera el id de cada movimiento. */
   existeMovimiento(id: string): Promise<boolean>;
+  /** Memoria del hogar: nombre normalizado → ubicación (puede estar borrada). */
+  ubicacionesRecordadas(): Promise<ReadonlyMap<string, string>>;
   /** Todo o nada, en una transacción. */
   guardar(cambios: CambiosDespensa): Promise<void>;
 }

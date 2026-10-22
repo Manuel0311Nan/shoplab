@@ -165,6 +165,11 @@ export class DeleteUbicacionCommand {
       ubicaciones: [ubicacion, ...resto],
       lineas: despensa.lineasCambiadas(),
       movimientos: despensa.movimientos,
+      // Lo que se guardaba aquí se recuerda donde han ido sus productos.
+      reubicarRecordadas: {
+        desde: input.id,
+        hacia: dentro.length > 0 ? (input.destinoId ?? null) : null,
+      },
     });
     return ok(undefined);
   }

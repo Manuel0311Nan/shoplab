@@ -173,7 +173,12 @@ hay en casa: cantidad, caducidad, ubicación).
   (`AVISO_ABIERTO`) o de su categoría (`AVISO_ABIERTO_POR_CATEGORIA`);
   fruta, verdura, limpieza e higiene no se abren. Con varias unidades se
   abre una: se separa en su línea (ajustes, no compra ni consumo). Abierta
-  y cerrada son líneas distintas: la compra nunca suma en una abierta
+  y cerrada son líneas distintas: la compra nunca suma en una abierta.
+  Memoria de ubicación (`UbicacionRecordada`, por nombre normalizado): se
+  apunta cuando el usuario elige sitio (alta, guardar la compra, mover). Se
+  propone con `ubicacionParaProducto` (la recordada si sigue viva; si no, por
+  categoría), en el servidor y en los formularios. Al borrar una ubicación lo
+  recordado pasa al destino de sus productos o, si estaba vacía, se olvida
 - **Catalog (hoy)**: `ProductoBase`, la lista base global (328 productos
   y sus sinónimos en `lista-base.data.ts`, cargados por `prisma db seed`
   sin transacción larga e ids UUID v5), y `ProductoRecordado`, la memoria
@@ -207,7 +212,10 @@ hay en casa: cantidad, caducidad, ubicación).
   vive ahí. Terminar compra en la general termina todas («conservarPendientes»).
   Packs: se guardan en unidades con `unidadesPorPack` (2..100, solo con
   unidad «unidad»); el stepper sube de pack en pack y si la cantidad deja de
-  ser un número entero de packs se quita el pack
+  ser un número entero de packs se quita el pack. Memoria de packs
+  (`PackRecordado`, por nombre normalizado): cada alta apunta el tamaño y si
+  fue por packs (`packTrasAlta`); los formularios (lista y «Añadir a la
+  lista» de la despensa) proponen el pack con `propuestaDeUnidad`
 - **Recipes** (vista 4): biblioteca global de solo lectura (`Receta`,
   `RecetaIngrediente`). Cada ingrediente nombra productos de la lista base
   que lo cubren (alternativas, el primero es el que se compra), cantidad
@@ -372,6 +380,8 @@ Recetas escritas para Migas: no copiar textos de webs ni de libros.
   calcula con `hoyEn(ZONA_HOGAR, clock)` en el servidor.
 - No cambiar la cantidad de una línea de despensa sin su movimiento.
 - No guardar «pack» como unidad: son unidades + `unidadesPorPack`.
+- No hacer que falle una operación por la memoria del hogar (packs, ubicaciones,
+  productos recordados): se lee y escribe en `try/catch` y se sigue.
 - No revalidar `/listas/${id}`: con la lista general hay que revalidar
   `revalidatePath("/listas/[listId]", "page")`.
 - No tratar «abierto» como caducidad ni decir «tíralo»: es un aviso para

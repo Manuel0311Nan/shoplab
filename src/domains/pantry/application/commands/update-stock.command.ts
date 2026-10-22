@@ -94,7 +94,10 @@ export class UpdateStockCommand {
       const apertura = linea.cambiarApertura(abiertoEl, ahora);
       if (!apertura.ok) return apertura;
     }
-    if (input.ubicacionId !== undefined) linea.mover(input.ubicacionId, ahora);
+    if (input.ubicacionId !== undefined) {
+      linea.mover(input.ubicacionId, ahora);
+      despensa.recordarUbicacion(linea.nombre, input.ubicacionId);
+    }
     despensa.registrar(
       linea,
       cantidad === undefined
@@ -108,6 +111,7 @@ export class UpdateStockCommand {
     await this.despensa.guardar({
       lineas: despensa.lineasCambiadas(),
       movimientos: despensa.movimientos,
+      recordar: despensa.ubicacionesARecordar(),
     });
     return ok(queda.value.toSnapshot());
   }
