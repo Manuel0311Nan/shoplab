@@ -250,8 +250,9 @@ Ejemplos listos para lanzar en [`api.http`](./api.http).
 
 - **Varias listas** (una por tienda, por ejemplo) y una **lista general**
   que las reúne: muestra lo de todas con una etiqueta de su lista de origen;
-  marcar, cambiar o quitar ahí se aplica en la lista original. No se puede
-  borrar ni cuenta para el límite.
+  marcar, cambiar o quitar ahí se aplica en la lista original. Al añadir
+  desde la general se puede elegir en qué lista va el producto o dejarlo
+  solo en la general. No se puede borrar ni cuenta para el límite.
 - Hasta **15 listas activas**; al crear la 16.ª se pide archivar una. Las
   archivadas se recuperan con un toque y se borran solas a los 15 días.
 - **Autocompletado** sobre una lista base de 328 productos y sobre lo que el
@@ -268,7 +269,8 @@ Ejemplos listos para lanzar en [`api.http`](./api.http).
 - **Dos vistas:** la de lista (tarjetas con categoría y cantidad) y la
   **vista rápida**, una cuadrícula para comprar deprisa: un toque lo pasa al
   carro, la cantidad va en la esquina y mantener pulsado deja cambiarla,
-  cambiar el emoji o quitarlo. Cada dispositivo recuerda la vista elegida.
+  cambiar el emoji o quitarlo. Siempre va en el orden del súper, así que no
+  muestra el selector de orden. Cada dispositivo recuerda la vista elegida.
 - **Terminar compra:** si queda algo pendiente, se elige conservarlo o
   vaciar la lista; desde la general termina en todas las listas.
 

@@ -33,6 +33,8 @@ const POR_NOMBRE: readonly (readonly [clave: string, emoji: string])[] = [
   ["pechuga de pavo", "🦃"],
   ["judias verdes", "🫛"],
   ["bebida de", "🥛"],
+  // «Tomate pera» es tomate, no pera.
+  ["tomate", "🍅"],
   // Fruta
   ["platano", "🍌"],
   ["banana", "🍌"],
@@ -61,7 +63,6 @@ const POR_NOMBRE: readonly (readonly [clave: string, emoji: string])[] = [
   ["coco", "🥥"],
   ["aguacate", "🥑"],
   // Verdura
-  ["tomate", "🍅"],
   ["lechuga", "🥬"],
   ["cogollo", "🥬"],
   ["espinaca", "🥬"],

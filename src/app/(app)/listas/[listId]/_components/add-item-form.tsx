@@ -36,6 +36,15 @@ type Props = {
   onAdd: (values: NewItemValues) => void;
   /** Memoria del hogar: al elegir un producto que se compra por packs, se propone el pack. */
   packs?: PacksRecordados;
+  /**
+   * Solo en la lista general: a qué lista va lo que se añade. Opcional: sin elegir,
+   * se queda solo en la general.
+   */
+  destino?: {
+    readonly listas: readonly { id: string; nombre: string }[];
+    readonly elegida: string | null;
+    readonly onElegir: (listaId: string | null) => void;
+  };
 };
 
 /**
@@ -43,7 +52,7 @@ type Props = {
  * Elegir una sugerencia rellena nombre, unidad, categoría y vínculo; si luego se edita
  * el nombre, eso se olvida y lo decide el servidor al guardar.
  */
-export function AddItemForm({ onAdd, packs = {} }: Props) {
+export function AddItemForm({ onAdd, packs = {}, destino }: Props) {
   const {
     register,
     handleSubmit,
@@ -130,6 +139,24 @@ export function AddItemForm({ onAdd, packs = {} }: Props) {
           Añadir +
         </Button>
       </div>
+      {destino !== undefined && destino.listas.length > 0 && (
+        <label className="flex items-center gap-2 text-sm font-semibold">
+          <span className="shrink-0">Añadir en</span>
+          <select
+            aria-label="Lista en la que se añade"
+            value={destino.elegida ?? ""}
+            onChange={(e) => destino.onElegir(e.target.value === "" ? null : e.target.value)}
+            className="h-11 min-w-0 flex-1 rounded-lg bg-muted px-3 text-base font-normal outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <option value="">Solo en la lista general</option>
+            {destino.listas.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.nombre}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       {unidad === "pack" && (
         <label className="flex items-center gap-2 text-sm font-semibold">
           de

@@ -1,19 +1,21 @@
 import {
-  CalendarDays,
   Check,
-  ListChecks,
-  ListPlus,
+  Hourglass,
+  Layers,
+  LayoutGrid,
   Package,
+  PackageOpen,
   Plus,
-  SlidersHorizontal,
+  Tags,
+  Undo2,
   Users,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { LoginForm } from "@/app/(auth)/_components/login-form";
 import despensa from "../_img/despensa.webp";
-import lista from "../_img/lista.webp";
 import misListas from "../_img/mis-listas.webp";
+import rapida from "../_img/rapida.webp";
 import { CarruselFuncionamiento } from "./carrusel-funcionamiento";
 import { Captura } from "./marco-movil";
 
@@ -132,8 +134,8 @@ export function Hero() {
           className="absolute top-10 left-1/2 aspect-square w-[min(440px,90%)] -translate-x-1/2 rounded-full bg-accent"
         />
         <Captura
-          src={lista}
-          alt="Lista de la compra compartida, por categorías"
+          src={rapida}
+          alt="Vista rápida de la lista: un toque y al carro"
           className="relative mt-14 -mr-12 w-[min(240px,42vw)] -rotate-4"
         />
         <Captura
@@ -209,33 +211,46 @@ const VENTAJAS = [
   {
     icono: Users,
     titulo: "Un hogar, todos dentro",
-    texto: "Sin límite de miembros. Lo que uno apunta, lo ven los demás.",
+    texto: "Sin límite de miembros. Lo que uno apunta, lo ven los demás al momento.",
   },
   {
-    icono: ListChecks,
-    titulo: "Una lista para cada ocasión",
+    icono: Layers,
+    titulo: "Una lista general que lo reúne todo",
     texto:
-      "La de la semana, la barbacoa, el cumple. Las que archivas se borran solas a los 15 días.",
+      "Mercadona, la barbacoa, el cumple… y una general con todo. Lo que tachas en una, se tacha en la otra.",
+  },
+  {
+    icono: LayoutGrid,
+    titulo: "Comprar a toques",
+    texto: "Vista rápida en cuadrícula, con el emoji de cada producto. Un toque y al carro.",
   },
   {
     icono: Package,
-    titulo: "Tu despensa, a tu manera",
-    texto: "Nevera, Congelador y Armario de serie. Añade las ubicaciones que tengas en casa.",
+    titulo: "Migas se acuerda",
+    texto:
+      "De que los yogures van de 4 en 4 y de dónde guardas cada cosa. Te lo propone la próxima vez.",
   },
   {
-    icono: SlidersHorizontal,
-    titulo: "Por ubicación o por categoría",
-    texto: "Ordena la despensa como la miras: por dónde está o por lo que es.",
+    icono: Undo2,
+    titulo: "Gastar sin pensar",
+    texto: "«−1» con un toque y «Deshacer» si te equivocas. Si se acaba, vuelve a la lista.",
   },
   {
-    icono: CalendarDays,
+    icono: PackageOpen,
+    titulo: "Abierto, ¿sigue bueno?",
+    texto:
+      "El jamón abierto pasa de verde a amarillo y a rojo: avisa a los pocos días, la pasta a las semanas.",
+  },
+  {
+    icono: Hourglass,
     titulo: "Caducidad, solo si importa",
-    texto: "Pon fecha a la pechuga y olvídate del arroz. Nada de apuntarlas una a una.",
+    texto: "Pon fecha a la pechuga y olvídate del arroz. Te avisa de lo que caduca esta semana.",
   },
   {
-    icono: ListPlus,
-    titulo: "Queda poco, a la lista",
-    texto: "Cuando algo se acaba, Migas te ofrece añadirlo a la compra.",
+    icono: Tags,
+    titulo: "Nombres en orden",
+    texto:
+      "«Yogures proteina» y «Yogur proteína» son lo mismo: Mis productos los une con un toque.",
   },
 ];
 
@@ -269,7 +284,7 @@ export function Hogar() {
         </div>
         <Captura
           src={misListas}
-          alt="Mis listas: Compra de la semana, Cumple de Martina y Barbacoa del sábado"
+          alt="Mis listas: la lista general, Barbacoa del sábado, Mercadona y Cumple de Martina"
           className="mx-auto w-[min(270px,72vw)] rotate-3"
         />
       </div>
@@ -298,8 +313,9 @@ export function Precios() {
           <ul className="flex flex-col gap-2.5">
             {[
               "1 hogar con miembros ilimitados",
-              "Listas compartidas",
-              "Despensa con ubicaciones y caducidades",
+              "Listas compartidas y una lista general",
+              "Vista rápida, packs y emojis",
+              "Despensa con ubicaciones, caducidades y paquetes abiertos",
               "Recetas con lo que tienes en casa",
             ].map((texto) => (
               <li key={texto} className="flex gap-2.5">

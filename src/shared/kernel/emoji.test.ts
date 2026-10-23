@@ -17,6 +17,7 @@ describe("emojiPorDefecto", () => {
     ["Manzana Granny Smith", "🍏"],
     ["Tomate frito", "🥫"],
     ["Tomates cherry", "🍅"],
+    ["Tomate pera", "🍅"],
     ["Atún en lata", "🥫"],
     ["Yogures proteína", null],
     ["Patatas fritas congeladas", "🍟"],

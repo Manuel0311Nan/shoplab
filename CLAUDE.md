@@ -229,8 +229,9 @@ hay en casa: cantidad, caducidad, ubicación).
   ni se borra (`LISTA_GENERAL`) y no cuenta para el límite de 15. Su vista
   (`vistaGeneral`) junta sus ítems con los de todas las activas; cada ítem
   lleva `listaId`/`listaNombre` y las acciones van a la lista de origen, así
-  que cambiar o quitar en una se ve en la otra. Lo añadido en la general solo
-  vive ahí. Terminar compra en la general termina todas («conservarPendientes»).
+  que cambiar o quitar en una se ve en la otra. Al añadir en la general se
+  puede elegir otra lista activa como destino («Añadir en», opcional); sin
+  elegir, el producto solo vive en la general. Terminar compra en la general termina todas («conservarPendientes»).
   Packs: se guardan en unidades con `unidadesPorPack` (2..100, solo con
   unidad «unidad»); el stepper sube de pack en pack y si la cantidad deja de
   ser un número entero de packs se quita el pack. Memoria de packs
@@ -514,7 +515,8 @@ del seed>
 - Home pública (`/`, `(marketing)`): hecha. Textos del «Plan de marketing —
   Migas»; capturas reales en `(marketing)/_img` (rehacerlas si cambian las
   pantallas). «Cómo funciona» es un carrusel con scroll-snap (móvil y
-  ordenador); el paso 4 enseña la pantalla de Recetas. Premium sale como
+  ordenador) de 5 pasos: lista, vista rápida, guardar, gastar y recetas. Las
+  capturas se rehicieron el 23/10/2026 con emojis, cuadrícula y «−1». Premium sale como
   «Próximamente» con el precio de hipótesis del plan.
 
 Plan completo y orden en la guía de vistas (`docs/shoplab-guia-vista.pdf`).
