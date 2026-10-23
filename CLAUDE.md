@@ -515,7 +515,8 @@ del seed>
 - Home pública (`/`, `(marketing)`): hecha. Textos del «Plan de marketing —
   Migas»; capturas reales en `(marketing)/_img` (rehacerlas si cambian las
   pantallas). «Cómo funciona» es un carrusel con scroll-snap (móvil y
-  ordenador); el paso 4 enseña la pantalla de Recetas. Premium sale como
+  ordenador) de 5 pasos: lista, vista rápida, guardar, gastar y recetas. Las
+  capturas se rehicieron el 23/10/2026 con emojis, cuadrícula y «−1». Premium sale como
   «Próximamente» con el precio de hipótesis del plan.
 
 Plan completo y orden en la guía de vistas (`docs/shoplab-guia-vista.pdf`).

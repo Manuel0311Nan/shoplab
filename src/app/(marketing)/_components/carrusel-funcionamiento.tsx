@@ -5,6 +5,7 @@ import { cn } from "@/shared/lib/utils";
 import gastar from "../_img/gastar.webp";
 import guardar from "../_img/guardar.webp";
 import lista from "../_img/lista.webp";
+import rapida from "../_img/rapida.webp";
 import recetas from "../_img/recetas.webp";
 import { pasoVecino, pasoVisible } from "./carrusel";
 import { Captura } from "./marco-movil";
@@ -13,13 +14,24 @@ const PASOS = [
   {
     titulo: "Apuntad entre todos",
     texto:
-      "Escribe «pech» y Migas te sugiere Pechuga de pollo. Cada producto cae en su categoría, en el orden en que recorres el súper, y todo el hogar ve la misma lista.",
-    pantalla: <Captura src={lista} alt="Lista de la compra agrupada por categorías" />,
+      "Escribe «pech» y Migas te sugiere Pechuga de pollo, con su emoji y su categoría, en el orden en que recorres el súper. Una lista por tienda y una general que las reúne todas; los yogures, por packs.",
+    pantalla: <Captura src={lista} alt="Lista de la compra por categorías, con emojis" />,
   },
   {
-    titulo: "Comprad y guardad",
+    titulo: "En el súper, un toque",
     texto:
-      "Al terminar la compra, Migas pregunta si lo guardas en la despensa y ya propone Nevera, Congelador o Armario. La caducidad, solo si quieres.",
+      "Cambia a la vista rápida: cada producto es una casilla y un toque lo pasa al carro. La cantidad va en la esquina y, si mantienes pulsado, la cambias.",
+    pantalla: (
+      <Captura
+        src={rapida}
+        alt="Vista rápida: cuadrícula de productos con su emoji y su cantidad"
+      />
+    ),
+  },
+  {
+    titulo: "Guardad sin teclear",
+    texto:
+      "Al terminar la compra, todo pasa a la despensa con un toque, y cada producto va donde lo guardasteis la última vez: nevera, congelador o armario. La caducidad, solo si quieres.",
     pantalla: (
       <Captura
         src={guardar}
@@ -30,8 +42,8 @@ const PASOS = [
   {
     titulo: "Gastad antes de que caduque",
     texto:
-      "La despensa avisa de lo que caduca en los próximos 7 días y de lo que queda poco. Al gastar algo, dices cuánto, y si se acaba lo pasas a la lista.",
-    pantalla: <Captura src={gastar} alt="Gastar un producto: cuánto has usado o tirado" />,
+      "«−1» y listo, con «Deshacer» por si acaso. La despensa avisa de lo que caduca esta semana y de lo abierto que conviene revisar; si algo se acaba, a la lista con un toque.",
+    pantalla: <Captura src={gastar} alt="Despensa: gastado 1 yogur, con Deshacer y A la lista" />,
   },
   {
     titulo: "Cocinad con lo que hay",
