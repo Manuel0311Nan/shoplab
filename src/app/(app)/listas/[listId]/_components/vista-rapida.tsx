@@ -14,6 +14,7 @@ import {
 import type { EmojisProductos } from "@/contracts/memoria";
 import { normalizarNombre } from "@/shared/kernel/texto";
 import { emojiDe } from "../../../_components/emoji-producto";
+import { BarraPulsacion, PistaGestos } from "../../../_components/gestos";
 import { IconoCategoria } from "../../../_components/icono-categoria";
 import { SelectorEmoji } from "../../../_components/selector-emoji";
 import { usePulsacionLarga } from "../../../_components/pulsacion-larga";
@@ -79,6 +80,13 @@ export function VistaRapida({
       <p id={ayudaId} className="sr-only">
         Toca para pasarlo al carro o devolverlo. Mantén pulsado para cambiar la cantidad.
       </p>
+      {!soloLectura && (
+        <PistaGestos
+          clave="migas.pista-lista-rapida"
+          toque="para pasarlo al carro"
+          mantener="para cambiar la cantidad o el emoji"
+        />
+      )}
       <Seccion titulo="Por comprar" total={pendientes.length}>
         {pendientes.length === 0 ? (
           <p className="rounded-xl border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
@@ -152,7 +160,7 @@ function Casilla({
   onToque: () => void;
   onLarga: () => void;
 }) {
-  const pulsacion = usePulsacionLarga({ onCorta: onToque, onLarga });
+  const { manejadores: pulsacion, pulsando } = usePulsacionLarga({ onCorta: onToque, onLarga });
   const cantidad = cantidadCorta(item.cantidad, item.unidadesPorPack);
 
   return (
@@ -163,10 +171,11 @@ function Casilla({
         {...pulsacion}
         aria-describedby={ayudaId}
         className={cn(
-          "relative flex size-full min-h-28 flex-col items-center justify-center gap-1.5 rounded-xl p-2 pt-4 text-center outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-95 disabled:opacity-60 motion-safe:transition-transform",
+          "relative flex size-full min-h-28 flex-col items-center justify-center gap-1.5 overflow-hidden rounded-xl p-2 pt-4 text-center outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-95 disabled:opacity-60 motion-safe:transition-transform",
           comprado ? "bg-muted text-muted-foreground" : "bg-primary text-primary-foreground",
         )}
       >
+        <BarraPulsacion pulsando={pulsando} />
         {cantidad !== null && (
           <span
             className={cn(

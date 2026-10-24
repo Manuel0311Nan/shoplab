@@ -192,3 +192,35 @@ export function textoCaducidad(caducidad: LineaDespensaResponse["caducidad"]): s
   if (dias === 1) return "Caduca mañana";
   return `Caduca en ${dias} días`;
 }
+
+export interface EstadoCasilla {
+  readonly texto: string;
+  readonly tono: "rojo" | "ambar" | "neutro";
+}
+
+/**
+ * Lo que la casilla de la cuadrícula dice debajo del nombre, en una línea: lo más
+ * urgente primero (caducado, caduca pronto, abierto para revisar, queda poco).
+ */
+export function estadoCasilla(producto: ProductoDespensa): EstadoCasilla | null {
+  const { caducidad, abierto, quedaPoco } = producto.principal;
+  if (caducidad.estado === "caducado") return { texto: "Caducado", tono: "rojo" };
+  if (caducidad.estado === "pronto" && caducidad.dias !== null) {
+    const cuando =
+      caducidad.dias === 0
+        ? "Caduca hoy"
+        : caducidad.dias === 1
+          ? "Caduca mañana"
+          : `Caduca en ${caducidad.dias} d`;
+    return { texto: cuando, tono: "ambar" };
+  }
+  if (abierto !== null && abierto.color !== "verde") {
+    return {
+      texto: `Abierto ${abierto.dias} d`,
+      tono: abierto.color === "rojo" ? "rojo" : "ambar",
+    };
+  }
+  if (abierto !== null) return { texto: "Abierto", tono: "neutro" };
+  if (quedaPoco) return { texto: "Queda poco", tono: "neutro" };
+  return null;
+}

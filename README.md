@@ -271,6 +271,8 @@ Ejemplos listos para lanzar en [`api.http`](./api.http).
   carro, la cantidad va en la esquina y mantener pulsado deja cambiarla,
   cambiar el emoji o quitarlo. Siempre va en el orden del súper, así que no
   muestra el selector de orden. Cada dispositivo recuerda la vista elegida.
+  Una pista que se puede cerrar explica los gestos y, al mantener pulsado,
+  una barra se llena en la casilla hasta que se abre el diálogo.
 - **Terminar compra:** si queda algo pendiente, se elige conservarlo o
   vaciar la lista; desde la general termina en todas las listas.
 
@@ -279,6 +281,14 @@ Ejemplos listos para lanzar en [`api.http`](./api.http).
 - **Guardar la compra** con un toque al terminar: cada producto llega con su
   ubicación propuesta (donde lo guardaste la última vez o, si no, según su
   categoría) y caducidad opcional con atajos.
+- **Vista rápida** (la de por defecto): una cuadrícula como la de la lista,
+  con el título de cada ubicación encima. Cada casilla lleva el emoji, la
+  cantidad en la esquina y una etiqueta de estado (caducado, caduca en N
+  días, abierto, queda poco). **Tocar gasta uno** (en g, kg, ml o l abre los
+  atajos) y **mantener pulsado edita**: gastar o tirar, abierto, mover,
+  fecha, categoría, nombre, añadir a la lista o quitar, eligiendo el lote si
+  hay varios. Un botón junto a la rueda de ajustes cambia a la vista de
+  lista; cada dispositivo recuerda la elegida.
 - Vista **por ubicación** o **por categoría**, filtro por ubicación y aviso
   de lo que **caduca esta semana**; la caducidad se marca en color.
 - **Gastar con un toque:** «−1» resta una unidad al momento; en g, kg, ml o

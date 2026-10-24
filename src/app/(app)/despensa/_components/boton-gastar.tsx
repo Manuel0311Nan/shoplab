@@ -15,7 +15,7 @@ type Props = {
  * abre el diálogo (varias, tirar). En g, kg, ml o l, «Gastar» abre el diálogo directamente.
  */
 export function BotonGastar({ linea, onGastarUno, onGastar, variant = "default" }: Props) {
-  const pulsacion = usePulsacionLarga({
+  const { manejadores: pulsacion } = usePulsacionLarga({
     onCorta: () => onGastarUno(linea),
     onLarga: () => onGastar(linea),
   });

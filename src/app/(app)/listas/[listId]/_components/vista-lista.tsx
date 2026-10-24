@@ -8,23 +8,29 @@ export type VistaLista = "detalle" | "rapida";
 
 const CLAVE = "migas.vista-lista";
 
-/** La vista de la lista, recordada en este dispositivo (como el orden). */
-export function useVistaLista(): [VistaLista, (vista: VistaLista) => void] {
-  const [vista, setVista] = useState<VistaLista>("detalle");
+/**
+ * La vista elegida, recordada en este dispositivo (como el orden). La despensa usa su
+ * propia clave y empieza en la cuadrícula.
+ */
+export function useVistaLista(
+  clave: string = CLAVE,
+  porDefecto: VistaLista = "detalle",
+): [VistaLista, (vista: VistaLista) => void] {
+  const [vista, setVista] = useState<VistaLista>(porDefecto);
 
   useEffect(() => {
     try {
-      const guardada = localStorage.getItem(CLAVE);
+      const guardada = localStorage.getItem(clave);
       if (guardada === "detalle" || guardada === "rapida") setVista(guardada);
     } catch {
       // Sin almacenamiento: se queda la vista por defecto.
     }
-  }, []);
+  }, [clave]);
 
   function cambiar(nueva: VistaLista) {
     setVista(nueva);
     try {
-      localStorage.setItem(CLAVE, nueva);
+      localStorage.setItem(clave, nueva);
     } catch {
       // Sin almacenamiento: vale para esta visita.
     }
@@ -41,15 +47,20 @@ const OPCIONES = [
 export function SelectorVista({
   vista,
   onCambiar,
+  etiqueta = "Vista de la lista",
+  compacto = false,
 }: {
   vista: VistaLista;
   onCambiar: (vista: VistaLista) => void;
+  etiqueta?: string;
+  /** Solo iconos, para ponerlo junto al título y no ocupar una fila. */
+  compacto?: boolean;
 }) {
   return (
     <div
       role="radiogroup"
-      aria-label="Vista de la lista"
-      className="flex gap-1 rounded-xl bg-muted p-1"
+      aria-label={etiqueta}
+      className={cn("flex gap-1 rounded-xl bg-muted p-1", compacto && "rounded-full")}
     >
       {OPCIONES.map(({ valor, nombre, Icono }) => (
         <button
@@ -58,13 +69,15 @@ export function SelectorVista({
           role="radio"
           aria-checked={vista === valor}
           onClick={() => onCambiar(valor)}
+          title={compacto ? nombre : undefined}
           className={cn(
-            "flex h-11 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-sm font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+            "flex items-center justify-center gap-1.5 text-sm font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+            compacto ? "size-10 rounded-full" : "h-11 flex-1 rounded-lg px-3",
             vista === valor ? "bg-card shadow-card" : "text-muted-foreground",
           )}
         >
-          <Icono className="size-4" aria-hidden="true" />
-          {nombre}
+          <Icono className={compacto ? "size-5" : "size-4"} aria-hidden="true" />
+          {compacto ? <span className="sr-only">{nombre}</span> : nombre}
         </button>
       ))}
     </div>

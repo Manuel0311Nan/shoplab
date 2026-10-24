@@ -4,6 +4,7 @@ import {
   agruparDespensa,
   agruparEnProductos,
   esUrgente,
+  estadoCasilla,
   textoAbierto,
   textoAvisos,
   textoCaducidad,
@@ -147,5 +148,40 @@ describe("abiertos", () => {
       linea("Tomate frito", { abierto: abierto(4, "amarillo") }),
     ]);
     expect(producto?.principal.abierto?.dias).toBe(4);
+  });
+});
+
+describe("estadoCasilla", () => {
+  const producto = (l: LineaDespensaResponse) => {
+    const [p] = agruparEnProductos([l]);
+    if (p === undefined) throw new Error("sin producto");
+    return p;
+  };
+  const abierto = (color: "verde" | "amarillo" | "rojo", dias: number) =>
+    ({ color, dias, aviso: { amarillo: 3, rojo: 5 }, abiertoEl: "2026-10-16" }) as never;
+
+  it("lo más urgente primero: caducado, caduca pronto, abierto, queda poco", () => {
+    expect(estadoCasilla(producto(linea("A", { dias: -2 })))).toEqual({
+      texto: "Caducado",
+      tono: "rojo",
+    });
+    expect(estadoCasilla(producto(linea("B", { dias: 0 })))?.texto).toBe("Caduca hoy");
+    expect(estadoCasilla(producto(linea("C", { dias: 1 })))?.texto).toBe("Caduca mañana");
+    expect(estadoCasilla(producto(linea("D", { dias: 4 })))).toEqual({
+      texto: "Caduca en 4 d",
+      tono: "ambar",
+    });
+    expect(estadoCasilla(producto(linea("E", { abierto: abierto("rojo", 6) })))).toEqual({
+      texto: "Abierto 6 d",
+      tono: "rojo",
+    });
+    expect(estadoCasilla(producto(linea("F", { abierto: abierto("amarillo", 4) })))?.tono).toBe(
+      "ambar",
+    );
+    expect(estadoCasilla(producto(linea("G", { abierto: abierto("verde", 1) })))?.texto).toBe(
+      "Abierto",
+    );
+    expect(estadoCasilla(producto(linea("H", { quedaPoco: true })))?.texto).toBe("Queda poco");
+    expect(estadoCasilla(producto(linea("I", { dias: 20 })))).toBeNull();
   });
 });
