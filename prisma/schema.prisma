@@ -336,6 +336,8 @@ model InventoryItem {
   /// Días abierto hasta amarillo y hasta rojo, fijados al abrirlo (producto o categoría).
   avisoAbiertoAmarillo Int?
   avisoAbiertoRojo     Int?
+  /// Se guardó al terminar la compra sin elegir dónde: hay que colocarlo.
+  porOrganizar         Boolean           @default(false)
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   deletedAt            DateTime?

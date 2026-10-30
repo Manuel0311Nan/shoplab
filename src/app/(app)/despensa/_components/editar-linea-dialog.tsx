@@ -1,11 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { CategoriaDto } from "@/contracts/categoria";
-import type {
-  LineaDespensaResponse,
-  UbicacionResponse,
-  UpdateStockRequest,
-} from "@/contracts/pantry";
+import type { LineaDespensaResponse, UpdateStockRequest } from "@/contracts/pantry";
 import { type UnidadDto, unidadSchema } from "@/contracts/shopping";
 import { CATEGORIAS, NOMBRE_CATEGORIA } from "@/shared/kernel/categoria";
 import { Button } from "@/shared/ui/button";
@@ -15,7 +11,6 @@ import { CaducidadRapida } from "../../_components/caducidad-rapida";
 
 type Props = {
   linea: LineaDespensaResponse | null;
-  ubicaciones: readonly UbicacionResponse[];
   hoy: string;
   onGuardar: (linea: LineaDespensaResponse, cambios: UpdateStockRequest) => void;
   onCerrar: () => void;
@@ -24,20 +19,12 @@ type Props = {
 export const selectClase =
   "h-11 w-full rounded-lg bg-muted px-3 text-base outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
 
-/** Mover, poner la caducidad, cambiar la categoría o corregir la cantidad. */
-export function EditarLineaDialog({ linea, ubicaciones, hoy, onGuardar, onCerrar }: Props) {
+/** Poner la caducidad, cambiar la categoría o corregir la cantidad (mover va aparte). */
+export function EditarLineaDialog({ linea, hoy, onGuardar, onCerrar }: Props) {
   return (
     <Dialog open={linea !== null} onOpenChange={(abierto) => !abierto && onCerrar()}>
       <DialogContent>
-        {linea && (
-          <Formulario
-            key={linea.id}
-            linea={linea}
-            ubicaciones={ubicaciones}
-            hoy={hoy}
-            onGuardar={onGuardar}
-          />
-        )}
+        {linea && <Formulario key={linea.id} linea={linea} hoy={hoy} onGuardar={onGuardar} />}
       </DialogContent>
     </Dialog>
   );
@@ -45,11 +32,9 @@ export function EditarLineaDialog({ linea, ubicaciones, hoy, onGuardar, onCerrar
 
 function Formulario({
   linea,
-  ubicaciones,
   hoy,
   onGuardar,
 }: Omit<Props, "linea" | "onCerrar"> & { linea: LineaDespensaResponse }) {
-  const [ubicacionId, setUbicacionId] = useState(linea.ubicacionId);
   const [categoria, setCategoria] = useState<CategoriaDto>(linea.categoria);
   const [caducaEl, setCaducaEl] = useState<string | null>(linea.caducaEl);
   const [valor, setValor] = useState(String(linea.cantidad.valor));
@@ -58,7 +43,6 @@ function Formulario({
   const numero = Number(valor.replace(",", "."));
   const cantidadValida = Number.isFinite(numero) && numero > 0;
   const cambios: UpdateStockRequest = {
-    ...(ubicacionId !== linea.ubicacionId ? { ubicacionId } : {}),
     ...(categoria !== linea.categoria ? { categoria } : {}),
     ...(caducaEl !== linea.caducaEl ? { caducaEl } : {}),
     ...(cantidadValida && (numero !== linea.cantidad.valor || unidad !== linea.cantidad.unidad)
@@ -76,20 +60,6 @@ function Formulario({
       }}
     >
       <DialogTitle>{linea.nombre}</DialogTitle>
-      <label className="flex flex-col gap-1 text-sm font-semibold">
-        Ubicación
-        <select
-          value={ubicacionId}
-          onChange={(e) => setUbicacionId(e.target.value)}
-          className={selectClase}
-        >
-          {ubicaciones.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.nombre}
-            </option>
-          ))}
-        </select>
-      </label>
       <label className="flex flex-col gap-1 text-sm font-semibold">
         Categoría
         <select

@@ -34,6 +34,7 @@ export function toLineaResponse(l: LineaDespensa): LineaDespensaResponse {
             color: l.abierto.color,
             aviso: { amarillo: l.avisoAbierto.amarillo, rojo: l.avisoAbierto.rojo },
           },
+    porOrganizar: l.porOrganizar,
     updatedAt: l.updatedAt.toISOString(),
   };
 }

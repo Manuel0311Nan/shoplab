@@ -1,5 +1,6 @@
 import "server-only";
 import { AddStockCommand } from "@/domains/pantry/application/commands/add-stock.command";
+import { MoveStockCommand } from "@/domains/pantry/application/commands/move-stock.command";
 import { DeshacerConsumoCommand } from "@/domains/pantry/application/commands/deshacer-consumo.command";
 import { ConsumeStockCommand } from "@/domains/pantry/application/commands/consume-stock.command";
 import {
@@ -45,6 +46,7 @@ export function pantryModule(
       deps.avisosAbierto ?? avisosPorCategoria,
     ),
     updateStock: new UpdateStockCommand(despensa, systemClock),
+    moveStock: new MoveStockCommand(despensa, systemClock),
     renombrarEnDespensa: new RenombrarEnDespensaCommand(despensa, systemClock),
     removeStock: new RemoveStockCommand(despensa, systemClock),
     createUbicacion: new CreateUbicacionCommand(despensa, systemClock),

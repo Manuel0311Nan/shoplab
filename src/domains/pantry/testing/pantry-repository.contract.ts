@@ -82,6 +82,15 @@ export function pantryRepositoryContract(nombre: string, crear: CrearRepositorio
       expect((await repo.findLinea(LINEA_ID))?.toSnapshot()).toEqual(l.toSnapshot());
     });
 
+    it("guardar_LineaPorOrganizar_SeRecuperaMarcada", async () => {
+      const repo = await crear({ ubicaciones: ubicacionesPorDefecto(), lineas: [] });
+      const l = linea({ porOrganizar: true });
+
+      await repo.guardar({ lineas: [l] });
+
+      expect((await repo.findLinea(LINEA_ID))?.porOrganizar).toBe(true);
+    });
+
     it("listarLineas_SinLasDadasDeBaja", async () => {
       const repo = await crear({
         ubicaciones: ubicacionesPorDefecto(),

@@ -86,8 +86,15 @@ export function textoAbierto(abierto: LineaDespensaResponse["abierto"]): string 
 
 function claveProducto(l: LineaDespensaResponse): string {
   const producto = l.productoBaseId ?? `n:${normalizarNombre(l.nombre)}`;
-  return `${producto}@${l.ubicacionId}`;
+  return `${producto}@${l.ubicacionId}${l.porOrganizar ? ":organizar" : ""}`;
 }
+
+/** La clave del grupo de lo guardado sin elegir sitio: va siempre el primero. */
+export const GRUPO_POR_ORGANIZAR = "por-organizar";
+
+/** Lo que se guardó al terminar la compra sin elegir dónde. */
+export const porOrganizar = (lineas: readonly LineaDespensaResponse[]) =>
+  lineas.filter((l) => l.porOrganizar);
 
 function sumar(lineas: readonly LineaDespensaResponse[]): CantidadDto | null {
   const primera = lineas.at(0);
@@ -147,8 +154,27 @@ export function agruparDespensa(
       (!filtro.ubicacionId || l.ubicacionId === filtro.ubicacionId) &&
       (!filtro.urgentes || esUrgente(l)),
   );
-  const productos = agruparEnProductos(visibles);
+  const todos = agruparEnProductos(visibles);
+  const pendientes = todos.filter((p) => p.principal.porOrganizar).sort(compararProductos);
+  const productos = todos.filter((p) => !p.principal.porOrganizar);
+  const primero: GrupoDespensa[] =
+    pendientes.length === 0
+      ? []
+      : [
+          {
+            clave: GRUPO_POR_ORGANIZAR,
+            titulo: "Por organizar",
+            subgrupos: [{ titulo: null, productos: pendientes }],
+          },
+        ];
+  return [...primero, ...agruparColocados(ubicaciones, productos, agrupar)];
+}
 
+function agruparColocados(
+  ubicaciones: readonly UbicacionResponse[],
+  productos: readonly ProductoDespensa[],
+  agrupar: Agrupar,
+): GrupoDespensa[] {
   if (agrupar === "categoria") {
     const categorias = [...new Set(productos.map((p) => p.categoria))].sort(compararCategorias);
     return categorias.map((categoria) => ({
@@ -191,4 +217,36 @@ export function textoCaducidad(caducidad: LineaDespensaResponse["caducidad"]): s
   if (dias === 0) return "Caduca hoy";
   if (dias === 1) return "Caduca mañana";
   return `Caduca en ${dias} días`;
+}
+
+export interface EstadoCasilla {
+  readonly texto: string;
+  readonly tono: "rojo" | "ambar" | "neutro";
+}
+
+/**
+ * Lo que la casilla de la cuadrícula dice debajo del nombre, en una línea: lo más
+ * urgente primero (caducado, caduca pronto, abierto para revisar, queda poco).
+ */
+export function estadoCasilla(producto: ProductoDespensa): EstadoCasilla | null {
+  const { caducidad, abierto, quedaPoco } = producto.principal;
+  if (caducidad.estado === "caducado") return { texto: "Caducado", tono: "rojo" };
+  if (caducidad.estado === "pronto" && caducidad.dias !== null) {
+    const cuando =
+      caducidad.dias === 0
+        ? "Caduca hoy"
+        : caducidad.dias === 1
+          ? "Caduca mañana"
+          : `Caduca en ${caducidad.dias} d`;
+    return { texto: cuando, tono: "ambar" };
+  }
+  if (abierto !== null && abierto.color !== "verde") {
+    return {
+      texto: `Abierto ${abierto.dias} d`,
+      tono: abierto.color === "rojo" ? "rojo" : "ambar",
+    };
+  }
+  if (abierto !== null) return { texto: "Abierto", tono: "neutro" };
+  if (quedaPoco) return { texto: "Queda poco", tono: "neutro" };
+  return null;
 }

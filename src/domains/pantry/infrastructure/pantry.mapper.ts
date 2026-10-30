@@ -31,6 +31,7 @@ export function lineaToDomain(fila: FilaLinea): InventoryItem {
       fila.avisoAbiertoAmarillo === null || fila.avisoAbiertoRojo === null
         ? null
         : { amarillo: fila.avisoAbiertoAmarillo, rojo: fila.avisoAbiertoRojo },
+    porOrganizar: fila.porOrganizar,
     createdAt: fila.createdAt,
     updatedAt: fila.updatedAt,
     deletedAt: fila.deletedAt,

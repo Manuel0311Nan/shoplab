@@ -47,9 +47,10 @@ function propuesta(
 
 /**
  * D6: al terminar la compra, lo comprado llega marcado, con la ubicación propuesta (la
- * última en la que se guardó o la de su categoría) y sin
- * fecha (D2). Una pulsación en "Guardar" basta; se puede desmarcar lo que no va a la
- * despensa o desplegar las caducidades.
+ * última en la que se guardó o la de su categoría) y sin fecha (D2). Una pulsación en
+ * "Guardar" basta; se puede desmarcar lo que no va a la despensa o desplegar las
+ * caducidades. La lista ya se ha vaciado, así que cerrar no pierde nada: lo marcado se
+ * guarda «por organizar» (en la ubicación propuesta) y se coloca luego desde la despensa.
  */
 export function GuardarEnDespensaSheet({ listaId, productos, onCerrar }: Props) {
   const [datos, setDatos] = useState<{ hoy: string; ubicaciones: UbicacionResponse[] } | null>(
@@ -64,6 +65,17 @@ export function GuardarEnDespensaSheet({ listaId, productos, onCerrar }: Props) 
     if (productos === null) return;
     setError(null);
     setConFechas(false);
+    setDatos(null);
+    // Las filas existen desde ya: aunque fallen las ubicaciones, se puede «organizar luego».
+    setFilas(
+      productos.map((item) => ({
+        id: newId(),
+        item,
+        marcado: true,
+        ubicacionId: "",
+        caducaEl: null,
+      })),
+    );
     let vigente = true;
     void ubicacionesAction().then(
       (r) => {
@@ -73,13 +85,10 @@ export function GuardarEnDespensaSheet({ listaId, productos, onCerrar }: Props) 
           return;
         }
         setDatos(r.value);
-        setFilas(
-          productos.map((item) => ({
-            id: newId(),
-            item,
-            marcado: true,
-            ubicacionId: propuesta(r.value.ubicaciones, r.value.recordadas, item),
-            caducaEl: null,
+        setFilas((actual) =>
+          actual.map((f) => ({
+            ...f,
+            ubicacionId: propuesta(r.value.ubicaciones, r.value.recordadas, f.item),
           })),
         );
       },
@@ -96,7 +105,13 @@ export function GuardarEnDespensaSheet({ listaId, productos, onCerrar }: Props) 
     setFilas((actual) => actual.map((f) => (f.id === id ? { ...f, ...cambio } : f)));
   const marcadas = filas.filter((f) => f.marcado);
 
-  function guardar() {
+  /** Con `luego`, todo a la ubicación propuesta y marcado «por organizar». */
+  function guardar(luego: boolean) {
+    if (guardando) return;
+    if (marcadas.length === 0) {
+      onCerrar();
+      return;
+    }
     setError(null);
     startTransition(async () => {
       const r = await guardarCompraAction({
@@ -106,12 +121,19 @@ export function GuardarEnDespensaSheet({ listaId, productos, onCerrar }: Props) 
           nombre: f.item.nombre,
           productoBaseId: f.item.productoBaseId,
           categoria: f.item.categoria,
-          ubicacionId: f.ubicacionId,
+          ...(luego || f.ubicacionId === "" ? {} : { ubicacionId: f.ubicacionId }),
+          ...(luego ? { porOrganizar: true } : {}),
           cantidad: f.item.cantidad,
           caducaEl: f.caducaEl,
         })),
       });
       if (!r.ok) setError(r.error.message);
+      else if (luego)
+        onCerrar(
+          r.value.guardados === 1
+            ? "1 producto en la despensa, por organizar."
+            : `${r.value.guardados} productos en la despensa, por organizar.`,
+        );
       else
         onCerrar(
           r.value.guardados === 1
@@ -122,11 +144,21 @@ export function GuardarEnDespensaSheet({ listaId, productos, onCerrar }: Props) 
   }
 
   return (
-    <Dialog open={productos !== null} onOpenChange={(a) => !a && onCerrar()}>
+    // Cerrar (fuera, Esc) es «organizar luego»: lo comprado no se pierde. Si el servidor
+    // ha fallado, se cierra sin más para no dejar a nadie atrapado en el diálogo.
+    <Dialog
+      open={productos !== null}
+      onOpenChange={(a) => {
+        if (a) return;
+        if (error !== null) onCerrar();
+        else guardar(true);
+      }}
+    >
       <DialogContent>
         <DialogTitle>¿Lo guardas en la despensa?</DialogTitle>
         <DialogDescription>
-          Desmarca lo que no va a la despensa. La ubicación se puede cambiar.
+          Desmarca lo que no va a la despensa. Si no quieres elegir ahora dónde va cada cosa, se
+          guarda como «por organizar» y lo colocas luego.
         </DialogDescription>
 
         {datos === null && error === null && <p className="text-muted-foreground">Cargando…</p>}
@@ -195,7 +227,7 @@ export function GuardarEnDespensaSheet({ listaId, productos, onCerrar }: Props) 
           </Button>
         )}
         <Button
-          onClick={guardar}
+          onClick={() => guardar(false)}
           disabled={guardando || datos === null || marcadas.length === 0}
           className="h-11 font-semibold"
         >
@@ -205,8 +237,13 @@ export function GuardarEnDespensaSheet({ listaId, productos, onCerrar }: Props) 
               ? "Guardar 1 producto"
               : `Guardar ${marcadas.length} productos`}
         </Button>
-        <Button variant="ghost" onClick={() => onCerrar()} className="h-11 font-semibold">
-          Ahora no
+        <Button
+          variant="ghost"
+          onClick={() => guardar(true)}
+          disabled={guardando}
+          className="h-11 font-semibold"
+        >
+          {marcadas.length === 0 ? "Cerrar sin guardar nada" : "Organizar luego"}
         </Button>
       </DialogContent>
     </Dialog>

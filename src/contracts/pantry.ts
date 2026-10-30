@@ -47,6 +47,8 @@ export const lineaDespensaSchema = z.object({
       aviso: z.object({ amarillo: z.number().int(), rojo: z.number().int() }),
     })
     .nullable(),
+  /** Se guardó al terminar la compra sin elegir sitio: está en la ubicación propuesta. */
+  porOrganizar: z.boolean(),
   updatedAt: z.iso.datetime(),
 });
 
@@ -75,7 +77,14 @@ export const addStockRequestSchema = z.object({ id: z.uuid().optional(), ...prod
 export const storeShoppingRequestSchema = z.object({
   listaId: z.uuid(),
   productos: z
-    .array(z.object({ id: z.uuid(), ...productoEntrante }))
+    .array(
+      z.object({
+        id: z.uuid(),
+        ...productoEntrante,
+        /** «Organizar luego»: a la ubicación propuesta, marcado para colocarlo después. */
+        porOrganizar: z.boolean().optional(),
+      }),
+    )
     .min(1, "Elige al menos un producto")
     .max(200),
 });
@@ -122,6 +131,23 @@ export const openStockRequestSchema = z.object({
 export const openStockResponseSchema = z.object({
   abierta: lineaDespensaSchema,
   /** La línea original con lo que queda cerrado; null si se abrió entera. */
+  resto: lineaDespensaSchema.nullable(),
+});
+
+/**
+ * POST /pantry/items/{id}/move: llevar a otra ubicación toda la línea o, con `cantidad`,
+ * solo una parte, que va a su propia línea (`lineaNuevaId`, generable en el cliente para
+ * que un reintento no separe otra) o se suma a una igual del destino.
+ */
+export const moveStockRequestSchema = z.object({
+  ubicacionId: z.uuid(),
+  cantidad: cantidadSchema.optional(),
+  lineaNuevaId: z.uuid().optional(),
+});
+
+export const moveStockResponseSchema = z.object({
+  movida: lineaDespensaSchema,
+  /** La línea original con lo que se queda; null si se movió entera. */
   resto: lineaDespensaSchema.nullable(),
 });
 
@@ -178,6 +204,8 @@ export type ConsumeStockRequest = z.input<typeof consumeStockRequestSchema>;
 export type DeshacerConsumoRequest = z.input<typeof deshacerConsumoRequestSchema>;
 export type OpenStockRequest = z.input<typeof openStockRequestSchema>;
 export type OpenStockResponse = z.infer<typeof openStockResponseSchema>;
+export type MoveStockRequest = z.input<typeof moveStockRequestSchema>;
+export type MoveStockResponse = z.infer<typeof moveStockResponseSchema>;
 export type ColorAbiertoDto = z.infer<typeof colorAbiertoSchema>;
 export type ConsumeStockResponse = z.infer<typeof consumeStockResponseSchema>;
 export type CreateUbicacionRequest = z.input<typeof createUbicacionRequestSchema>;

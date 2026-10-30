@@ -222,6 +222,13 @@ Content-Type: application/json
 
 { "listaId": "{{lista}}", "productos": [ { "id": "0199c000-0000-7000-8000-00000000a002", "nombre": "Leche", "cantidad": { "valor": 2, "unidad": "l" } } ] }
 
+### «Organizar luego»: a la ubicación propuesta, marcado como por organizar
+POST {{base}}/pantry/items/batch
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "listaId": "{{lista}}", "productos": [ { "id": "0199c000-0000-7000-8000-00000000a003", "nombre": "Leche de avena", "cantidad": { "valor": 6, "unidad": "unidad" }, "porOrganizar": true } ] }
+
 ### Gastar 200 g (sin cantidad, todo). avisarLista propone añadirlo a la lista
 POST {{base}}/pantry/items/{{linea}}/consume
 Authorization: Bearer {{token}}
@@ -249,6 +256,13 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 { "abiertoEl": "2026-10-18" }
+
+### Mover 1 de las 6 leches a la nevera (sin cantidad, toda la línea). También organiza
+POST {{base}}/pantry/items/{{linea}}/move
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "ubicacionId": "{{ubicacion}}", "cantidad": { "valor": 1, "unidad": "unidad" } }
 
 ### No está abierto (se marcó por error)
 PATCH {{base}}/pantry/items/{{linea}}

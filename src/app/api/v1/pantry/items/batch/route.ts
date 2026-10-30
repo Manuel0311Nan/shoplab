@@ -4,7 +4,10 @@ import { resultResponse } from "@/app/api/_lib/responses";
 import { storeShoppingRequestSchema, type StoreShoppingResponse } from "@/contracts/pantry";
 import { mapResult } from "@/shared/kernel/result";
 
-/** "Guardar en la despensa" al terminar la compra: todo en una transacción. */
+/**
+ * "Guardar en la despensa" al terminar la compra: todo en una transacción. Con
+ * `porOrganizar`, a la ubicación propuesta y marcado para colocarlo después.
+ */
 export const POST = apiRoute({ body: storeShoppingRequestSchema }, async ({ auth, body }) => {
   const result = await guardarCompra(auth, {
     listaId: body.listaId,
@@ -17,6 +20,7 @@ export const POST = apiRoute({ body: storeShoppingRequestSchema }, async ({ auth
       ...(p.ubicacionId === undefined ? {} : { ubicacionId: p.ubicacionId }),
       cantidad: p.cantidad,
       caducaEl: p.caducaEl ?? null,
+      ...(p.porOrganizar === undefined ? {} : { porOrganizar: p.porOrganizar }),
     })),
   });
   return resultResponse(

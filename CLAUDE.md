@@ -169,7 +169,13 @@ hay en casa: cantidad, caducidad, ubicación).
   el mismo producto en la misma ubicación es una sola línea que suma. Cada
   cambio de cantidad devuelve un `MovimientoDespensa` (entrada, consumo,
   desecho, ajuste, baja) que se guarda con la línea en una transacción.
-  Máx. 500 líneas vivas por hogar, sin paginar. Un solo
+  Máx. 500 líneas vivas por hogar, sin paginar. «Por organizar»
+  (`porOrganizar`): lo guardado al terminar la compra sin elegir sitio va a
+  la ubicación propuesta marcado, no se mezcla con lo ya colocado (es parte
+  de la clave de línea), no se recuerda como elección y se quita al moverlo
+  (también a la misma ubicación). Mover una parte (`MoveStockCommand`,
+  `InventoryItem.separar`) deja el resto en la línea y lleva la parte, con
+  dos ajustes, a una línea nueva o a una igual del destino. Un solo
   `PantryRepository` para ubicaciones, líneas y movimientos.
   Paquetes abiertos: «Lo he abierto» guarda `abiertoEl` y fija en la línea
   los días de aviso (`avisoAbierto`: amarillo, rojo). No cambia la
@@ -414,7 +420,13 @@ Recetas escritas para Migas: no copiar textos de webs ni de libros.
   pasa al nombre nuevo). Se muestra con `emojiDe` y, sin emoji, `IconoCategoria`.
 - No duplicar la lógica de la lista en la vista rápida (`vista-rapida.tsx`): usa
   las mismas acciones (`marcar`, `cambiarCantidad`, `quitar`); el toque largo va
-  por `usePulsacionLarga`, que ignora el scroll.
+  por `usePulsacionLarga`, que ignora el scroll y devuelve `pulsando` para la
+  `BarraPulsacion`. La pista de gestos es `PistaGestos` (`gestos.tsx`, se cierra
+  y se recuerda por dispositivo).
+- La cuadrícula de la despensa (`cuadricula-despensa.tsx`) tampoco duplica
+  lógica: tocar llama a `gastarUno` (o abre los atajos si no es «unidad») y
+  mantener abre `AccionesProductoDialog`, que delega en los diálogos de siempre.
+  La etiqueta de estado sale de `estadoCasilla` (`vista-despensa.ts`, con tests).
 - No pedir confirmación para gastar: «−1» (en unidades) y los atajos ¼ · ½ · todo
   se aplican al momento; el aviso flotante ofrece «Deshacer»
   (`DeshacerConsumoCommand`, ajuste con margen de `MINUTOS_PARA_DESHACER`) y,
@@ -507,7 +519,8 @@ del seed>
 6. Mejoras de la primera versión, hechas: paquetes abiertos; lista general,
    packs y tarjetas de lista como las de despensa; memorias del hogar (pack
    y ubicación); editar nombres y Mis productos (`/productos`); gastar con un
-   toque y deshacer; vista rápida de la lista; emojis por producto.
+   toque y deshacer; vista rápida de la lista y de la despensa (tocar gasta
+   uno, mantener edita); emojis por producto.
    Planeado aparte: recetas del hogar con moderación
    (`docs/migas-plan-recetas-del-hogar.pdf`), subcategorías del hogar,
    valor nutricional y variantes (producto · sabor) en el catálogo.
