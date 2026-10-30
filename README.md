@@ -227,6 +227,7 @@ fechas ISO 8601, IDs UUIDv7 y paginación por cursor.
 | Ítems         | `POST /lists/{id}/items`, `PATCH`/`DELETE /lists/{id}/items/{itemId}`                                   |
 | Despensa      | `GET /pantry`, `POST /pantry/items`, `POST /pantry/items/batch`, `PATCH`/`DELETE /pantry/items/{id}`    |
 | Gastar, abrir | `POST /pantry/items/{id}/consume`, `POST /pantry/movements/{id}/undo`, `POST /pantry/items/{id}/open`   |
+| Mover         | `POST /pantry/items/{id}/move` (toda la línea o, con `cantidad`, una parte)                             |
 | Ubicaciones   | `GET`/`POST /pantry/locations`, `PATCH`/`DELETE /pantry/locations/{id}`                                 |
 | Catálogo      | `GET /catalog/products`, `GET /catalog/household-products`, `GET`/`PUT /catalog/emojis`                 |
 | Mis productos | `GET /catalog/my-products`, `POST /catalog/my-products/standardize`, `POST /catalog/my-products/forget` |
@@ -280,7 +281,10 @@ Ejemplos listos para lanzar en [`api.http`](./api.http).
 
 - **Guardar la compra** con un toque al terminar: cada producto llega con su
   ubicación propuesta (donde lo guardaste la última vez o, si no, según su
-  categoría) y caducidad opcional con atajos.
+  categoría) y caducidad opcional con atajos. Si no quieres elegir el sitio
+  en ese momento («Organizar luego» o cerrar el diálogo), nada se pierde: se
+  guarda en la ubicación propuesta como **«Por organizar»**, sale primero en
+  la despensa y un aviso verde abre «Organizar la compra» para colocarlo.
 - **Vista rápida** (la de por defecto): una cuadrícula como la de la lista,
   con el título de cada ubicación encima. Cada casilla lleva el emoji, la
   cantidad en la esquina y una etiqueta de estado (caducado, caduca en N
@@ -293,15 +297,18 @@ Ejemplos listos para lanzar en [`api.http`](./api.http).
   de lo que **caduca esta semana**; la caducidad se marca en color.
 - **Gastar con un toque:** «−1» resta una unidad al momento; en g, kg, ml o
   l hay atajos ¼ · ½ · Todo. Un aviso abajo permite **deshacer** y, si se
-  acaba o queda poco, **añadirlo a la lista** con el pack recordado.
+  acaba o queda poco, **añadirlo a la lista** con el pack recordado, eligiendo
+  en qué lista (cada dispositivo recuerda la última).
   Mantener pulsado abre el diálogo completo para gastar varias o marcar como
   **tirado**.
 - **Paquetes abiertos:** «Lo he abierto» (hoy, ayer u otro día); el aviso
   pasa de verde a amarillo y rojo según los días abiertos, con plazos por
   categoría y excepciones por producto (el jamón cocido avisa antes que la
   pasta). Con varias unidades, solo se abre una.
-- Mover, cambiar fecha o categoría, cambiar el nombre, quitar lo añadido por
-  error y añadir a mano con autocompletado.
+- **Mover a otro sitio** todo o solo una parte («de las 6 leches, 1 a la
+  nevera»): la parte se queda con su caducidad y, si en el destino ya hay
+  una igual, se suma. Cambiar fecha, categoría o cantidad, cambiar el nombre,
+  quitar lo añadido por error y añadir a mano con autocompletado.
 - **Ubicaciones** propias (rueda de ajustes): crear, renombrar, ordenar,
   elegir si son frío, congelado o ambiente y borrarlas moviendo sus
   productos. Cada cambio en la despensa queda registrado como movimiento

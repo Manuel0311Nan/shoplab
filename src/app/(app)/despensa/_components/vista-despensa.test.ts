@@ -37,6 +37,7 @@ function linea(
       dias,
     },
     quedaPoco: false,
+    porOrganizar: false,
     updatedAt: "2026-10-20T10:00:00.000Z",
     ...resto,
     abierto: resto.abierto ?? null,
@@ -183,5 +184,28 @@ describe("estadoCasilla", () => {
     );
     expect(estadoCasilla(producto(linea("H", { quedaPoco: true })))?.texto).toBe("Queda poco");
     expect(estadoCasilla(producto(linea("I", { dias: 20 })))).toBeNull();
+  });
+});
+
+describe("agruparDespensa con lo por organizar", () => {
+  it("agruparDespensa_PorOrganizar_VaEnSuGrupoElPrimeroYNoEnSuUbicacion", () => {
+    const lineas = [
+      linea("Leche de avena", { ubicacionId: NEVERA, porOrganizar: true }),
+      linea("Leche de avena", { ubicacionId: NEVERA }),
+      linea("Arroz"),
+    ];
+
+    for (const modo of ["ubicacion", "categoria"] as const) {
+      const grupos = agruparDespensa(ubicaciones, lineas, modo);
+      expect(grupos[0]?.titulo).toBe("Por organizar");
+      expect(grupos[0]?.subgrupos[0]?.productos.map((p) => p.nombre)).toEqual(["Leche de avena"]);
+      const resto = grupos.slice(1).flatMap((g) => g.subgrupos.flatMap((s) => s.productos));
+      expect(resto.map((p) => p.nombre).sort()).toEqual(["Arroz", "Leche de avena"]);
+    }
+  });
+
+  it("agruparDespensa_SinNadaPorOrganizar_SinEseGrupo", () => {
+    const grupos = agruparDespensa(ubicaciones, [linea("Arroz")], "ubicacion");
+    expect(grupos.map((g) => g.titulo)).toEqual(["Armario"]);
   });
 });

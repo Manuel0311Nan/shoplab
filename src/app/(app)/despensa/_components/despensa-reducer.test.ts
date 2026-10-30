@@ -13,6 +13,7 @@ const yogur: LineaDespensaResponse = {
   caducidad: { estado: "sin_fecha", dias: null },
   quedaPoco: false,
   abierto: null,
+  porOrganizar: false,
   updatedAt: "2026-10-20T10:00:00.000Z",
 };
 

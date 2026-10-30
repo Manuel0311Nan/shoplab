@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Plus, Settings } from "lucide-react";
+import { AlertTriangle, Boxes, Plus, Settings } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -11,6 +11,7 @@ import {
   anadirALaListaAction,
   deshacerConsumoAction,
   consumirAction,
+  moverLineaAction,
   quitarLineaAction,
 } from "@/app/actions/pantry";
 import type { EmojisProductos, PacksRecordados, UbicacionesRecordadas } from "@/contracts/memoria";
@@ -40,6 +41,8 @@ import {
 import { ConsumirDialog } from "./consumir-dialog";
 import { aplicarAccionDespensa } from "./despensa-reducer";
 import { EditarLineaDialog } from "./editar-linea-dialog";
+import { MoverDialog } from "./mover-dialog";
+import { type Colocacion, OrganizarDialog } from "./organizar-dialog";
 import { NuevoProductoDialog } from "./nuevo-producto-dialog";
 import { SelectorVista, useVistaLista } from "../../listas/[listId]/_components/vista-lista";
 import { AccionesProductoDialog } from "./acciones-producto-dialog";
@@ -49,6 +52,7 @@ import {
   type Agrupar,
   agruparDespensa,
   type ProductoDespensa,
+  porOrganizar,
   textoAvisos,
 } from "./vista-despensa";
 
@@ -97,6 +101,8 @@ export function DespensaScreen({
   const [paraLista, setParaLista] = useState<ProductoParaLista | null>(null);
   const [nuevo, setNuevo] = useState(false);
   const [aAbrir, setAAbrir] = useState<LineaDespensaResponse | null>(null);
+  const [aMover, setAMover] = useState<LineaDespensaResponse | null>(null);
+  const [organizando, setOrganizando] = useState(false);
 
   function cambiarParam(clave: string, valor: string | null) {
     const siguiente = new URLSearchParams(params);
@@ -164,7 +170,16 @@ export function DespensaScreen({
         texto: `${hecho}: ${cuanto} de ${linea.nombre}.${estado}`,
         acciones: [
           ...(r.value.avisarLista
-            ? [{ etiqueta: "A la lista", onClick: () => anadirRapido(linea) }]
+            ? [
+                {
+                  etiqueta: "A la lista",
+                  // Con varias listas, se elige en cuál; con una, directo.
+                  onClick: () =>
+                    listas.length > 1
+                      ? setParaLista(productoDe(linea, r.value.linea.agotada ? "acabado" : "poco"))
+                      : anadirRapido(linea),
+                },
+              ]
             : []),
           { etiqueta: "Deshacer", onClick: () => deshacer(movimientoId, linea) },
         ],
@@ -215,6 +230,47 @@ export function DespensaScreen({
     hacer(async () => {
       const r = await actualizarLineaAction(linea.id, cambios);
       if (!r.ok) setError(r.error.message);
+    });
+  }
+
+  /** Todo o una parte a otra ubicación (o dejarlo donde está, si estaba por organizar). */
+  function mover(linea: LineaDespensaResponse, ubicacionId: string, valor: number | undefined) {
+    setAMover(null);
+    hacer(async () => {
+      const r = await moverLineaAction(linea.id, {
+        ubicacionId,
+        lineaNuevaId: newId(),
+        ...(valor === undefined ? {} : { cantidad: { valor, unidad: linea.cantidad.unidad } }),
+      });
+      if (!r.ok) {
+        setError(r.error.message);
+        return;
+      }
+      const destino = despensa.ubicaciones.find((u) => u.id === ubicacionId)?.nombre ?? "";
+      const cuanto =
+        valor === undefined
+          ? ""
+          : `${formatCantidad({ valor, unidad: linea.cantidad.unidad })} de `;
+      setAviso(`${cuanto}${linea.nombre}: en ${destino}.`);
+    });
+  }
+
+  /** Lo que se guardó sin elegir sitio: cada uno a la ubicación elegida. */
+  function organizar(colocaciones: Colocacion[]) {
+    setOrganizando(false);
+    hacer(async () => {
+      for (const { linea, ubicacionId } of colocaciones) {
+        const r = await moverLineaAction(linea.id, { ubicacionId });
+        if (!r.ok) {
+          setError(r.error.message);
+          return;
+        }
+      }
+      setAviso(
+        colocaciones.length === 1
+          ? "Organizado: 1 producto en su sitio."
+          : `Organizado: ${colocaciones.length} productos en su sitio.`,
+      );
     });
   }
 
@@ -291,6 +347,7 @@ export function DespensaScreen({
   }
 
   const avisos = textoAvisos(lineas);
+  const pendientes = porOrganizar(lineas);
   const grupos = agruparDespensa(despensa.ubicaciones, lineas, agrupar, { ubicacionId, urgentes });
   const nombreUbicacion = new Map(despensa.ubicaciones.map((u) => [u.id, u.nombre]));
 
@@ -315,6 +372,20 @@ export function DespensaScreen({
           </Link>
         </div>
       </header>
+
+      {pendientes.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setOrganizando(true)}
+          className="flex min-h-11 items-center gap-3 rounded-xl bg-secondary px-4 py-2 text-left text-sm font-semibold text-secondary-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          <Boxes className="size-5 shrink-0" aria-hidden="true" />
+          {pendientes.length === 1
+            ? "1 producto por organizar"
+            : `${pendientes.length} productos por organizar`}
+          <span className="ml-auto underline underline-offset-2">Organizar</span>
+        </button>
+      )}
 
       {avisos !== null && (
         <button
@@ -429,6 +500,7 @@ export function DespensaScreen({
                         onGastar={setAGastar}
                         onGastarUno={gastarUno}
                         onEditar={setAEditar}
+                        onMover={setAMover}
                         onAnadirALista={(l) => setParaLista(productoDe(l, "manual"))}
                         onQuitar={quitar}
                         onAbrir={setAAbrir}
@@ -462,14 +534,26 @@ export function DespensaScreen({
         onAbrir={setAAbrir}
         onCerrarAbierto={cerrarAbierto}
         onEditar={setAEditar}
+        onMover={setAMover}
         onRenombrar={setARenombrar}
         onAnadirALista={(l) => setParaLista(productoDe(l, "manual"))}
         onQuitar={quitar}
         onCerrar={() => setAcciones(null)}
       />
+      <MoverDialog
+        linea={aMover}
+        ubicaciones={despensa.ubicaciones}
+        onMover={mover}
+        onCerrar={() => setAMover(null)}
+      />
+      <OrganizarDialog
+        lineas={organizando ? pendientes : null}
+        ubicaciones={despensa.ubicaciones}
+        onGuardar={organizar}
+        onCerrar={() => setOrganizando(false)}
+      />
       <EditarLineaDialog
         linea={aEditar}
-        ubicaciones={despensa.ubicaciones}
         hoy={despensa.hoy}
         onGuardar={editar}
         onCerrar={() => setAEditar(null)}

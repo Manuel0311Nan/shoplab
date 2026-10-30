@@ -22,6 +22,9 @@ import {
   type DeshacerConsumoRequest,
   deshacerConsumoRequestSchema,
   type LineaDespensaResponse,
+  type MoveStockRequest,
+  type MoveStockResponse,
+  moveStockRequestSchema,
   type OpenStockRequest,
   type OpenStockResponse,
   openStockRequestSchema,
@@ -170,6 +173,32 @@ export async function abrirLineaAction(
   revalidar();
   return ok({
     abierta: toLineaDesdeSnapshot(result.value.abierta),
+    resto: result.value.resto === null ? null : toLineaDesdeSnapshot(result.value.resto),
+  });
+}
+
+/** Mover toda la línea o, con cantidad, una parte a otra ubicación. */
+export async function moverLineaAction(
+  itemId: string,
+  input: MoveStockRequest,
+): Promise<Result<MoveStockResponse>> {
+  const auth = await getAuthContext();
+  if (!auth.ok) return auth;
+  const id = idSchema.safeParse(itemId);
+  const body = moveStockRequestSchema.safeParse(input);
+  if (!id.success || !body.success) return datosNoValidos();
+
+  const result = await pantryModule(auth.value).moveStock.execute({
+    itemId: id.data,
+    ubicacionId: body.data.ubicacionId,
+    usuarioId: auth.value.userId,
+    ...(body.data.cantidad === undefined ? {} : { cantidad: body.data.cantidad }),
+    ...(body.data.lineaNuevaId === undefined ? {} : { lineaNuevaId: body.data.lineaNuevaId }),
+  });
+  if (!result.ok) return result;
+  revalidar();
+  return ok({
+    movida: toLineaDesdeSnapshot(result.value.movida),
     resto: result.value.resto === null ? null : toLineaDesdeSnapshot(result.value.resto),
   });
 }

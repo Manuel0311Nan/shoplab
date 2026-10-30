@@ -27,6 +27,11 @@ export interface ProductoEntrante {
   readonly cantidad: { readonly valor: number; readonly unidad: string };
   /** AAAA-MM-DD, opcional (D2). */
   readonly caducaEl?: string | null;
+  /**
+   * Se guarda sin elegir sitio (la compra se terminó sin organizar): va a la ubicación
+   * propuesta, marcado para colocarlo después, y no se recuerda como elección.
+   */
+  readonly porOrganizar?: boolean;
 }
 
 interface EntradaValidada {
@@ -36,6 +41,7 @@ interface EntradaValidada {
   readonly ubicacionId: string;
   readonly cantidad: Cantidad;
   readonly caducaEl: Dia | null;
+  readonly porOrganizar: boolean;
 }
 
 /**
@@ -66,13 +72,15 @@ export class Despensa {
       caducaEl = dia.value;
     }
 
-    const ubicacion = producto.ubicacionId
-      ? this.ubicaciones.find((u) => u.id === producto.ubicacionId)
-      : ubicacionParaProducto(
-          this.ubicaciones,
-          this.recordadas.get(normalizarNombre(producto.nombre)),
-          tipoDeUbicacion(producto.categoria),
-        );
+    const porOrganizar = producto.porOrganizar === true;
+    const ubicacion =
+      producto.ubicacionId && !porOrganizar
+        ? this.ubicaciones.find((u) => u.id === producto.ubicacionId)
+        : ubicacionParaProducto(
+            this.ubicaciones,
+            this.recordadas.get(normalizarNombre(producto.nombre)),
+            tipoDeUbicacion(producto.categoria),
+          );
     if (ubicacion === undefined) return err(PantryErrors.ubicacionNoEncontrada());
 
     return ok({
@@ -82,6 +90,7 @@ export class Despensa {
       ubicacionId: ubicacion.id,
       cantidad: cantidad.value,
       caducaEl,
+      porOrganizar,
     });
   }
 
@@ -95,7 +104,8 @@ export class Despensa {
     if (!entrada.ok) return entrada;
     const e = entrada.value;
     // Solo se recuerda el sitio elegido; el propuesto ya sale de la memoria o la categoría.
-    if (producto.ubicacionId !== undefined) this.recordarUbicacion(e.nombre, e.ubicacionId);
+    if (producto.ubicacionId !== undefined && !e.porOrganizar)
+      this.recordarUbicacion(e.nombre, e.ubicacionId);
 
     const igual = this.lineas.find((l) =>
       l.esMismaLinea({
@@ -103,6 +113,7 @@ export class Despensa {
         nombreNormalizado: normalizarNombre(e.nombre),
         ubicacionId: e.ubicacionId,
         caducaEl: e.caducaEl,
+        porOrganizar: e.porOrganizar,
         unidad: e.cantidad.unidad,
       }),
     );

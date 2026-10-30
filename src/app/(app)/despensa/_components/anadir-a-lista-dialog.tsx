@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/shared/ui/dialog";
 import { Input } from "@/shared/ui/input";
+import { cn } from "@/shared/lib/utils";
 import {
   aCantidadDeLista,
   ETIQUETA_UNIDAD,
@@ -54,6 +55,25 @@ const TITULO: Record<ProductoParaLista["motivo"], (nombre: string) => string> = 
 
 const campo = "h-11 rounded-lg border-transparent bg-muted md:text-base";
 
+/** La última lista elegida al reponer, por dispositivo: suele ser la misma tienda. */
+const CLAVE_ULTIMA_LISTA = "migas.lista-reponer";
+
+function ultimaLista(): string | null {
+  try {
+    return localStorage.getItem(CLAVE_ULTIMA_LISTA);
+  } catch {
+    return null;
+  }
+}
+
+function recordarLista(id: string) {
+  try {
+    localStorage.setItem(CLAVE_ULTIMA_LISTA, id);
+  } catch {
+    // Sin almacenamiento, la próxima vez propone la primera.
+  }
+}
+
 /**
  * D8: lo que se acaba (o queda poco) vuelve a la lista con un toque. Propone 1 en su
  * unidad, o 1 pack si el hogar lo compra así; se puede cambiar antes de añadir.
@@ -88,7 +108,10 @@ function Formulario({
   onAnadir: Props["onAnadir"];
 }) {
   const propuesta = propuestaDeUnidad(packs, producto.nombre, producto.unidad);
-  const [listaId, setListaId] = useState<string | null>(null);
+  const [listaId, setListaId] = useState<string | null>(() => {
+    const ultima = ultimaLista();
+    return listas.some((l) => l.id === ultima) ? ultima : null;
+  });
   const [valor, setValor] = useState("1");
   const [unidad, setUnidad] = useState<UnidadElegida>(propuesta.unidad);
   const [porPack, setPorPack] = useState(propuesta.porPack);
@@ -102,6 +125,7 @@ function Formulario({
       setError(r.mensaje);
       return;
     }
+    recordarLista(elegida);
     onAnadir(producto, elegida, { cantidad: r.cantidad, unidadesPorPack: r.unidadesPorPack });
   }
 
@@ -114,20 +138,25 @@ function Formulario({
         <>
           <DialogDescription>¿Lo añades a la lista de la compra?</DialogDescription>
           {listas.length > 1 && (
-            <label className="flex flex-col gap-1 text-sm font-semibold">
-              Lista
-              <select
-                value={elegida ?? ""}
-                onChange={(e) => setListaId(e.target.value)}
-                className={selectClase}
-              >
+            <fieldset className="flex flex-col gap-2">
+              <legend className="mb-1 text-sm font-semibold">¿En qué lista?</legend>
+              <div className="flex flex-wrap gap-2">
                 {listas.map((l) => (
-                  <option key={l.id} value={l.id}>
+                  <button
+                    key={l.id}
+                    type="button"
+                    aria-pressed={elegida === l.id}
+                    onClick={() => setListaId(l.id)}
+                    className={cn(
+                      "h-11 rounded-full px-4 text-sm font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                      elegida === l.id ? "bg-primary text-primary-foreground" : "bg-muted",
+                    )}
+                  >
                     {l.nombre}
-                  </option>
+                  </button>
                 ))}
-              </select>
-            </label>
+              </div>
+            </fieldset>
           )}
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-1 text-sm font-semibold">Cantidad</legend>

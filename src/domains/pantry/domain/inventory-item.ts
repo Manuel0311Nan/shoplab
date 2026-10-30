@@ -64,6 +64,11 @@ export interface InventoryItemSnapshot {
   readonly abiertoEl: Dia | null;
   /** Días abierto hasta amarillo y hasta rojo: se fijan al abrirlo. */
   readonly avisoAbierto: AvisoAbierto | null;
+  /**
+   * Guardado sin elegir dónde (se terminó la compra sin organizarla): está en la
+   * ubicación propuesta, pero la despensa pide colocarlo. Se quita al moverlo.
+   */
+  readonly porOrganizar: boolean;
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly deletedAt: Date | null;
@@ -77,6 +82,7 @@ export interface NewInventoryItem {
   readonly ubicacionId: string;
   readonly cantidad: Cantidad;
   readonly caducaEl?: Dia | null;
+  readonly porOrganizar?: boolean;
 }
 
 /**
@@ -90,6 +96,8 @@ export interface ClaveLinea {
   readonly ubicacionId: string;
   readonly caducaEl: Dia | null;
   readonly abiertoEl?: Dia | null;
+  /** Lo pendiente de organizar no se mezcla con lo ya colocado. */
+  readonly porOrganizar?: boolean;
   readonly unidad: Cantidad["unidad"];
 }
 
@@ -131,6 +139,7 @@ export class InventoryItem {
       caducaEl: input.caducaEl ?? null,
       abiertoEl: null,
       avisoAbierto: null,
+      porOrganizar: input.porOrganizar ?? false,
       createdAt: ahora,
       updatedAt: ahora,
       deletedAt: null,
@@ -160,6 +169,9 @@ export class InventoryItem {
   get estaDeBaja(): boolean {
     return this.state.deletedAt !== null;
   }
+  get porOrganizar(): boolean {
+    return this.state.porOrganizar;
+  }
 
   clave(): ClaveLinea {
     return {
@@ -168,6 +180,7 @@ export class InventoryItem {
       ubicacionId: this.state.ubicacionId,
       caducaEl: this.state.caducaEl,
       abiertoEl: this.state.abiertoEl,
+      porOrganizar: this.state.porOrganizar,
       unidad: this.state.cantidad.unidad,
     };
   }
@@ -181,6 +194,7 @@ export class InventoryItem {
       propia.ubicacionId === otra.ubicacionId &&
       propia.caducaEl === otra.caducaEl &&
       propia.abiertoEl === (otra.abiertoEl ?? null) &&
+      propia.porOrganizar === (otra.porOrganizar ?? false) &&
       sonConvertibles(propia.unidad, otra.unidad)
     );
   }
@@ -275,9 +289,54 @@ export class InventoryItem {
     return this.movimiento("baja", this.state.cantidad, contexto, ahora);
   }
 
+  /** A otra ubicación (o a la misma, para darla por organizada). */
   mover(ubicacionId: string, ahora: Date): void {
-    if (ubicacionId === this.state.ubicacionId) return;
-    this.state = { ...this.state, ubicacionId, updatedAt: ahora };
+    if (ubicacionId === this.state.ubicacionId && !this.state.porOrganizar) return;
+    this.state = { ...this.state, ubicacionId, porOrganizar: false, updatedAt: ahora };
+  }
+
+  /**
+   * Llevar solo una parte a otra ubicación («de las 6 leches, 1 a la nevera»): la parte
+   * va a una línea nueva con la misma caducidad y apertura, y aquí queda el resto. Las dos
+   * cantidades cambian con un ajuste (no es compra ni consumo). Con todo, es mover.
+   */
+  separar(input: {
+    readonly cantidad: Cantidad;
+    readonly ubicacionId: string;
+    readonly nuevaLinea: { readonly id: string; readonly movimientoId: string };
+    readonly contexto: ContextoMovimiento;
+    readonly ahora: Date;
+  }): Result<{ movida: InventoryItem; movimientos: MovimientoSnapshot[] }> {
+    const { ahora } = input;
+    const actual = this.state.cantidad;
+    const parte = convertirCantidad(input.cantidad, actual.unidad);
+    if (parte === null) return err(PantryErrors.cantidadIncompatible());
+    const resto = Math.round((actual.valor - parte.valor) * 1000) / 1000;
+    if (resto < 0) return err(PantryErrors.cantidadInsuficiente(actual));
+    if (resto === 0) {
+      this.mover(input.ubicacionId, ahora);
+      return ok({ movida: this, movimientos: [] });
+    }
+    const queda = Cantidad.create(resto, actual.unidad);
+    if (!queda.ok) return queda;
+    const movimientoResto = this.ajustar(queda.value, input.contexto, ahora);
+    const movida = new InventoryItem({
+      ...this.state,
+      id: input.nuevaLinea.id,
+      ubicacionId: input.ubicacionId,
+      porOrganizar: false,
+      cantidad: parte,
+      cantidadReferencia: parte,
+      createdAt: ahora,
+      updatedAt: ahora,
+    });
+    const movimientoParte = movida.movimiento(
+      "ajuste",
+      parte,
+      { ...input.contexto, id: input.nuevaLinea.movimientoId },
+      ahora,
+    );
+    return ok({ movida, movimientos: [movimientoResto, movimientoParte] });
   }
 
   cambiarCaducidad(caducaEl: Dia | null, ahora: Date): void {

@@ -86,8 +86,15 @@ export function textoAbierto(abierto: LineaDespensaResponse["abierto"]): string 
 
 function claveProducto(l: LineaDespensaResponse): string {
   const producto = l.productoBaseId ?? `n:${normalizarNombre(l.nombre)}`;
-  return `${producto}@${l.ubicacionId}`;
+  return `${producto}@${l.ubicacionId}${l.porOrganizar ? ":organizar" : ""}`;
 }
+
+/** La clave del grupo de lo guardado sin elegir sitio: va siempre el primero. */
+export const GRUPO_POR_ORGANIZAR = "por-organizar";
+
+/** Lo que se guardó al terminar la compra sin elegir dónde. */
+export const porOrganizar = (lineas: readonly LineaDespensaResponse[]) =>
+  lineas.filter((l) => l.porOrganizar);
 
 function sumar(lineas: readonly LineaDespensaResponse[]): CantidadDto | null {
   const primera = lineas.at(0);
@@ -147,8 +154,27 @@ export function agruparDespensa(
       (!filtro.ubicacionId || l.ubicacionId === filtro.ubicacionId) &&
       (!filtro.urgentes || esUrgente(l)),
   );
-  const productos = agruparEnProductos(visibles);
+  const todos = agruparEnProductos(visibles);
+  const pendientes = todos.filter((p) => p.principal.porOrganizar).sort(compararProductos);
+  const productos = todos.filter((p) => !p.principal.porOrganizar);
+  const primero: GrupoDespensa[] =
+    pendientes.length === 0
+      ? []
+      : [
+          {
+            clave: GRUPO_POR_ORGANIZAR,
+            titulo: "Por organizar",
+            subgrupos: [{ titulo: null, productos: pendientes }],
+          },
+        ];
+  return [...primero, ...agruparColocados(ubicaciones, productos, agrupar)];
+}
 
+function agruparColocados(
+  ubicaciones: readonly UbicacionResponse[],
+  productos: readonly ProductoDespensa[],
+  agrupar: Agrupar,
+): GrupoDespensa[] {
   if (agrupar === "categoria") {
     const categorias = [...new Set(productos.map((p) => p.categoria))].sort(compararCategorias);
     return categorias.map((categoria) => ({

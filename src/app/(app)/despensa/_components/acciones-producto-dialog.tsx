@@ -1,5 +1,6 @@
 "use client";
 import {
+  ArrowRightLeft,
   Minus,
   PackageOpen,
   Pencil,
@@ -31,6 +32,7 @@ type Props = {
   onAbrir: Accion;
   onCerrarAbierto: Accion;
   onEditar: Accion;
+  onMover: Accion;
   onRenombrar: Accion;
   onAnadirALista: Accion;
   onQuitar: Accion;
@@ -69,6 +71,7 @@ function Contenido({
   onAbrir,
   onCerrarAbierto,
   onEditar,
+  onMover,
   onRenombrar,
   onAnadirALista,
   onQuitar,
@@ -124,9 +127,13 @@ function Contenido({
             No está abierto
           </button>
         )}
+        <button type="button" className={opcion} onClick={hacer(onMover)}>
+          <ArrowRightLeft className="size-5" aria-hidden="true" />
+          Mover a otro sitio…
+        </button>
         <button type="button" className={opcion} onClick={hacer(onEditar)}>
           <Pencil className="size-5" aria-hidden="true" />
-          Mover, fecha, categoría…
+          Fecha, categoría, cantidad…
         </button>
         <button type="button" className={opcion} onClick={hacer(onRenombrar)}>
           <TextCursorInput className="size-5" aria-hidden="true" />

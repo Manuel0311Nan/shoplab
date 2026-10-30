@@ -169,7 +169,13 @@ hay en casa: cantidad, caducidad, ubicación).
   el mismo producto en la misma ubicación es una sola línea que suma. Cada
   cambio de cantidad devuelve un `MovimientoDespensa` (entrada, consumo,
   desecho, ajuste, baja) que se guarda con la línea en una transacción.
-  Máx. 500 líneas vivas por hogar, sin paginar. Un solo
+  Máx. 500 líneas vivas por hogar, sin paginar. «Por organizar»
+  (`porOrganizar`): lo guardado al terminar la compra sin elegir sitio va a
+  la ubicación propuesta marcado, no se mezcla con lo ya colocado (es parte
+  de la clave de línea), no se recuerda como elección y se quita al moverlo
+  (también a la misma ubicación). Mover una parte (`MoveStockCommand`,
+  `InventoryItem.separar`) deja el resto en la línea y lleva la parte, con
+  dos ajustes, a una línea nueva o a una igual del destino. Un solo
   `PantryRepository` para ubicaciones, líneas y movimientos.
   Paquetes abiertos: «Lo he abierto» guarda `abiertoEl` y fija en la línea
   los días de aviso (`avisoAbierto`: amarillo, rojo). No cambia la

@@ -83,6 +83,7 @@ export class PrismaPantryRepository extends TenantRepository implements PantryRe
           abiertoEl: s.abiertoEl === null ? null : Dia.aFechaBd(s.abiertoEl),
           avisoAbiertoAmarillo: s.avisoAbierto?.amarillo ?? null,
           avisoAbiertoRojo: s.avisoAbierto?.rojo ?? null,
+          porOrganizar: s.porOrganizar,
           updatedAt: s.updatedAt,
           deletedAt: s.deletedAt,
         };

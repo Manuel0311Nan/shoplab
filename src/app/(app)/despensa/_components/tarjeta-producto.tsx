@@ -1,6 +1,7 @@
 "use client";
 import { Menu } from "@base-ui/react/menu";
 import {
+  ArrowRightLeft,
   Minus,
   MoreVertical,
   PackageOpen,
@@ -27,6 +28,8 @@ type Props = {
   /** Un toque: 1 ud. gastada (con «Deshacer»). */
   onGastarUno: (linea: LineaDespensaResponse) => void;
   onEditar: (linea: LineaDespensaResponse) => void;
+  /** Llevarlo (todo o una parte) a otra ubicación. */
+  onMover: (linea: LineaDespensaResponse) => void;
   onAnadirALista: (linea: LineaDespensaResponse) => void;
   onQuitar: (linea: LineaDespensaResponse) => void;
   onAbrir: (linea: LineaDespensaResponse) => void;
@@ -90,6 +93,7 @@ const opcion =
 function MenuLinea({
   linea,
   onEditar,
+  onMover,
   onAnadirALista,
   onQuitar,
   onAbrir,
@@ -114,9 +118,13 @@ function MenuLinea({
               <Minus className="size-5" aria-hidden="true" />
               Gastar o tirar…
             </Menu.Item>
+            <Menu.Item className={opcion} onClick={() => onMover(linea)}>
+              <ArrowRightLeft className="size-5" aria-hidden="true" />
+              Mover a otro sitio…
+            </Menu.Item>
             <Menu.Item className={opcion} onClick={() => onEditar(linea)}>
               <Pencil className="size-5" aria-hidden="true" />
-              Mover, fecha, categoría…
+              Fecha, categoría, cantidad…
             </Menu.Item>
             <Menu.Item className={opcion} onClick={() => onRenombrar(linea)}>
               <TextCursorInput className="size-5" aria-hidden="true" />
